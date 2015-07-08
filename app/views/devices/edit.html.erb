@@ -1,0 +1,18 @@
+<%= render :partial => "header", :locals => {:section_title => (t :Editing_device), :actions => "form_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'Editing_device', :actions => "devices/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<div id="content_container" class="device_container">
+		<input type="hidden" id="edition_mode" value="on">
+		<%= form_for(@device, :html => { :class => "device_form" }) do |f_device| %>
+			<%= render :partial => "form" , :locals => {:device_form => f_device} %>
+			<%= render :partial => "submit", :locals => {:device_form => f_device} %>
+		<% end %>
+	</div>	
+	
+	<script src="/javascript/devices_form.js"></script>
+<% end %>

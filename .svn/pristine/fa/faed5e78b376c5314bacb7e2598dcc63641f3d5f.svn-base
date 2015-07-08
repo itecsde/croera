@@ -1,0 +1,20 @@
+<% if current_user != nil && @applications.first_page? %>
+	<% if current_layout == "popup" %>
+	<a class="extract_box popup_new_activity_sequence_box new_extract_box" onclick="">+</a>
+	<% else %>
+	<%= link_to "+", new_application_path, html_options = {:class => "new_extract_box_fixed"} %>
+	<% end %>
+<% end %>
+
+<% @applications.each do |application| %>
+	<%= render :partial => "elements/element_fixed", :locals => {:element => application, :current_layout => current_layout} %>
+<% end %>
+
+<div class="clear"></div>
+
+<div class= "paginate_controls active">
+	<%= paginate @applications %>
+</div>
+
+
+

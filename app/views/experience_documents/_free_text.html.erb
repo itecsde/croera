@@ -1,0 +1,21 @@
+<%
+	if box.id == nil
+		component= box.components.new
+		component.texts.new
+	end
+%>
+
+<% box.components.each do |component| %>
+	<div class="component_container">
+		<%= hidden_field_tag :component_id, component.id %>
+		<%= hidden_field_tag :component_type, "textarea" %>
+		<% component.texts.each do |text| %>
+			<div class= "text_container textarea editable active">
+				<%= hidden_field_tag :text_id, text.id, :class => "text_id" %>
+				<textarea class="text_content" placeholder="<%= t("write_here") %>"><%= text.content %></textarea>
+				<i class="icon-pencil icon-grey"></i>
+			</div>
+		<% end %>
+	</div>
+<% end %>
+

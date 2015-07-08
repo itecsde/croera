@@ -1,0 +1,15 @@
+<div class= "paginate_controls">
+	<%= paginate @sites %>
+</div>
+
+<% if current_user != nil && @sites.first_page? %>
+	<% if current_layout == "popup" %>
+	<a class="extract_box popup_new_activity_sequence_box new_extract_box" onclick="">+</a>
+	<% else %>
+	<%= link_to "+", new_site_path, html_options = {:class => "extract_box new_extract_box"} %>
+	<% end %>
+<% end %>
+
+<% @sites.each do |site| %>
+	<%= render :partial => "elements/element", :locals => {:element => site, :current_layout => current_layout} %>
+<% end %>

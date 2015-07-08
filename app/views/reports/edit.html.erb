@@ -1,0 +1,22 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'editing_report', :actions => "reports/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@report, :html => { :class => "report_form" }) do |f_report| %>
+		<div id="element_header">
+			<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @report,:element_type=>"report"} %> 
+			<hr />
+			<div class="clear"></div>
+		</div>
+		<div id="content_container" class="report_container">
+			<input type="hidden" id="edition_mode" value="on">
+				<%= render :partial => "form" , :locals => {:report_form => f_report} %>
+				<%= render :partial => "submit", :locals => {:report_form => f_report} %>			
+		</div>			
+		<span style="display:none" id="is_edition" data-value="true"></span>	
+		
+		<script src="/javascript/reports_form.js"></script>
+	<% end %>
+<% end %>

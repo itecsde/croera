@@ -1,0 +1,222 @@
+.circumstance_page {
+	margin-top: 20px;
+	background: none repeat scroll 0% 0% #FBFBFB;
+	padding: 20px;
+    overflow: hidden;
+	-webkit-box-shadow: 0px 4px 10px rgba(50, 50, 51, 0.75);
+	-moz-box-shadow:    0px 4px 10px rgba(50, 50, 51, 0.75);
+	box-shadow:         0px 4px 10px rgba(50, 50, 51, 0.75);
+}
+
+.circumstance_header {	
+	width: 1020px;
+	height: 100px;
+	margin: 0 10px;
+	background-color: #534A5F;
+	
+	-webkit-box-shadow: -1px 1px 3px rgba(50, 50, 50, 0.5);
+	-moz-box-shadow:    -1px 1px 3px rgba(50, 50, 50, 0.5);
+	box-shadow:         -1px 1px 3px rgba(50, 50, 50, 0.5);	
+}
+
+.circumstance_header .circumstance_icon {
+	height: inherit;
+	width: 100px;
+	float: left;
+}
+
+.circumstance_icon img {
+	margin: 20px;
+} 
+
+.circumstance_header .circumstance_name_box {
+	height: inherit;
+	width: 870px;
+	float: left;
+	margin-left: 50px;
+}
+
+.circumstance_name_box .name_prompt {
+	margin-top: 20px;
+	margin-bottom: 15px;
+    color: #FFFFFF;
+    font-family: Arial;
+    font-size: 20px;
+    font-weight: bold;	
+}
+
+.circumstance_name_box span.circumstance_name {
+	color: #FFFFFF;
+	font-weight: bold;
+	font-size: 16px;
+	margin-left: 4px;
+}
+
+.circumstance_name_box textarea.circumstance_name {
+	width: 825px;
+	border: medium none;
+	color: #333333;
+	line-height: 22px;
+	height:22px;
+	font-size: 16px;
+	resize: none;
+	padding: 4px 6px;
+	font-family:"Arial";
+}
+
+.circumstance_body {
+}
+
+.circumstance_body img {
+	width: auto\9;
+	height: auto;
+	max-width: 100%;
+	vertical-align: middle;
+	border: 0;
+	-ms-interpolation-mode: bicubic;	
+}
+
+
+.school, .classroom, .class, .school, .subject_box {
+	float: left;
+	width: 500px;
+	height: 350px;
+	background-color: #D3CADD;
+	margin: 10px;
+	
+	-webkit-box-shadow: -1px 1px 3px rgba(50, 50, 50, 0.5);
+	-moz-box-shadow:    -1px 1px 3px rgba(50, 50, 50, 0.5);
+	box-shadow:         -1px 1px 3px rgba(50, 50, 50, 0.5);	
+}
+
+.school_icon, .classroom_icon, .class_icon, .subject_icon {
+	width: 70px;
+	height: 70px;
+	margin-top: 10px;
+	margin-left: 10px;
+}
+
+.address {
+	margin-right: 10px;
+}
+
+.school textarea.address {
+	width: 350px;
+	border: medium none;
+	color: #333333;
+	line-height: 20px;
+	height: 20px;
+	margin-bottom: 5px;
+	resize: none;
+	background-color: #FFFFFF;
+	padding: 4px 6px;
+	font-size:14px;
+	font-family:"Arial";	
+}
+
+.address_prompt {
+	margin-right: 10px;
+	margin-top: 0px;
+	margin-bottom: 5px;
+    color: #534A5F;
+    font-family: Arial;
+    font-size: 15px;
+    font-weight: bold;	
+}
+
+.school span.address {
+	margin-left: 104px;
+}
+
+.address, .address_prompt, .school #map-canvas {
+	margin-left: 100px;
+}
+
+.school #map-canvas {
+	margin-right: 10px;
+	margin-top: 10px;
+	width: 360px;
+	height: 190px;
+}
+
+.classroom ul, .class ul, .subject_box ul {
+	margin-top: 20px;
+	margin-left: 100px;
+}
+
+.classroom li, .class li {
+	list-style-type: none;
+	height: 36px;
+	text-align: left;
+	margin-bottom: 10px;
+}
+
+.subject_box li {
+	list-style-type: none;
+	text-align: left;
+	margin-bottom: 10px;
+	margin-top:10px;
+}
+
+.classroom .prompt, .class .prompt, .subject_box .prompt {
+    color: #534A5F;
+    font-family: Arial;
+    font-size: 15px;
+    font-weight: bold;	
+}
+
+.classroom .has_internet, .classroom .operating_system, .classroom .has_interactive_whiteboard, .class .educational_level, .class .locale, .subject_box .subject {
+	float: right;
+	margin-right: 30px;
+}
+
+.class .educational_level {
+	max-width: 200px;
+}
+
+.subject_box textarea.tags {
+	width: 355px;
+	border: medium none;
+	color: #333333;
+	line-height: 20px;
+	resize: none;
+	
+	padding: 4px 6px;
+	font-size:13px;
+	font-family:"Arial";
+	height: 20px;	
+}
+
+.subject_box div.tags {
+	width: 355px;
+	border: medium none;
+	color: #333333;
+	line-height: 20px;	
+	padding: 4px 6px;
+	font-size:13px;
+	font-family:"Arial";
+	height: 20px;
+	overflow-y: auto;	
+}
+
+
+.subject_box textarea.description {
+	width: 355px;
+	border: medium none;
+	color: #333333;	
+	resize: none;
+	padding: 4px 6px;
+	font-size:12px;
+	font-family:"Arial";
+	height: 100px;
+	
+}
+.subject_box div.description {
+	width: 360px;
+	padding: 4px 6px;
+	font-size:12px;
+	font-family:"Arial";
+	text-align:justify;
+	overflow-y:auto;
+	height: 120px;
+}

@@ -1,0 +1,40 @@
+<% contribution_annotation = ExperienceStepContributionAnnotation.new %>
+
+<div id="new_free_text">
+	<% contribution_annotation.contribution_type = "FreeText" %>
+	<%= render :partial => "contribution_annotation", :locals => {:contribution_annotation => contribution_annotation} %>
+</div>
+<div id="new_positive_comment">
+	<% contribution_annotation.contribution_type = "PositiveComment" %>
+	<%= render :partial => "contribution_annotation", :locals => {:contribution_annotation => contribution_annotation} %>
+</div>
+<div id="new_negative_comment">
+	<% contribution_annotation.contribution_type = "NegativeComment" %>
+	<%= render :partial => "contribution_annotation", :locals => {:contribution_annotation => contribution_annotation} %>
+</div>
+<div id="new_picture">
+	<% contribution_annotation.contribution_type = "Picture" %>
+	<%= render :partial => "contribution_annotation", :locals => {:contribution_annotation => contribution_annotation} %>
+</div>
+<div id="new_video">
+	<% contribution_annotation.contribution_type = "YoutubeItem" %>
+	<%= render :partial => "contribution_annotation", :locals => {:contribution_annotation => contribution_annotation} %>
+</div>
+<div id="new_element">
+	<% contribution_annotation.contribution_type = "Event" %>
+	<%= render :partial => "contribution_annotation", :locals => {:contribution_annotation => contribution_annotation} %>	
+</div>	
+
+<div id="youtube_iframe">
+	<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>
+</div>
+
+<div id="item_to_itemize">
+	<div class= "text_container editable active deleteable has_edition_controls">
+		<div class="delete_button edition_control" onclick="delete_text_container(this);"><%= image_tag("/images/icons/delete_item.png") %></div>
+		<%= hidden_field_tag :text_id,"", :class => "text_id" %>
+		<li class="itemize_li"></li>
+		<%= text_area_tag "text_content","", :class => "text_content", :placeholder => t("Write_here") %>
+		<i class="icon-pencil icon-grey"></i>
+	</div>		
+</div>

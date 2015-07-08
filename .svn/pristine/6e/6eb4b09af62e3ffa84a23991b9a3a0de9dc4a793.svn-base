@@ -1,0 +1,15 @@
+<%= form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :post }) do |f| %>
+	<div class="field_prompt">
+  		<%= f.label :email %>
+  	</div>
+  	<div>
+  		<%= f.email_field :email, :autofocus => true %>
+  	</div>
+
+  	<div class="forgot_password_button"><%= f.submit t("Send_me_reset_password_instructions") %></div>
+<% end %>
+
+<div class="access_control_links">
+	<%= render "devise/shared/links" %>
+</div>
+

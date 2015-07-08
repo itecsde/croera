@@ -1,0 +1,157 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+require "mechanize"
+
+class ScraperBooks
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+  
+  #############################################################
+  ####### SCRAPE_GUTEnBERG
+  ###########################################################
+  def scrape_gutenberg (*siguiente)
+    begin
+      source_name = __method__.to_s    
+      #Add new source, or select it if exists
+      source = Source.create_or_select_source(source_name, "Biography", "http://biography.com/")
+      
+      if siguiente[1]==1
+        reintentos = siguiente[2]
+      else
+        reintentos = 2
+      end    
+         
+      url = "http://www.biography.com/people"
+
+      source.correct_scrape
+    rescue  Exception => e
+      puts "Exception in scrape_gutenberg"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_gutenberg(siguiente,1,reintentos)
+      end
+      source.incorrect_scrape
+    end
+  end #scrape_gutenberg
+  
+
+   def scrape_book_gutenberg(*reintentos)
+      begin
+         name = ""
+         description = ""
+         
+         book_url = "http://www.gutenberg.org/ebooks/29904"
+         book_url = "http://www.gutenberg.org/ebooks/28233"
+         book_url = "http://www.gutenberg.org/ebooks/7094"
+         book_url = "http://www.gutenberg.org/ebooks/28801"
+         book_url = "http://www.gutenberg.org/ebooks/5200"
+         
+         
+         puts book_url
+         idiomas_disponibles = Array.new
+         manual_tags = Array.new
+         idiomas_disponibles = ['en']
+
+         if reintentos[0]==1
+            reintentos = reintentos[1].to_i
+         else
+            reintentos = 2
+         end
+
+         book_html_page = open(book_url, &:read)
+         book_page = Nokogiri::HTML(book_html_page)
+
+         scraped_book = Lre.new
+
+         begin
+            name = book_page.css("div#content div.header h1")[0].text.strip
+            puts "Name: " + name
+         rescue
+            puts "Exception name gutenberg"
+         end
+              
+              
+         #search on amazon
+         #url + search term
+         
+         search_term = name.split("by")[0].strip
+         
+         amazon_url = URI.encode("http://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Dstripbooks&field-keywords=" + search_term)
+         
+         puts "Searching '" + search_term + "' in Amazon..."
+         
+         amazon_page = Nokogiri::HTML(open(amazon_url))
+         
+         puts "Found!" 
+         
+         File.open('amazon.html', 'w') do |f2|
+           # '\n' es el retorno de carro
+           f2.puts amazon_page
+         end
+         
+         book_url = amazon_page.css("div#result_0 .image a")[0]['href']
+         
+         puts book_url
+         
+         book_page = Nokogiri::HTML(open(book_url))
+                           
+         begin
+           description = book_page.css("div#centerCol.centerColumn div#bookDescription_feature_div.feature noscript")[0].text.strip
+           puts description
+         rescue Exception => e
+            puts "Exception description ite"
+            puts e.message
+            puts e.backtrace.inspect
+         end
+         begin
+             photo_url = book_page.css("div#main-image-container.a-column div#img-wrapper.maintain-height div#img-canvas.maintain-height img#imgBlkFront.image-stretch-vertical")[0]['src']
+             puts photo_url
+         rescue
+            puts "Failed photo ite"
+            photo_url = nil
+         end
+
+         prosa = name + ". " + description
+         
+         I18n.locale = "en"
+         scraped_from = "http://www.amazon.com"
+         scraped_book.name = name
+         scraped_book.description = description
+         scraped_book.url = book_url
+         scraped_book.link = book_url
+         scraped_book.raw_html = book_html_page
+         scraped_book.scraped_from = scraped_from
+         if photo_url!=nil
+            begin
+               scraped_book.element_image=URI.parse(photo_url)
+            rescue Exception => e
+               puts e.message
+               puts e.backtrace.inspect
+               puts "ite: IMAGEN NO GUARDADA"
+               scraped_book.element_image.clear
+            end
+         end
+         scraped_book.persist(idiomas_disponibles, prosa, manual_tags)
+         reintentos = 2
+      rescue Exception => e
+         puts "Exception scrape_oer_ite"
+         puts e.backtrace.inspect
+         puts e.message
+         puts reintentos
+         if reintentos > 0
+            reintentos-=1
+            sleep 2
+            scrape_oer_ite(oer_url,1,reintentos)
+         end
+      end
+   end #scrape_oer_ite  
+   
+end

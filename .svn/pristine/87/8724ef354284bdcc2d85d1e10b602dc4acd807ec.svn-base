@@ -1,0 +1,20 @@
+<div class= "picture_container has_edition_controls">
+	<%= hidden_field_tag :component_id, component.id %>
+	<%= hidden_field_tag :component_type, component.component_type %>
+	<span class="change_picture edition_control active" onclick= "change_picture(this);"><p><%= t("Change_picture") %></p></span>
+	<%= image_tag component.area_image.url(), width:'100%', :class => "image_preview" %>	
+	<div class= "file_upload">
+		<%= file_field_tag :area_image, :onchange => "handleFileSelect(this, event);" %>
+	</div>
+	<div class= "picture_information">
+			<% component.texts.each do |text| %>
+				<div class= "text_container textarea editable active">
+					<%= hidden_field_tag :text_id, text.id, :class => "text_id" %>
+					<textarea class="text_content" placeholder="<%= t("Write_here") %>"><%= text.content %></textarea>
+					<i class="icon-pencil icon-white"></i>
+				</div>
+			<% end %>
+		<div class="clear"></div>
+	</div>
+</div>
+

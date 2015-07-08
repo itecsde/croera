@@ -1,0 +1,7 @@
+<% component.texts.each do |text| %>
+	<div class= "text_container header template_editable editable active">
+		<%= hidden_field_tag :text_id, text.id, :class => "text_id" %>
+		<%= text_area_tag "text_content", text.content, :class => "text_content", :placeholder => t("title") %>
+		<i class="icon-pencil icon-grey"></i>
+	</div>
+<% end %>

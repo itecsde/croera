@@ -1,0 +1,16 @@
+<div class="item_box">
+	<div class="selection_info_box">
+		<div class="selection_info">
+			<input type="hidden" class="item_type" value="<%= item_type %>">
+		</div>
+	</div>
+	<div class="item_body">
+		<span class="item_picture">
+			<img src="/images/<%=item_picture%>" width= "200" height= "100" />
+		</span>
+		<div class="clear"></div>
+    	<span class="item_name"><%= t(item_name) %></span>
+    	<div class="clear"></div>
+    	<span class="item_description"><%= t(item_description) %></span>
+    </div>
+</div>

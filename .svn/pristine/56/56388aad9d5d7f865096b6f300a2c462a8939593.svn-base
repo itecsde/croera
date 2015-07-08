@@ -1,0 +1,29 @@
+# spec/features/visitor_searchs_spec.rb
+require 'spec_helper'
+
+feature 'User signs up' do
+    
+  scenario 'correctly', :js => true do
+    sign_up_sde("Marcos", "Mourino", "marcosmourino@gmail.com", "1111", "1111")
+    expect(page).to have_content("Recommended Reports")
+    expect(page).to have_content("Marcos")
+  end  
+  
+  scenario 'with invalid_email', :js => true do
+    sign_up_sde("Marcos", "Mourino", "invalid_email", "1111", "1111")
+    expect(page).to have_content("Registrarse")
+  end
+  
+  scenario 'with email already in use', :js => true do
+    sign_up_sde("Marcos", "Mourino", "marcosmourino@gmail.com", "1111", "1111")
+    expect(page).to have_content("Registrarse")
+    expect(page).to have_content("Email ya")
+    expect(page).to have_content("en uso")
+  end  
+
+  scenario 'with passwords mismatch', :js => true do
+    sign_up_sde("Marcos", "Mourino", "marcosmourino@gmail.com", "1111", "2222")
+    expect(page).to have_content("Registrarse")
+    expect(page).to have_content("Password no coincide con la")
+  end      
+end

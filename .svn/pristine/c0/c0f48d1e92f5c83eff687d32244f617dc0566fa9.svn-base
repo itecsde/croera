@@ -1,0 +1,1 @@
+var my_activity_list = ("<%=j render :partial => 'list', :locals => { :current_layout => "application" } %>");

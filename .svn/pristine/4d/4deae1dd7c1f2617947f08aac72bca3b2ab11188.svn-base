@@ -1,0 +1,117 @@
+<% if @slideshow.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@slideshow.errors.count, "error") %> prohibited this slideshow from being saved:</h2>
+	
+	  <ul>
+	  <% @slideshow.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+
+
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="slideshow_name field_body">
+		<% if @edition_mode==true %>
+			<textarea id="slideshow_name" name="slideshow[name]" placeholder="<%= t("title") %>"><%= @slideshow.name %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<span><%= @slideshow.name %></span>
+		<% end %>
+	</div>
+	
+		
+	<div class="slideshow_description description field_body">
+		<% if @edition_mode==true %>
+			<textarea id="slideshow_description" name="slideshow[description]" placeholder="<%= t("description") %>"><%= @slideshow.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<div>
+				<% if @slideshow.description != nil %>			
+					<%= raw @slideshow.description.truncate(1000, :separator => " ", :omission => "...") %>
+				<% end %>
+				
+			</div>
+		<% end %>
+	</div>
+	
+	
+	<div class="slideshow_tags element_field_box">
+		<div class="field_prompt"><%= t("keywords") %></div>
+		<div class="field_body">			
+			<% if @edition_mode==true %>    
+		    	<textarea id="slideshow_tags" class="tags" name="slideshow[tag_list]"><% if @slideshow!=nil %><%= @slideshow.tag_list %><% end %></textarea>
+		    	<i class="icon-pencil icon-grey"></i>
+		    <% else %>
+		    	<span class="tags"><% if @slideshow!=nil %><%= @slideshow.tag_list_with_links.html_safe %><% end %></span>	
+		    <% end %>														
+		</div>
+	</div>		
+	
+	
+	<div class="slideshow_url element_field_box">
+		<div class="field_prompt"><%= t("url") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>    
+		    	<%= slideshow_form.text_field :url %>
+		    	<i class="icon-pencil icon-grey"></i>			    	
+		    <% else %>
+		    	<a href="<%= @slideshow.url %>" target="_blank"><%= @slideshow.url %></a>
+		    <% end %>
+	   </div>		
+	</div>
+	
+	<% if @edition_mode!=true && @slideshow.scraped_from!=nil && @slideshow.scraped_from!="" %>  
+		<div class="slideshow_scraped_from element_field_box">
+			<div class="field_prompt"><%= t("source") %></div>
+			<div class="field_body">
+				<a href="<%= @slideshow.scraped_from %>" target="_blank"><%= @slideshow.scraped_from %></a>
+			</div>
+		</div>
+	<% end %>
+	
+	
+</div>
+
+
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>		
+			<% if @slideshow.element_image.url() != "none" %>
+				<%= image_tag @slideshow.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_slideshow.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= slideshow_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		<% else %>
+			<% if @slideshow.element_image.url() != "none" %>
+				<%= image_tag @slideshow.element_image.url(:medium), width:'100%', :class => "image_preview_show" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_slideshow.png", width:'100%', :class => "image_preview_show" %>
+			<% end %>
+		<% end %>
+	</div>
+
+</div>
+
+
+
+
+
+<% if @edition_mode==true %>
+	<div id="snippets_library" style="display: none">
+		<div class="subject_item">				
+			<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name"), :prompt => "", :class => "subject" %>
+			<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+		</div>
+	</div>
+<% end %>

@@ -1,0 +1,52 @@
+<%
+	element_type = element.class.name.underscore
+	element_path = element_type + "_path(element)"
+	popup_show_element_path = "popup_show_" + element_type + "_path"
+%>
+
+<div class="source_box">
+	
+	<div class="selection_info_box">
+		<div class="selection_info">
+			<input type="hidden" class="element_id" value="<%= element.id %>">
+			<% if element_type!="user"%>
+				<input type="hidden" class="element_name" value="<%= element.name %>">
+			<% else %>
+				<input type="hidden" class="element_name" value="<%= element.email%>">			
+			<% end %>
+			<input type="hidden" class="element_class" value="<%= element_type %>">
+			<% case element_type %>
+			<% when 'device', 'application' %>
+			<input type="hidden" class="itec_id" value="<%= element.itec_id %>">
+			<input type="hidden" class="ld_id" value="<%= element.ld_id %>">
+			<% end %>
+		</div>
+	</div>
+	
+	<% if current_layout == "popup"%>
+	<div class="extract_box_button" onclick="popup_show_element('<%= element_type %>', '<%= element.id %>', '<%= eval(popup_show_element_path) %>'); ">
+	<% else %>
+	<div class="extract_box_button" onclick="window.location.href ='<%= eval(element_path) %>';return false;">
+	<% end %>
+	
+			
+		<div class= "watermark_container">
+			<div class="watermark <%= element_type %>_watermark"></div>
+		</div>
+		<% if element_type!="user"%>
+    		<span class="extract_name"><% if element.name!= nil %><%= raw element.name.truncate(72, :separator => " ", :omission => "...") %><% end %></span>
+    		<span class="extract_number_of_resources"><% if element.number_of_resources!= nil %>(<%= raw element.number_of_resources %>)<% end %></span>
+    		<span class="extract_last_scraping"><% if element.last_scraping != nil %>Last Scraping at: <%= raw element.last_scraping %><% end %></span>
+    		<span class="extract_last_scraping"><% if element.last_tagged != nil %>Last Tagged at: <%= raw element.last_tagged %><% end %></span>
+    		<span class="extract_last_scraping"><% if element.last_categorize != nil %>Last Categorize at: <%= raw element.last_categorize %><% end %></span>
+    		<span class="extract_last_scraping"><% if element.last_geolocalize != nil %>Last Geolocalize at: <%= raw element.last_geolocalize %><% end %></span>
+	    	<br />
+	    	
+	    	
+	    	</div>
+    	<% else %>
+    	</div>
+    	<% end %>
+    	
+		
+</div>

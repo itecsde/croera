@@ -1,0 +1,20 @@
+<div id="nav_bar">
+			<ul>
+				<li class="resources_link"><%= link_to t("Resources"), resources_path %></li>
+				<li class="activities_link"><%= link_to t("activities"), activities_path %></li>
+				<!--<li class="activity_sequence_link"><%= link_to t("sequences"), activity_sequences_path %></li> -->
+				<li class="guides_link"><%= link_to t("guides"), guides_path %></li>
+				<li class="experiences_link"><%= link_to t("experiences"), experiences_path %></li>
+				<li class="shareboards_link"><%= link_to t("boards") %></li>
+			</ul>
+		</div>
+	</div>
+	<div id="section_header" class="activity_sequence_header">
+		<div id="actions" class="a-left">
+			<%= render actions %>
+		</div>
+		<div id="section_title" class="a-right">
+			<p><%= section_title %></p>
+		</div>	
+	</div>
+</header><!-- HEADER -->

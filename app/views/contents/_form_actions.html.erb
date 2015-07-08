@@ -1,0 +1,8 @@
+<%=link_to  contents_path, :class => "back_icon has_tooltip" do %>
+	 <%= image_tag("/images/icons/atras_30.png") %>
+	<span class="tooltip"><p><%= t("Back_to_list")%></p></span>
+<% end %>
+<%=link_to "", :class => "has_tooltip", :onclick => "save_content_form();return false;" do %>
+	 <%= image_tag("/images/icons/save.png") %>
+	<span class="tooltip"><p><%= t("Save")%></p></span>
+<% end %>

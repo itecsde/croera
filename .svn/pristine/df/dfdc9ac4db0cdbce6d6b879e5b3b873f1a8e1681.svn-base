@@ -1,0 +1,623 @@
+# encoding: utf-8
+require 'net/http'
+require 'net/https'
+require 'uri'
+
+#require "capybara/dsl"
+class Classify
+   include ActionView::Helpers::SanitizeHelper
+   def classify_it(wikitopics, sections)
+      begin
+                  
+         scraper = Scraper.new
+         wikipediator = Wikipediator.new
+                          
+         newspaper_sections = sections
+         
+         categories = Array.new
+         total_relatedness = 0
+              
+         newspaper_sections.each do |section|
+            category = wikipediator.complex_search_it(section)
+            categories << {:name => category[0][:name], :wikipedia_article_id => category[0][:wikipedia_article_id]}
+         end
+                  
+         #wikitopics = wikipediator.wikify_it(text)
+         
+         categories.each do |category|
+            wikitopics.each do |wikitopic|
+               relatedness = wikipediator.compare(wikitopic[:wikipedia_article_id],category[:wikipedia_article_id])
+               total_relatedness = total_relatedness + relatedness.to_f
+            end
+            relatedness_mean = total_relatedness / wikitopics.size
+            category = category[:relatedness_mean] = relatedness_mean 
+            relatedness_mean = 0
+            total_relatedness = 0
+         end 
+             
+         categories = categories.sort_by { |hsh| hsh[:relatedness_mean] }
+         
+         puts "WIKITOPICS"
+         puts wikitopics
+         
+         puts "CATEGORIES"
+         puts categories
+         
+         puts "CATEGORY SELECTED: "
+         puts categories.last     
+                  
+         return categories.last    
+      rescue Exception => e
+         puts "Exception classify_it"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end
+   
+   def classify_it_with_weight(wikitopics, sections)
+      begin
+                  
+         scraper = Scraper.new
+         wikipediator = Wikipediator.new
+                          
+         categories = Array.new
+         total_relatedness = 0
+              
+         newspaper_sections = sections              
+              
+         newspaper_sections.each do |section|
+            category = wikipediator.complex_search_it(section)
+            categories << {:name => category[0][:name], :wikipedia_article_id => category[0][:wikipedia_article_id]}
+         end
+                  
+         #wikitopics = wikipediator.wikify_it(text)
+         
+         categories.each do |category|
+            wikitopics.each do |wikitopic|
+               relatedness = (wikipediator.compare(wikitopic[:wikipedia_article_id],category[:wikipedia_article_id]).to_f * wikitopic[:weight].to_f)
+               total_relatedness = total_relatedness + relatedness.to_f
+            end
+            relatedness_mean = total_relatedness / wikitopics.size
+            category = category[:relatedness_mean] = relatedness_mean 
+            relatedness_mean = 0
+            total_relatedness = 0
+         end 
+             
+         categories = categories.sort_by { |hsh| hsh[:relatedness_mean] }
+         
+         puts "WIKITOPICS"
+         puts wikitopics
+         
+         puts "CATEGORIES"
+         puts categories
+         
+         puts "CATEGORY SELECTED: "
+         puts categories.last     
+                  
+         return categories.last    
+      rescue Exception => e
+         puts "Exception classify_it_with_weight"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end
+   
+   def classify_it_without_countries(wikitopics,sections)
+      begin
+                  
+         scraper = Scraper.new
+         wikipediator = Wikipediator.new
+         countries = Array.new        
+         
+         newspaper_sections = sections
+         
+         Carmen::Country.all.each do |carmen_country|
+            countries << carmen_country.name
+         end
+         
+         categories = Array.new
+         total_relatedness = 0
+              
+         newspaper_sections.each do |section|
+            category = wikipediator.complex_search_it(section)
+            categories << {:name => category[0][:name], :wikipedia_article_id => category[0][:wikipedia_article_id]}
+         end
+                  
+         #wikitopics = wikipediator.wikify_it(text)
+         
+         categories.each do |category|
+            wikitopics.each do |wikitopic|
+               if !countries.include? wikitopic[:name]
+                  relatedness = (wikipediator.compare(wikitopic[:wikipedia_article_id],category[:wikipedia_article_id]).to_f * wikitopic[:weight].to_f)
+                  total_relatedness = total_relatedness + relatedness.to_f
+               end
+            end
+            relatedness_mean = total_relatedness / wikitopics.size
+            category = category[:relatedness_mean] = relatedness_mean 
+            relatedness_mean = 0
+            total_relatedness = 0
+         end 
+             
+         categories = categories.sort_by { |hsh| hsh[:relatedness_mean] }
+         
+         puts "WIKITOPICS"
+         puts wikitopics
+         
+         puts "CATEGORIES"
+         puts categories
+         
+         puts "CATEGORY SELECTED: "
+         puts categories.last     
+                  
+         return categories.last    
+      rescue Exception => e
+         puts "Exception classify_it_without_countries"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end   
+   
+   def classify_it_with_broader_sections(wikitopics, sections)
+      begin
+                  
+         scraper = Scraper.new
+         wikipediator = Wikipediator.new
+                          
+         newspaper_sections = sections
+         
+         categories = Array.new
+         total_relatedness = 0
+              
+         newspaper_sections.each do |section|
+            category = wikipediator.complex_search_it(section)
+            categories << {:name => category[0][:name], :wikipedia_article_id => category[0][:wikipedia_article_id]}
+         end
+                  
+         #wikitopics = wikipediator.wikify_it(text)
+         
+         categories.each do |category|
+            wikitopics.each do |wikitopic|
+               relatedness = wikipediator.compare(wikitopic[:wikipedia_article_id],category[:wikipedia_article_id])
+               total_relatedness = total_relatedness + relatedness.to_f
+            end
+            relatedness_mean = total_relatedness / wikitopics.size
+            category = category[:relatedness_mean] = relatedness_mean 
+            relatedness_mean = 0
+            total_relatedness = 0
+         end 
+             
+         categories = categories.sort_by { |hsh| hsh[:relatedness_mean] }
+         
+         puts "WIKITOPICS"
+         puts wikitopics
+         
+         puts "CATEGORIES"
+         puts categories
+         
+         puts "CATEGORY SELECTED: "
+         puts categories.last     
+                  
+         return categories.last    
+      rescue Exception => e
+         puts "Exception classify_it_with_broader_sections"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end   
+   
+  
+   def classify_stored_reports(method, sections, remove_outliers)
+      begin
+         method = method.downcase
+         wikipediator = Wikipediator.new   
+         report_feeds = Array.new
+                  
+         Report.where(:section => nil).each do |report|      
+            wikitopics = Array.new
+            if remove_outliers == true
+               annotations = remove_outliers(report,0)
+            else
+               annotations = report.taggable_tag_annotations
+            end
+            annotations.each do |wikitopic|
+               wikitopics << {:name =>wikitopic.tag.name, :weight => wikitopic.weight, :wikipedia_article_id => wikitopic.wikipedia_article_id}
+            end
+            puts report.id
+            begin
+               if method == "basic"
+                  section = classify_it(wikitopics, sections)
+               elsif method == "with_weight"
+                  section = classify_it_with_weight(wikitopics, sections)
+               elsif method == "with_broader_sections"
+                  section = classify_it_with_broader_sections(wikitopics, sections)
+               elsif method == "without_countries"
+                  section = classify_it_without_countries(wikitopics, sections)
+               end            
+               report.section = section[:name]
+               report.save
+            rescue
+               section = nil
+            end            
+         end
+      rescue Exception => e
+         puts "Exception classify_stored_reports"
+         puts e.message
+         puts e.backtrace.inspect
+      end              
+   end  
+   
+   
+   #receives a report an a threshold and returns an annotations filtered array
+   def remove_outliers(report,threshold)
+      begin
+         wikipediator = Wikipediator.new
+         filtered_annotations = Array.new
+         totals = Array.new             
+
+         terms = report.taggable_tag_annotations.map{|annotation| annotation.tag.name}
+              
+         annotations = report.taggable_tag_annotations.map{|annotation| annotation}
+         
+         annotations.each do |annotation|
+            puts annotation.wikipedia_article_id
+         end                 
+            
+         annotations.each do |annotation_x|
+            total_relatedness = 0
+            annotations.each do |annotation_y|            
+               relatedness = wikipediator.compare(annotation_x.wikipedia_article_id.to_i, annotation_y.wikipedia_article_id.to_i)
+               total_relatedness = total_relatedness + relatedness.to_f
+            end
+            if total_relatedness >= threshold
+               filtered_annotations << annotation_x
+               totals << {:name => annotation_x.tag.name, :relatedness => total_relatedness}
+            end
+         end
+         totals = totals.sort_by { |hsh| hsh[:relatedness] }
+         puts totals
+         return filtered_annotations
+      rescue Exception => e
+         puts "Exception remove outliers"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end
+   
+    
+   def reuters_statistics(date,method)
+      begin      
+      wikipediator = Wikipediator.new   
+      
+      rss_feeds = [{:url_feed => "http://feeds.reuters.com/reuters/healthNews", :section => wikipediator.complex_search_it("Health")[0][:name]},
+         {:url_feed => "http://feeds.reuters.com/news/artsculture", :section => wikipediator.complex_search_it("Art")[0][:name]},
+         {:url_feed => "http://feeds.reuters.com/Reuters/PoliticsNews", :section => wikipediator.complex_search_it("Politics")[0][:name]},
+         {:url_feed => "http://feeds.reuters.com/reuters/sportsNews", :section => wikipediator.complex_search_it("Sport")[0][:name]},
+         {:url_feed => "http://feeds.reuters.com/reuters/scienceNews", :section => wikipediator.complex_search_it("Science")[0][:name]},
+         {:url_feed => "http://feeds.reuters.com/reuters/technologyNews", :section => wikipediator.complex_search_it("Technology")[0][:name]},
+         {:url_feed => "http://feeds.reuters.com/news/economy", :section => wikipediator.complex_search_it("Economy")[0][:name]},
+         {:url_feed => "http://feeds.reuters.com/reuters/businessNews" , :section => wikipediator.complex_search_it("Business")[0][:name]}]
+      
+      report_feeds = Array.new
+      
+      Report.all.each do |report|
+         if !report_feeds.include? report.scraped_from
+            report_feeds << report.scraped_from
+         end 
+      end
+           
+      report_feeds.each do |report_feed|          
+         selected_rss_feed = rss_feeds.find {|x| x[:url_feed] == report_feed }       
+         puts selected_rss_feed        
+         section = selected_rss_feed[:section]        
+         puts section            
+         well_classified = Report.where(:scraped_from => report_feed, :section => section).size
+         health_classified = Report.where(:scraped_from => report_feed, :section => "Health").size
+         art_classified = Report.where(:scraped_from => report_feed, :section => "Art").size
+         politics_classified = Report.where(:scraped_from => report_feed, :section => "Politics").size
+         sport_classified = Report.where(:scraped_from => report_feed, :section => "Sport").size
+         science_classified = Report.where(:scraped_from => report_feed, :section => "Science").size
+         technology_classified = Report.where(:scraped_from => report_feed, :section => "Technology").size
+         economy_classified = Report.where(:scraped_from => report_feed, :section => "Economy").size
+         business_classified = Report.where(:scraped_from => report_feed, :section => "Business").size
+         education_classified = Report.where(:scraped_from => report_feed, :section => "Education").size
+         fashion_classified = Report.where(:scraped_from => report_feed, :section => "Fashion").size
+         culture_classified = Report.where(:scraped_from => report_feed, :section => "Culture").size         
+         not_classified = Report.where(:scraped_from => report_feed, :section => nil).size
+         bad_classified = Report.where(:scraped_from => report_feed).size - not_classified - well_classified      
+         well_classified_percentage = well_classified.to_f / (well_classified.to_f + bad_classified.to_f)        
+         puts well_classified_percentage
+         if method == "basic"
+            filename = "reuters_" + date + "_statistics_basic_method.txt"
+         elsif method == "with_weight"
+            filename = "reuters_" + date + "_statistics_with_weight_method.txt"
+         elsif method == "with_broader_sections"
+            filename = "reuters_" + date + "_statistics_with_broader_sections_method.txt"
+         elsif method == "without_countries"
+            filename = "reuters_" + date + "_statistics_without_countries_method.txt"
+         end                 
+         File.open(filename, 'a') do |f2|
+            f2.puts
+            f2.puts "Section: "  + section.to_s
+            f2.puts "---------------------------------------------"
+            f2.puts "Health classified: " + health_classified.to_s 
+            f2.puts "Art classified: " + art_classified.to_s 
+            f2.puts "Politics classified: " + politics_classified.to_s 
+            f2.puts "Sport classified: " + sport_classified.to_s 
+            f2.puts "Science classified: " + science_classified.to_s 
+            f2.puts "Technology classified: " + technology_classified.to_s 
+            f2.puts "Economy classified: " + economy_classified.to_s 
+            f2.puts "Business classified: " + business_classified.to_s     
+            f2.puts "Education classified: " + education_classified.to_s
+            f2.puts "Fashion classified: " + fashion_classified.to_s  
+            f2.puts "Culture classified: " + culture_classified.to_s                                        
+            f2.puts
+            f2.puts "Total: " + Report.where(:scraped_from => report_feed).size.to_s 
+            f2.puts "Classified: " + (Report.where(:scraped_from => report_feed).size - not_classified).to_s
+            f2.puts "Not classified: " + not_classified.to_s               
+            f2.puts "Well classified: " + well_classified.to_s        
+            f2.puts "Bad classified: " + bad_classified.to_s
+            f2.puts "Well classified Percentage: " + well_classified_percentage.to_s
+            f2.puts    
+         end
+      end
+      rescue Exception => e
+         puts "Exception reuters statistics"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end 
+         
+   def dailymail_statistics(date,method)
+      begin      
+      wikipediator = Wikipediator.new   
+      
+      rss_feeds = [{:url_feed => "http://www.dailymail.co.uk/sport/index.rss", :section => wikipediator.complex_search_it("Sport")[0][:name]},
+         {:url_feed => "http://www.dailymail.co.uk/health/index.rss", :section => wikipediator.complex_search_it("Health")[0][:name]},
+         {:url_feed => "http://www.dailymail.co.uk/sciencetech/index.rss", :section => wikipediator.complex_search_it("Science")[0][:name]},
+         {:url_feed => "http://www.dailymail.co.uk/money/index.rss", :section => wikipediator.complex_search_it("Economy")[0][:name]},
+         {:url_feed => "http://www.dailymail.co.uk/femail/fashionfinder/index.rss", :section => wikipediator.complex_search_it("Fashion")[0][:name]},
+         {:url_feed => "http://www.dailymail.co.uk/tvshowbiz/index.rss", :section => wikipediator.complex_search_it("ShowBusiness")[0][:name]}]
+      
+      report_feeds = Array.new
+      
+      Report.all.each do |report|
+         if !report_feeds.include? report.scraped_from
+            report_feeds << report.scraped_from
+         end 
+      end
+           
+      report_feeds.each do |report_feed|          
+         selected_rss_feed = rss_feeds.find {|x| x[:url_feed] == report_feed }       
+         puts selected_rss_feed        
+         section = selected_rss_feed[:section]        
+         puts section            
+         well_classified = Report.where(:scraped_from => report_feed, :section => section).size
+         health_classified = Report.where(:scraped_from => report_feed, :section => "Health").size
+         sport_classified = Report.where(:scraped_from => report_feed, :section => "Sport").size
+         science_classified = Report.where(:scraped_from => report_feed, :section => "Science").size
+         economy_classified = Report.where(:scraped_from => report_feed, :section => "Economy").size
+         fashion_classified = Report.where(:scraped_from => report_feed, :section => "Fashion").size   
+         show_business_classified = Report.where(:scraped_from => report_feed, :section => "ShowBusiness").size               
+         not_classified = Report.where(:scraped_from => report_feed, :section => nil).size
+         bad_classified = Report.where(:scraped_from => report_feed).size - not_classified - well_classified      
+         well_classified_percentage = well_classified.to_f / (well_classified.to_f + bad_classified.to_f)        
+         puts well_classified_percentage
+         if method == "basic"
+            filename = "dailymail_" + date + "_statistics_basic_method.txt"
+         elsif method == "with_weight"
+            filename = "dailymail_" + date + "_statistics_with_weight_method.txt"
+         elsif method == "with_broader_sections"
+            filename = "dailymail_" + date + "_statistics_with_broader_sections_method.txt"
+         elsif method == "without_countries"
+            filename = "dailymail_" + date + "_statistics_without_countries_method.txt"
+         end                 
+         File.open(filename, 'a') do |f2|
+            f2.puts
+            f2.puts "Section: "  + section.to_s
+            f2.puts "---------------------------------------------"
+            f2.puts "Health classified: " + health_classified.to_s 
+            f2.puts "Sport classified: " + sport_classified.to_s 
+            f2.puts "Science classified: " + science_classified.to_s 
+            f2.puts "Economy classified: " + economy_classified.to_s 
+            f2.puts "Fashion classified: " + fashion_classified.to_s                                       
+            f2.puts "Show Business classified: " + show_business_classified.to_s             
+            f2.puts
+            f2.puts "Total: " + Report.where(:scraped_from => report_feed).size.to_s 
+            f2.puts "Classified: " + (Report.where(:scraped_from => report_feed).size - not_classified).to_s
+            f2.puts "Not classified: " + not_classified.to_s               
+            f2.puts "Well classified: " + well_classified.to_s        
+            f2.puts "Bad classified: " + bad_classified.to_s
+            f2.puts "Well classified Percentage: " + well_classified_percentage.to_s
+            f2.puts    
+         end
+      end
+      rescue Exception => e
+         puts "Exception dailymail statistics"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end    
+   
+   
+   
+   def reuters_categories_dispersion
+      begin
+         wikipediator = Wikipediator.new
+         wikisections = Array.new
+         relatedness = 0.0
+         newspaper_sections = ["Business", "Technology", "Science", "Health", "Sport", "Art", "Fashion", "Politics", "Education", "Culture", "Economy"]
+         newspaper_sections.each do |section|
+            wikisections << wikipediator.complex_search_it(section)  
+         end 
+         
+         File.open('categories_dispersion.txt', 'w') do |f2| 
+            f2.puts "            | Business |Technology| Science  |  Health  |  Sport   |   Art    | Fashion  | Politics |Education | Culture  | Economy |"                                    
+            wikisections.each_with_index do |wikisection_x, index_x|
+               f2.puts "--------------------------------------------------------------------------------------------------------------------------------------"
+               f2.print wikisection_x[0][:name]
+               case wikisection_x[0][:name]
+               when "Business"
+               f2.print "    |   "
+               when "Technology"
+               f2.print "  |   "   
+               when "Science"
+               f2.print "     |   "   
+               when "Health"
+               f2.print "      |   "   
+               when "Sport"
+               f2.print "       |   "   
+               when "Art"
+               f2.print "         |   "   
+               when "Fashion"
+               f2.print "     |   "  
+               when "Politics"
+               f2.print "    |   "   
+               when "Education"
+               f2.print "   |   "   
+               when "Culture"
+               f2.print "     |   "   
+               when "Economy"
+               f2.print "     |   "   
+               end                      
+               wikisections.each_with_index do |wikisection_y, index_y|
+                  relatedness = wikipediator.compare(wikisection_x[0][:wikipedia_article_id],wikisection_y[0][:wikipedia_article_id])
+                  f2.print "%.2f" % relatedness + "   |   "
+               end
+               f2.puts 
+            end
+            f2.puts "--------------------------------------------------------------------------------------------------------------------------------------"       
+         end #file
+      rescue Exception => e
+         puts "Exception reuters_categories_dispersion"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end      
+      
+               
+=begin     
+   def classify_statistics(method)
+      begin
+         wikipediator = Wikipediator.new   
+         report_feeds = Array.new
+         
+         rss_feeds = [{:url_feed => "http://feeds.reuters.com/reuters/healthNews", :section => wikipediator.complex_search_it("Health")[0][:name]},
+            {:url_feed => "http://feeds.reuters.com/news/artsculture", :section => wikipediator.complex_search_it("Art")[0][:name]},
+            {:url_feed => "http://feeds.reuters.com/Reuters/PoliticsNews", :section => wikipediator.complex_search_it("Politics")[0][:name]},
+            {:url_feed => "http://feeds.reuters.com/reuters/sportsNews", :section => wikipediator.complex_search_it("Sport")[0][:name]},
+            {:url_feed => "http://feeds.reuters.com/reuters/scienceNews", :section => wikipediator.complex_search_it("Science")[0][:name]},
+            {:url_feed => "http://feeds.reuters.com/reuters/technologyNews", :section => wikipediator.complex_search_it("Technology")[0][:name]},
+            {:url_feed => "http://feeds.reuters.com/news/economy", :section => wikipediator.complex_search_it("Economy")[0][:name]},
+            {:url_feed => "http://feeds.reuters.com/reuters/businessNews" , :section => wikipediator.complex_search_it("Business")[0][:name]}]
+              
+         Report.all.each do |report|
+            if !report_feeds.include? report.scraped_from
+               report_feeds << report.scraped_from
+            end 
+         end
+              
+         report_feeds.each do |report_feed|   
+            selected_rss_feed = rss_feeds.find {|x| x[:url_feed] == report_feed }            
+            section_expected = selected_rss_feed[:section]
+            section = ""
+            puts section_expected
+            well_classified = 0
+            not_classified = 0
+            health_classified = 0
+            art_classified = 0
+            politics_classified = 0
+            sport_classified = 0
+            science_classified = 0
+            technology_classified = 0
+            economy_classified = 0
+            business_classified = 0
+            education_classified = 0
+            fashion_classified = 0
+            culture_classified = 0             
+            Report.where(:scraped_from => report_feed).each do |report|      
+               wikitopics = Array.new
+               report.taggable_tag_annotations.each do |wikitopic|
+                  wikitopics << {:name =>wikitopic.tag.name, :weight => wikitopic.weight, :wikipedia_article_id => wikitopic.wikipedia_article_id}
+               end
+               puts report.id
+               puts wikitopics
+               sleep 1
+               begin
+                  #section = classify_it_with_weight(wikitopics)
+                  section = classify_it(wikitopics)
+               rescue
+                  section = nil
+               end
+               if section !=  nil
+                  section = section[:name]
+               end
+               if section == section_expected
+                  well_classified+=1
+               end
+               if section == nil
+                  not_classified+=1
+               end
+               case section
+                  when "Health"
+                     health_classified+=1
+                  when "Art"
+                     art_classified+=1
+                  when "Politics"
+                     politics_classified+=1
+                  when "Sport"
+                     sport_classified+=1
+                  when "Science"
+                     science_classified+=1
+                  when "Technology"
+                     technology_classified+=1
+                  when "Economy"
+                     economy_classified+=1
+                  when "Business"
+                     business_classified+=1
+                  when "Education"
+                     education_classified+=1
+                  when "Fashion"
+                     fashion_classified+=1
+                  when "Culture"
+                     culture_classified+=1
+               end
+               puts health_classified                              
+            end
+            total = Report.where(:scraped_from => report_feed).size
+            bad_classified = total - well_classified - not_classified
+            well_classified_percentage = well_classified.to_f / (well_classified.to_f + bad_classified.to_f)            
+            File.open('statistics.txt', 'a') do |f2|
+               f2.puts
+               f2.puts "Section: "  + section_expected.to_s
+               f2.puts "---------------------------------------------"
+               f2.puts "Health classified: " + health_classified.to_s 
+               f2.puts "Art classified: " + art_classified.to_s 
+               f2.puts "Politics classified: " + politics_classified.to_s 
+               f2.puts "Sport classified: " + sport_classified.to_s 
+               f2.puts "Science classified: " + science_classified.to_s 
+               f2.puts "Technology classified: " + technology_classified.to_s 
+               f2.puts "Economy classified: " + economy_classified.to_s 
+               f2.puts "Business classified: " + business_classified.to_s     
+               f2.puts "Education classified: " + education_classified.to_s
+               f2.puts "Fashion classified: " + fashion_classified.to_s  
+               f2.puts "Culture classified: " + culture_classified.to_s                                        
+               f2.puts
+               f2.puts "Total: " + Report.where(:scraped_from => report_feed).size.to_s 
+               f2.puts "Classified: " + (Report.where(:scraped_from => report_feed).size - not_classified).to_s
+               f2.puts "Not classified: " + not_classified.to_s               
+               f2.puts "Well classified: " + well_classified.to_s        
+               f2.puts "Bad classified: " + bad_classified.to_s
+               f2.puts "Well classified Percentage: " + well_classified_percentage.to_s
+               f2.puts    
+            end
+         end
+      rescue Exception => e
+         puts "Exception classify_statistics"
+         puts e.message
+         puts e.backtrace.inspect
+      end              
+   end
+=end   
+   
+   
+end

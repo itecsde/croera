@@ -1,0 +1,144 @@
+<% if @documentary.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@documentary.errors.count, "error") %> prohibited this documentary from being saved:</h2>
+	
+	  <ul>
+	  <% @documentary.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+
+
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="documentary_name field_body">
+		<% if @edition_mode==true %>
+			<textarea id="documentary_name" name="documentary[name]" placeholder="<%= t("title") %>"><%= @documentary.name %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<span><%= @documentary.name %></span>
+		<% end %>
+	</div>
+	
+		
+	<div class="documentary_description description field_body">
+		<% if @edition_mode==true %>
+			<textarea id="documentary_description" name="documentary[description]" placeholder="<%= t("description") %>"><%= @documentary.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<div>
+				<% if @documentary.description != nil %>			
+					<%= raw @documentary.description.truncate(1000, :separator => " ", :omission => "...") %>
+				<% end %>				
+			</div>
+		<% end %>
+	</div>
+	
+	
+	<div class="documentary_tags element_field_box">
+		<div class="field_prompt"><%= t("keywords") %></div>
+		<div class="field_body">			
+			<% if @edition_mode==true %>    
+		    	<textarea id="documentary_tags" class="tags" name="documentary[tag_list]"><% if @documentary!=nil %><%= @documentary.tag_list %><% end %></textarea>
+		    	<i class="icon-pencil icon-grey"></i>
+		    <% else %>
+		    	<span class="tags"><% if @documentary!=nil %><%= @documentary.tag_list_with_links.html_safe  %><% end %></span>	
+		    <% end %>														
+		</div>
+	</div>		
+	
+	
+	<div class="documentary_url element_field_box">
+		<div class="field_prompt"><%= t("url") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>    
+		    	<%= documentary_form.text_field :url %>
+		    	<i class="icon-pencil icon-grey"></i>			    	
+		    <% else %>
+		    	<a href="<%= @documentary.url %>" target="_blank"><%= @documentary.url %></a>
+		    <% end %>
+	   </div>		
+	</div>
+
+
+	<% if @edition_mode == true or @documentary.documentary_subject_annotations.size > 0 %>	
+		<div class="documentary_subjects element_field_box">
+			<div class="field_prompt"><%= t("subjects") %></div>
+			<div class="field_body">
+				<% @documentary.documentary_subject_annotations.each do |annotation| %>
+					<div class="subject_item">
+						<% if @edition_mode==true %>
+							<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name", annotation.subject.id), :prompt => "", :class => "subject" %>
+							<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+						<% else %>
+							<span><%= annotation.subject.name %></span>	
+						<% end %>
+					</div>
+				<% end %>			
+			</div>
+			<% if @edition_mode==true %>
+				<div class="add_item_to_itemize" onclick="add_subject(this);">
+					<span>+</span>
+				</div>
+			<% end %>		
+		</div>
+	<% end %>		
+	
+	
+	
+	<% if @edition_mode!=true && @documentary.scraped_from!=nil && @documentary.scraped_from!="" %>  
+		<div class="documentary_scraped_from element_field_box">
+			<div class="field_prompt"><%= t("source") %></div>
+			<div class="field_body">
+				<a href="<%= @documentary.scraped_from %>" target="_blank"><%= @documentary.scraped_from %></a>
+			</div>
+		</div>
+	<% end %>
+	
+	
+</div>
+
+
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>		
+			<% if @documentary.element_image.url() != "none" %>
+				<%= image_tag @documentary.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_documentary.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= documentary_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		<% else %>
+			<% if @documentary.element_image.url() != "none" %>
+				<%= image_tag @documentary.element_image.url(:medium), width:'100%', :class => "image_preview_show" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_documentary.png", width:'100%', :class => "image_preview_show" %>
+			<% end %>
+		<% end %>
+	</div>
+
+</div>
+
+
+
+
+
+<% if @edition_mode==true %>
+	<div id="snippets_library" style="display: none">
+		<div class="subject_item">				
+			<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name"), :prompt => "", :class => "subject" %>
+			<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+		</div>
+	</div>
+<% end %>
+
+

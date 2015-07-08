@@ -1,0 +1,45 @@
+# encoding: utf-8
+
+scrape_events = ScraperEvents.new
+scrape_applications = ScraperApplications.new
+scrape_people = ScraperPeople.new
+scrape_lecture = ScraperLectures.new
+
+scrape_events.scrape_openeducationeuropa
+scrape_events.scrape_visitportugal
+scrape_events.scrape_ulisboa
+scrape_events.scrape_google_calendar_pt
+scrape_events.scrape_universidad_algarve
+scrape_events.scrape_universidad_porto
+scrape_events.scrape_globalevents
+scrape_events.scrape_conferencealerts_portugal
+
+scrape_applications.scrape_alternativeto
+scrape_applications.scrape_softonic
+
+scrape_lecture.scrape_ted
+
+scrape_people.scrape_scholar
+
+
+#scrape_events.scrape_spainisculture
+scrape_events.scrape_discoveringfinland
+#scrape_events.scrape_unesco
+scrape_events.scrape_finnbay
+scrape_events.scrape_uoslo
+scrape_events.scrape_visithungary
+scrape_events.scrape_visitbudapest
+scrape_events.scrape_visitbrussels
+scrape_events.scrape_belgica_turismo
+scrape_events.scrape_european_commission
+scrape_events.scrape_allconferences
+scrape_events.scrape_worldconferencecalendar
+scrape_events.scrape_best
+
+
+
+scrape_lecture.scrape_videolectures
+scrape_lecture.scrape_khanacademy
+
+scrape_people.scrape_linkedin
+

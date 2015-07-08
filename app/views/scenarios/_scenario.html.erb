@@ -1,0 +1,5 @@
+<%= form_for(@scenario,:html => { :class => "scenario_form" }) do |f_scenario| %>
+	<%= render :partial => "scenarios/form" , :locals => {:f => f_scenario, :is_in_guide => false} %>
+<% end %>
+<input type="hidden" id="edition_mode" value="off"/>
+<input type="hidden" id="template_edition_mode" value="off"/>

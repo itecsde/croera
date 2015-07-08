@@ -1,0 +1,10 @@
+
+<% @scenarios.each do |scenario| %>
+	<%= render :partial => "elements/element_fixed", :locals => {:element => scenario, :current_layout => current_layout} %>
+<% end %>
+
+<div class="clear"></div>
+
+<div class= "paginate_controls active">
+	<%= paginate @scenarios,:remote => true, :param_name => "scenarios_page" %>
+</div>

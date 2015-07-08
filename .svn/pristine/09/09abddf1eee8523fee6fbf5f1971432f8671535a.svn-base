@@ -1,0 +1,230 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'home', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'home', :actions => nil} %>
+<% end %>
+		
+<% content_for :content do %>
+	<div class="home_search">
+		<div class="home_search_bar">
+			<%= form_tag search_results_path, :method => 'get' do %>  
+				<%= text_field_tag :search, params[:search],:class => "input_search_bar" %><%= submit_tag "",:type => :image, :src => "/images/search_button.png" %>  
+			<% end %>
+		</div>
+	</div>
+
+	<div class="container_home_logged">
+		<div class="first_row">
+			<div class="first_text_box">
+				<h3><%= t('scenario_development_environment') %></h3>
+				<p><%= t('sde_description') %></p>
+			</div>	
+			<div class="second_text_box">
+				<h3><%= t('discover_and_create_title') %></h3>
+				<p><%= t('discover_and_create_description') %></p>
+			</div>	
+			<div class="third_text_box">
+				<h3>iTEC </h3>
+				<p><%= t('itec_description') %></p>
+				<p><a href="http://itec.eun.org/web/guest" target="_blank">http://itec.eun.org/</a></p>		
+			</div>	
+		</div>	
+		<div class="second_row">
+			<div class="first_column">
+				<div class="discover_row active" onclick="toggle_home_discover_create(this);">
+					<h3><%= t('discover')%></h3>
+					<img src="/images/discover_400x200.png"></img>
+				</div>	
+				<div class="relevant_resources_row">
+					<div class="relevant_resource_box">
+						
+						<% if @application!=nil &&  @application.element_image.url!="none"  %>
+						<div class="mini_extract mini_extract_discover" style="background-image: url('<%= @application.element_image.url%>')" onclick="window.location.href ='<%= applications_path %>';return false;">
+						<% else %>
+						<div class="mini_extract mini_extract_discover" style="background-image: url('/images/watermarks/b_watermark_application.png')" onclick="window.location.href ='<%= applications_path %>';return false;">
+						<% end %>
+						
+							<div class="mini_extract_header">
+								<p><%= t('relevant_applications') %></p>
+							</div>	
+							<div class="mini_extract_footer">
+								<% if @application!=nil %>
+									<p><%= truncate(@application.name, :length =>30) %></p>
+								<% end %>
+								<p></p>
+							</div>	
+						</div>
+						<% if current_user != nil %>
+							<div class="mini_extract mini_extract_create" style="background-image: url('/images/watermarks/b_watermark_scenario.png')" onclick="window.location.href ='<%= new_scenario_path %>';return false;">
+						<% else %>
+							<div class="mini_extract mini_extract_create" style="background-image: url('/images/watermarks/b_watermark_scenario.png')" onclick="alert('Login for this feature');">
+						<% end %>												
+							<div class="mini_extract_header">
+								<p><%= t("scenario") %></p>
+							</div>	
+							<div class="mini_extract_footer">
+								<p>&nbsp;</p>
+								<p><%= t('create_scenario') %></p>								
+							</div>	
+						</div>
+							
+					</div>	
+					
+					<div class="relevant_resource_box">
+						
+						<% if @event!=nil && @event.element_image.url!="none"  %>
+						<div class="mini_extract mini_extract_discover" style="background-image: url('<%= @event.element_image.url%>')" onclick="window.location.href ='<%= events_path %>';return false;">
+						<% else %>
+						<div class="mini_extract mini_extract_discover" style="background-image: url('/images/watermarks/b_watermark_event.png')" onclick="window.location.href ='<%= events_path %>';return false;">
+						<% end %>
+							<div class="mini_extract_header">
+								<p><%= t('relevant_events') %></p>
+							</div>	
+							<div class="mini_extract_footer" >
+								<% if @event!=nil %>
+									<p><%= truncate(@event.name, :length =>30) %></p>
+								<% end %>
+								<p></p>
+							</div>	
+						</div>
+						
+						<% if current_user != nil %>
+							<div class="mini_extract mini_extract_create" style="background-image: url('/images/watermarks/b_watermark_activity.png')" onclick="window.location.href ='<%= new_activity_path %>';return false;">
+						<% else %>												
+							<div class="mini_extract mini_extract_create" style="background-image: url('/images/watermarks/b_watermark_activity.png')" onclick="alert('Login for this feature');">
+						<% end %>
+							<div class="mini_extract_header">
+								<p><%= t("learning_activity") %></p>
+							</div>	
+							<div class="mini_extract_footer">
+								<p>&nbsp;</p>
+								<p><%= t('create_learning_activity') %></p>								
+							</div>	
+						</div>
+							
+					</div>	
+				</div>	
+			</div>
+			
+			<!-- Segunda columna -->
+			<div class="second_column">
+				<div class="create_row" onclick="toggle_home_discover_create(this);">
+					<h3><%= t('create')%></h3>
+					<img src="/images/create_400x200.png"></img>
+				</div>	
+				<div class="relevant_resources_row">
+					<div class="relevant_resource_box">
+						
+						<% if @person!=nil &&  @person.element_image.url!="none"  %>
+						<div class="mini_extract mini_extract_discover" style="background-image: url('<%= @person.element_image.url%>')" onclick="window.location.href ='<%= people_path %>';return false;">
+						<% else %>
+						<div class="mini_extract mini_extract_discover" style="background-image: url('/images/watermarks/b_watermark_expert.png')" onclick="window.location.href ='<%= people_path %>';return false;">
+						<% end %>
+							<div class="mini_extract_header">
+								<p><%= t('relevant_people') %></p>
+							</div>	
+							<div class="mini_extract_footer" >
+								<% if @person!=nil %>
+									<p><%= truncate(@person.name, :length =>30) %></p>
+								<% end %>
+								<p></p>
+							</div>	
+						</div>
+						
+						<% if current_user != nil %>
+							<div class="mini_extract mini_extract_create" style="background-image: url('/images/watermarks/b_watermark_story.png')" onclick="window.location.href ='<%= new_experience_path %>';return false;">
+						<% else %>
+							<div class="mini_extract mini_extract_create" style="background-image: url('/images/watermarks/b_watermark_story.png')" onclick="alert('Login for this feature');">
+						<% end %>												
+							<div class="mini_extract_header">
+								<p><%= t("learning_story") %></p>
+							</div>	
+							<div class="mini_extract_footer">
+								<p>&nbsp;</p>
+								<p><%= t('create_learning_story') %></p>								
+							</div>	
+						</div>
+							
+					</div>
+						
+					<div class="relevant_resource_box">
+						
+						<% if @lecture!=nil && @lecture.element_image.url!="none"  %>
+						<div class="mini_extract mini_extract_discover" style="background-image: url('<%= @lecture.element_image.url%>')" onclick="window.location.href ='<%= lectures_path %>';return false;">
+						<% else %>
+						<div class="mini_extract mini_extract_discover" style="background-image: url('/images/watermarks/b_watermark_lecture.png')" onclick="window.location.href ='<%= lectures_path %>';return false;">
+						<% end %>
+							<div class="mini_extract_header">
+								<p><%= t('relevant_lectures') %></p>
+							</div>	
+							<div class="mini_extract_footer" >
+								<% if @lecture!=nil %>
+									<p><%= truncate(@lecture.name, :length =>30) %></p>
+								<% end %>
+								<p></p>
+							</div>	
+						</div>
+						
+						
+						
+					</div>	
+				</div>	
+			</div>
+			
+			
+			<div class="third_column">
+				<div id="myCarousel" class="carousel slide">
+					<ol class="carousel-indicators">
+					    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+					    <li data-target="#myCarousel" data-slide-to="1"></li>
+					    <li data-target="#myCarousel" data-slide-to="2"></li>
+					    <li data-target="#myCarousel" data-slide-to="3"></li>
+					    <li data-target="#myCarousel" data-slide-to="4"></li>							    
+					</ol>
+					<!-- Carousel items -->
+					<div class="carousel-inner">
+					   <div class="active item">
+					   		<img src="/images/carousel/carousel_1.jpg"></img>
+					   		<div class="carousel-caption">
+                     			<h4>Workshop in Oulu</h4>
+                      			<p>Teachers and students testing the ITEC-SDE in a workshop in Oulu, Finland.</p>
+                    		</div>
+					   </div>
+					   <div class="item">
+					   		<img src="/images/carousel/carousel_2.jpg"></img>
+					   		<div class="carousel-caption">
+                     			<h4>Workshop in Oulu</h4>
+                      			<p>Teachers and students testing the ITEC-SDE in a workshop in Oulu, Finland.</p>
+                    		</div>
+					   </div>
+					   <div class="item">
+					   		<img src="/images/carousel/carousel_3.jpg"></img>
+					   		<div class="carousel-caption">
+                     			<h4>Workshop in Oulu</h4>
+                      			<p>Teachers and students testing the ITEC-SDE in a workshop in Oulu, Finland.</p>
+                    		</div>
+					   </div>
+					   <div class="item">
+					   		<img src="/images/carousel/carousel_4.jpg"></img>
+					   		<div class="carousel-caption">
+                     			<h4>Workshop in Lisbon</h4>
+                      			<p>Teachers testing the ITEC-SDE in a workshop in Lisbon, Portugal.</p>
+                    		</div>
+					   </div>
+					   <div class="item">
+					   		<img src="/images/carousel/carousel_5.jpg"></img>
+					   		<div class="carousel-caption">
+                     			<h4>Workshop in Lisbon</h4>
+                      			<p>Teachers testing the ITEC-SDE in a workshop in Lisbon, Portugal.</p>
+                    		</div>
+					   </div>
+					</div>
+					<!-- Carousel nav -->
+					<a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+					<a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
+				</div>				
+				
+				
+			</div>	
+		</div>	
+	</div>
+<% end %>

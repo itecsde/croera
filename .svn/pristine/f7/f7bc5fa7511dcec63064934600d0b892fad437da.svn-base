@@ -1,0 +1,152 @@
+<header class="z-max" role="top_navigation">
+	
+	<div class="dropdown hamburger" onmouseout="$('.full_hamburger').css('width', '0px')">
+		<div class="dropdown_button" onclick="toggle_full_hamburger(this)">
+			<div class="icon_hamburger">
+			</div>
+		</div>		
+		<div class="full_hamburger" onmouseover="$('.full_hamburger').css('width', '350px')">		
+			<ul>
+				<%= link_to scenarios_path do %>
+				<li>
+					<img src="/images/white_scenario_30.png"></img>
+					<span><%= t('scenarios') %></span>
+				</li>	
+				<% end %>
+				<%= link_to activities_path do %>
+				<li>
+					<img src="/images/white_activity_30.png"></img>
+					<span><%= t('learning_activities') %></span>
+				</li>	
+				<% end %>
+				<%= link_to experiences_path do %>
+				<li>
+					<img src="/images/white_story_30.png"></img>
+					<span><%= t('learning_stories') %></span>
+				</li>	
+				<% end %>
+								
+			</ul>	
+		</div>
+	</div>		
+	
+	
+	<div class="logo">
+		<a href="<%= root_path%>">
+			<div class="icon_logo">
+			</div>
+		</a>		
+	</div>
+	
+	<div class="dropdown menu_item" onmouseleave="hide_dropdown_list(this)">
+		<div class="dropdown_button" onclick="toggle_dropbox_list_visibility(this);">
+			<div class="down">
+				<img src="/images/arrow_down.png"></img>
+			</div>
+			<div class="section_title"><%= t('discover').upcase %></div>
+		</div>
+		<ul class="dropdown_list">
+			<a href="<%= applications_path %>">
+				<li><%= t('applications') %></li>
+			</a>
+			<a href="<%= events_path %>">
+				<li><%= t('events') %></li>
+			</a>
+			<a href="<%= biographies_path %>">
+				<li><%= t('biographies') %></li>				
+			</a>
+			<a href="<%= lectures_path %>">
+				<li><%= t('lectures') %></li>
+			</a>
+			<a href="<%= sites_path %>">
+				<li><%= t('sites') %></li>
+			</a>
+			<a href="<%= documentaries_path %>">
+				<li><%= t('documentaries') %></li>
+			</a>
+			<a href="<%= courses_path %>">
+				<li><%= t('courses') %></li>
+			</a>
+			<a href="<%= articles_path %>">
+				<li><%= t('articles') %></li>
+			<a href="<%= lres_path %>">
+				<li><%= t('lres') %></li>				
+			</a>
+			<a href="<%= posts_path %>">
+				<li><%= t('posts') %></li>				
+			</a>
+			<a href="<%= slideshows_path %>">
+				<li><%= t('slideshows') %></li>				
+			</a>										
+		</ul>	
+	</div>
+	
+	
+	
+	<%= link_to new_user_registration_path do %>
+		<% if element_active=="sign_up" %>
+		<div class="sign_up active">
+		<% else %>
+		<div class="sign_up">
+		<% end %>
+			<div class="section_title"><%= t('sign_up') %></div>
+		</div>
+	<% end %>
+	
+	<%= link_to new_user_session_path do %>
+		<% if element_active=="login" %>	
+		<div class="login active">
+		<% else %>
+		<div class="login">
+		<% end %>
+			<div class="section_title"><%= t('login') %></div>
+		</div>	
+	<% end %>
+	
+	<div class="dropdown menu_item dropdown_languages" onmouseleave="hide_dropdown_list(this)">
+		<div class="dropdown_button" onclick="toggle_dropbox_list_visibility(this);">
+			<div class="down">
+				<img src="/images/arrow_down.png"></img>
+			</div>
+			<div class="section_title"><%= t('language') %></div>
+		</div>
+		<ul class="dropdown_list">			
+			<%= link_to :locale=>"en" do %>
+				<li><%= image_tag("/images/languages/en.gif") %>&nbsp;&nbsp;&nbsp;<%= t('English') %></li>
+			<% end %>
+			<%= link_to :locale=>"es" do %>	
+				<li><%= image_tag("/images/languages/es.gif") %>&nbsp;&nbsp;&nbsp;<%= t('Spanish') %></li>
+			<% end %>
+			<%= link_to :locale=>"gl" do %>	
+				<li><%= image_tag("/images/languages/gl.gif") %>&nbsp;&nbsp;&nbsp;<%= t('Galician') %></li>
+			<% end %>
+			<%= link_to :locale=>"pt" do %>	
+				<li><%= image_tag("/images/languages/pt.gif") %>&nbsp;&nbsp;&nbsp;<%= t('Portuguese') %></li>
+			<% end %>
+			<%= link_to :locale=>"fr" do %>	
+				<li><%= image_tag("/images/languages/fr.gif") %>&nbsp;&nbsp;&nbsp;<%= t('French') %></li>
+			<% end %>
+			<%= link_to :locale=>"fi" do %>	
+				<li><%= image_tag("/images/languages/fi.gif") %>&nbsp;&nbsp;&nbsp;<%= t('Finnish') %></li>
+			<% end %>
+			<%= link_to :locale=>"no" do %>	
+				<li><%= image_tag("/images/languages/no.gif") %>&nbsp;&nbsp;&nbsp;<%= t('Norwegian') %></li>
+			<% end %>
+			<%= link_to :locale=>"lt" do %>	
+				<li><%= image_tag("/images/languages/lt.gif") %>&nbsp;&nbsp;&nbsp;<%= t('Lithuanian') %></li>
+			<% end %>
+			<%= link_to :locale=>"tr" do %>	
+				<li><%= image_tag("/images/languages/tr.gif") %>&nbsp;&nbsp;&nbsp;<%= t('Turkish') %></li>
+			<% end %>
+			<%= link_to :locale=>"nl" do %>	
+				<li><%= image_tag("/images/languages/nl.gif") %>&nbsp;&nbsp;&nbsp;<%= t('Dutch') %></li>
+			<% end %>
+			<%= link_to :locale=>"sk" do %>	
+				<li><%= image_tag("/images/languages/sk.gif") %>&nbsp;&nbsp;&nbsp;<%= t('Slovak') %></li>
+			<% end %>
+			<%= link_to :locale=>"hu" do %>	
+				<li><%= image_tag("/images/languages/hu.gif") %>&nbsp;&nbsp;&nbsp;<%= t('Hungarian') %></li>
+			<% end %>
+		</ul>	
+	</div>		
+</header>

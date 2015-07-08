@@ -1,0 +1,184 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+require 'watir-webdriver'
+
+class ScraperLres
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+  def scrape_lre(*reintentos)
+    begin
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+
+      url = "http://lreforschools.eun.org/web/guest/resource-details?resourceId="
+
+      for i in 1..1000000
+        scrape_resource_lre url + i.to_s 
+      end
+      
+    rescue  Exception => e
+      puts "Exception in scrape_lre"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_lre(1,reintentos)
+      end
+    end
+  end #scrape_lre
+  
+    def scrape_resource_lre(resource_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts "resource_url --->" + resource_url
+      idiomas_disponibles = Array.new
+      human_tags = Array.new
+      
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end              
+      resource_page = Nokogiri::HTML(open(resource_url))
+      scraped_resource = Lre.new      
+ 
+      begin
+        name = resource_page.css("h2.resourceTitle")[0].text.strip
+        puts "Name: " + name 
+      rescue Exception => e
+        puts "Exception name lre"
+        puts e.message
+      end
+
+      description = ""
+      begin
+        description = strip_tags resource_page.css("div#tabs-2.ui-tabs-panel")[0].text.strip
+        puts "Description: " + description 
+      rescue
+        puts "Exception description lre"
+      end
+    
+      begin
+        resource_page.css("dt").each do |dt|
+          if dt.text.strip == "Available in:"
+            dt.next.next.css("span.iceOutTxt span.iceOutTxt").each do |language|
+              idiomas_disponibles << language.text.strip
+            end
+          end
+        end
+        language = idiomas_disponibles[0]
+        idiomas_disponibles.clear
+        idiomas_disponibles << language
+        puts idiomas_disponibles
+      rescue Exception => e
+        puts "Failed languages lre"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      I18n.locale = idiomas_disponibles[0]
+      scraped_resource.name = name
+      scraped_resource.description = description
+      
+      I18n.locale = "en"
+
+      begin
+        photo_url = resource_page.css("img")[0]['src']
+        puts "photo_url: " + photo_url
+      rescue Exception => e
+        puts "Failed photo lre"
+        puts e.message
+        puts e.backtrace.inspect
+        photo_url = nil
+      end
+      
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_resource.element_image=URI.parse(photo_url)
+        rescue
+          puts "lre  IMAGEN NO GUARDADA"
+          scraped_resource.element_image.clear
+        end
+      end
+      
+      begin
+        resource_page.css("dt").each do |dt|
+          if dt.text.strip == "Users' Tags" || dt.text.strip == "Descriptors"
+            dt.next.next.css("span.iceOutTxt a").each do |tag|
+              human_tags << tag.text.strip
+            end
+          end
+          if dt.text.strip == "Keywords"
+            dt.next.next.css("span.iceOutTxt").each do |tag|
+              tag.text.split(",").each do |keyword|
+                human_tags << keyword.strip
+              end
+            end
+          end
+        end
+        human_tags.delete("Not Available")
+        puts human_tags.length
+        puts human_tags
+      rescue Exception => e
+        puts "Failed Human Tags lre"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      prosa = name + ". " + description
+             
+      scraped_from = "http://lreforschools.eun.org"
+      I18n.locale = idiomas_disponibles[0]
+
+      scraped_resource.url=resource_url
+      scraped_resource.link = resource_url
+      scraped_resource.scraped_from=scraped_from
+      
+      
+      if name != "Resource unavailable"
+        scraped_resource.persist(idiomas_disponibles,prosa,human_tags)
+      end 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_resource_lre"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_resource_lre(resource_url,1,reintentos)
+      end
+    end
+    
+  end #scrape_resource_lre
+  
+  
+  #########################################################
+  ## scrape_klascement
+  ##################################################
+  
+  def scrape_klascement
+    browser = Watir::Browser.new
+    browser.goto "http://www.google.es"
+    
+  end
+  
+  
+  
+  
+
+end

@@ -1,0 +1,11 @@
+scrape_slideshow = ScraperSlideshows.new
+scrape_slideshow.scrape_slideshare("es")
+scrape_slideshow.scrape_slideshare("en")
+scrape_slideshow.scrape_slideshare("pt")
+scrape_slideshow.scrape_slideshare("tr")
+scrape_slideshow.scrape_slideshare("sk")
+scrape_slideshow.scrape_slideshare("no")
+scrape_slideshow.scrape_slideshare("fi")
+scrape_slideshow.scrape_slideshare("lt")
+scrape_slideshow.scrape_slideshare("nl")
+scrape_slideshow.scrape_slideshare("hu")

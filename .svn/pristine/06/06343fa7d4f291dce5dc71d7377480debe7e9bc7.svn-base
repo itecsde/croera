@@ -1,0 +1,57 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'experiences', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => (t ('new_learning_story')), :actions => "experiences/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+
+	<%= form_for(@experience, :html => { :class => "experience_form", :multipart => true }) do |fo| %>
+	<div id="element_header">
+		<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @experience,:element_type=>"experience"} %> 
+		<hr />
+		<div class="clear"></div>
+	</div>
+	<div id="content_container" class="experience_container">
+		
+			<%= render :partial => "form" , :locals => {:f => fo} %>
+			<%= render :partial => "submit", :locals => {:f => fo} %>		
+		<input type="hidden" id="edition_mode" value="on"/>
+		<div class="clear"></div>
+	</div>
+	<% end %>
+<div id="elements_library">
+	<%= render :partial => "adding_elements" %>
+</div>
+<div id="popups">
+	<!-- Includes a popup for selecting events -->
+	<%= render :partial => "selectors/event_assignment_selector", :layout => "layouts/popup", :locals => {:popup_id => "event_assignment_selection", :popup_class => "selection simple", :callback => "insert_element('Event')", :details_header_title => "event"} %>
+	<!-- Includes a popup for selecting applications -->
+	<%= render :partial => "selectors/tool_assignment_selector", :layout => "layouts/popup", :locals => {:popup_id => "tool_assignment_selection", :popup_class => "selection simple", :callback => "insert_element('Application')", :details_header_title => "tool"} %>
+	<!-- Includes a popup for selecting a biography -->
+	<%= render :partial => "selectors/biography_assignment_selector", :layout => "layouts/popup", :locals => {:popup_id => "biography_assignment_selection", :popup_class => "selection simple", :callback => "insert_element('Biography')", :details_header_title => "biography"} %>
+	<!-- Includes a popup for selecting a lecture -->
+	<%= render :partial => "selectors/lecture_assignment_selector", :layout => "layouts/popup", :locals => {:popup_id => "lecture_assignment_selection", :popup_class => "selection simple", :callback => "insert_element('Lecture')", :details_header_title => "lecture"} %>
+	<!-- Includes a popup for selecting a site -->
+	<%= render :partial => "selectors/site_assignment_selector", :layout => "layouts/popup", :locals => {:popup_id => "site_assignment_selection", :popup_class => "selection simple", :callback => "insert_element('Site')", :details_header_title => "site"} %>
+	<!-- Includes a popup for selecting a documentary -->
+	<%= render :partial => "selectors/documentary_assignment_selector", :layout => "layouts/popup", :locals => {:popup_id => "documentary_assignment_selection", :popup_class => "selection simple", :callback => "insert_element('Documentary')", :details_header_title => "documentary"} %>
+	<!-- Includes a popup for selecting a course -->
+	<%= render :partial => "selectors/course_assignment_selector", :layout => "layouts/popup", :locals => {:popup_id => "course_assignment_selection", :popup_class => "selection simple", :callback => "insert_element('Course')", :details_header_title => "course"} %>
+	<!-- Includes a popup for selecting a activity -->
+	<%= render :partial => "selectors/activity_assignment_selector", :layout => "layouts/popup", :locals => {:popup_id => "activity_assignment_selection", :popup_class => "selection simple", :callback => "insert_element('Activity')", :details_header_title => "activity"} %>
+	<!-- Includes a popup that acts as a placeholder for showing an element -->
+	<%= render :partial => "bookmarks/popup_show", :layout => "layouts/popup", :locals => {:popup_id => "popup_show", :popup_class => "details", :callback => "", :details_header_title => "show"} %>
+</div>
+
+<script src="/javascript/experience_form.js"></script>
+<!-- Esto es para el popup de show activity para que no sparezca que se pueda editar -->	
+<script src="/javascript/activities_form.js"></script>
+
+<script src="/javascript/jquery.ui.widget.js"></script>
+<script src="/javascript/jquery.ui.core.min.js"></script>
+<script src="/javascript/jquery.ui.mouse.min.js"></script>
+<script src="/javascript/jquery.ui.accordion.min.js"></script>
+<script src="/javascript/jquery.ui.draggable.min.js"></script>
+<script src="/javascript/jquery.ui.droppable.min.js"></script>
+<script src="/javascript/jquery.ui.sortable.min.js"></script>
+<% end %>

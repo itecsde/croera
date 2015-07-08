@@ -1,0 +1,9 @@
+alice_comment_on_first_law_of_motion_resource:
+  name: 'Comment of Alice on first law resource'
+  commentable: wikipedia_first_law_of_motion (Resource)
+  user: alice
+
+bob_comment_on_second_law_of_motion_resource:
+  name: 'Comment of Bob on second law resource'
+  commentable: wikipedia_second_law_of_motion (Resource)
+  user: bob

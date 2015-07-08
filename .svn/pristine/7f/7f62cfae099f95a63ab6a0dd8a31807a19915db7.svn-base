@@ -1,0 +1,48 @@
+class ApplicationController < ActionController::Base
+  #protect_from_forgery
+  #before_filter :authenticate_user!
+  # Pass the locale as a URL query parameter
+  layout :resolve_layout
+  before_filter :set_locale
+  #before_filter :authenticate_user!, :except => [:index]
+  # before_filter :authenticate_user! 
+   
+  def extract_locale_from_accept_language_header
+    browser_language = request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first
+    accepted_languages =["en","es","pt","lt","no","tr","fr","nl","gl","sk","hu","fi"]
+    if accepted_languages.include? browser_language
+       return browser_language
+    else
+       return nil
+    end 
+  end
+  
+  def set_locale     
+    I18n.locale = params[:locale] || extract_locale_from_accept_language_header || I18n.default_locale
+  end
+    
+  
+  # Every helper method will include the URL in the query string
+  def default_url_options(options={})
+    logger.debug "default_url_options is passed options: #{options.inspect}\n"
+    { :locale => I18n.locale }
+  end
+  
+  def self.default_url_options
+  { :locale => I18n.locale }
+  end
+
+  def resolve_layout
+    case action_name
+    when "new", "create"
+      "application"
+    when "index","my_groups", "all_related_elements"
+      "listing"
+    else
+      "application"
+    end
+  end
+  
+  
+    
+end

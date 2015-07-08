@@ -1,0 +1,55 @@
+<%= render :partial => "header", :locals => {:section_title => (t :group), :actions => "group_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'groups', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => t('group'), :actions => "groups/group_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+
+	<div id="content_container" class="group_container">
+		<%= render "group" %>				
+		
+		<% if @group.scenarios_owned.size > 0 %>
+			<div class="ownership_elements">
+				<div class="prompt"><%= image_tag"/images/black_scenario_100.png", :width => "40px", :height => "40px" %>&nbsp;&nbsp;<%= t('scenarios') %></div>
+				<hr>
+				<div class="body">
+					<% @group.scenarios_owned.each do |element| %>
+						<%= render :partial => "elements/miniature" , :locals => {:element => element, :edition_mode =>@edition_mode} %> 
+					<% end %>
+				</div>	
+			</div>
+			<div class="clear"></div>
+		<% end %>
+		
+		<% if @group.activities_owned.size > 0 %>
+			<div class="ownership_elements">
+				<div class="prompt"><%= image_tag"/images/black_activity_100.png", :width => "40px", :height => "40px" %>&nbsp;&nbsp;<%= t('activities') %></div>
+				<hr>
+				<div class="body">
+					<% @group.activities_owned.each do |element| %>
+						<%= render :partial => "elements/miniature" , :locals => {:element => element, :edition_mode =>@edition_mode} %> 
+					<% end %>
+				</div>	
+			</div>
+			<div class="clear"></div>
+		<% end %>
+		
+		<% if @group.experiences_owned.size > 0 %>
+			<div class="ownership_elements">
+				<div class="prompt"><%= image_tag"/images/black_story_100.png", :width => "40px", :height => "40px" %>&nbsp;&nbsp;<%= t('learning_stories') %></div>
+				<hr>
+				<div class="body">
+					<% @group.experiences_owned.each do |element| %>
+						<%= render :partial => "elements/miniature" , :locals => {:element => element, :edition_mode =>@edition_mode} %> 
+					<% end %>
+				</div>	
+			</div>
+		<% end %>				
+		
+	</div> <!-- CONTENT -->
+	<span style="display:none" id="is_edition" data-value="false"></span>
+		
+	<script src="/javascript/groups_form.js"></script>
+<% end %>

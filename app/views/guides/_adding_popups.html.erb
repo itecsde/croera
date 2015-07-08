@@ -1,0 +1,14 @@
+<!-- Technological Setting selector window -->
+<%= render :partial => "selectors/technological_setting_selector", :layout => "layouts/popup", :locals => {:popup_id => "technological_settings", :popup_class => "selection simple", :callback => "select_technological_setting()", :details_header_title => "technological_setting"} %>
+<!-- Contextual Setting selector window -->
+<%= render :partial => "selectors/contextual_setting_selector", :layout => "layouts/popup", :locals => {:popup_id => "contextual_settings", :popup_class => "selection simple", :callback => "select_contextual_setting()", :details_header_title => "contextual_setting"} %>
+<!-- Sequence selector window -->
+<%= render :partial => "selectors/sequence_selector", :layout => "layouts/popup", :locals => {:popup_id => "sequences", :popup_class => "selection simple", :callback => "select_sequence()", :details_header_title => "sequence"} %>
+<!-- Tool assignment selector -->
+<%= render :partial => "selectors/tool_assignment_selector", :layout => "layouts/popup", :locals => {:popup_id => "tool_assignment_selection", :popup_class => "selection simple", :callback => "select_tool_assignment()", :details_header_title => "tool"} %>
+<!-- Person assignment selector -->
+<%= render :partial => "selectors/person_assignment_selector", :layout => "layouts/popup", :locals => {:popup_id => "person_assignment_selection", :popup_class => "selection simple", :callback => "select_person_assignment()", :details_header_title => "person"} %>
+<!-- Event assignment selector -->
+<%= render :partial => "selectors/event_assignment_selector", :layout => "layouts/popup", :locals => {:popup_id => "event_assignment_selection", :popup_class => "selection simple", :callback => "select_event_assignment()", :details_header_title => "event"} %>
+<!-- Show -->
+<%= render :partial => "guides/popup_show", :layout => "layouts/popup", :locals => {:popup_id => "popup_show", :popup_class => "details", :callback => "", :details_header_title => "activity"} %>

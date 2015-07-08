@@ -1,0 +1,4 @@
+<%= form_for(@person, :html => { :class => "person_form" }) do |fo| %>
+	<%= render :partial => "people/form" , :locals => {:person_form => fo} %>
+<% end %>
+<input type="hidden" id="edition_mode" value="off"/>

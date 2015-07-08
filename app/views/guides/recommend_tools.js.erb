@@ -1,0 +1,6 @@
+<% if @recommended_tools.length == 0 %>
+	var recommended_tools= ("<p class='no_recommend_text'><%=j t("no_recommends") %></p>");
+<% else %>
+	var recommended_tools= ("<% @recommended_tools.each_with_index do |tool, index| %><%=j render :partial => "recommended_resource", :locals => {:resource => tool, :details_button => "tool_details_button", :select_button => "select_device_tool", :recommendation_position => index + 1} %><% end %>");
+<% end %>
+recommend_tools_callback();

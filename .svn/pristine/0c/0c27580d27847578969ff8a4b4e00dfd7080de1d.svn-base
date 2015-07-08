@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title><%= @page_title or 'iTEC-SDE' %></title>
+	<%= javascript_include_tag "application"%>
+
+	<%= csrf_meta_tags %>
+	<meta name="description" content="Actividades e Recursos Educativos Abertos">
+	<meta name="author" content="GIST">
+	
+	<!-- Estilos -->
+	<%= stylesheet_link_tag "devise" %>    
+	<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+  
+</head>
+<body>	
+	<%= yield %>
+</body>

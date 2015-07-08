@@ -1,0 +1,21 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header_document", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+
+<% end %>
+
+
+<% content_for :advanced_search do %>	
+	<%= render :partial =>"advanced_search" %>
+<% end %>
+
+
+<% content_for :content do %>
+
+	<div id="content_index">	
+		<%= render :partial => "participant", :locals => { :current_layout => "application" }%>
+	</div> <!-- CONTENT -->
+	
+	
+	<script src="/javascript/resource_index.js"></script>
+	<script src="/javascript/books_index.js"></script>
+<% end %>

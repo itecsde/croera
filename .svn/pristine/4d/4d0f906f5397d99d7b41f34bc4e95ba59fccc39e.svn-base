@@ -1,0 +1,143 @@
+class Biography < ActiveRecord::Base
+  include Taggable
+  include Ownable
+  include Wikipediable
+  include Globalizable
+  include Categorizable
+  include Scrapeable
+  
+  translates :name
+  translates :description
+  translates :link
+  
+  searchable do
+    integer :id
+    text :name
+    text :tags do |p|
+      p.tags.map(&:name)
+    end
+    text :categories do |p|
+      p.categories.map(&:name)
+    end
+    text :subjects do |p|
+      p.subjects.map(&:name)
+    end 
+    text :language do |lan|
+      lan.languages.map(&:language)
+    end
+    string :translations, :multiple => true do
+      translations.map{|translation| translation.locale}
+    end     
+    I18n.available_locales.each do |locale|
+      text "description_" + locale.to_s do
+        read_attribute(:description, :locale => locale.to_s)
+      end
+    end    
+    integer :owner_id
+    time :updated_at
+  end
+  
+  # An biography may have many comments
+  has_many :comments, :as => :commentable, :dependent => :destroy
+  
+  # An biography is categorised into many subjects
+  has_many :biography_subject_annotations, :dependent => :destroy
+  has_many :subjects, :through => :biography_subject_annotations
+  accepts_nested_attributes_for :biography_subject_annotations, :allow_destroy => :true
+  
+  # An biography is bookmarkable
+  has_many :bookmark_user_element_annotations, :as => :element, :dependent => :destroy
+  has_many :bookmarked_by, :through => :bookmark_user_element_annotations, :source =>:user
+
+  # And an biography may include a representative picture
+  attr_accessible :element_image, :name, :description, :url, :link, :biography_subject_annotations_attributes, :owner_type, :owner_id, :scraped_from, :creator_id, :tag_list
+  has_attached_file :element_image, :styles => { :original => "300x300>", :medium => "200x200>", :thumb => "30x30>" }, :default_url => "none"
+   
+ 
+  def persist(idiomas_disponibles, prosa, array_tags)
+    recent_hash = Digest::MD5.hexdigest(prosa)
+    check_result = check_resource_storage_state(self.url,recent_hash)
+    if check_result == "insert"
+      puts "SE INSERTA EL BIOGRAPHY"
+      self.info_to_wikify = prosa
+      self.hash_resource = recent_hash
+      self.create_semantic_annotations(array_tags)
+      #automatic_tags_ids = self.create_automatic_semantic_annotations(prosa)
+      #self.categorize(automatic_tags_ids)
+      self.save
+      self.reload
+      Sunspot.index self
+      Sunspot.commit      
+    elsif check_result == "update"
+      puts "UPDATE => SE ACTUALIZA EL BIOGRAPHY"
+      scraped_biography = Biography.where(:url => self.url)[0]
+      idiomas_disponibles.each do |idioma|
+        I18n.locale = idioma
+        scraped_biography.name = self.name
+        scraped_biography.description = self.description
+        scraped_biography.link = self.link
+      end
+      scraped_biography.create_semantic_annotations(array_tags)
+      #automatic_tags_ids = scraped_biography.create_automatic_semantic_annotations(prosa)
+      #scraped_biography.categorize(automatic_tags_ids)
+      scraped_biography.info_to_wikify = prosa
+      scraped_biography.hash_resource = recent_hash
+      scraped_biography.save
+      scraped_biography.reload
+      Sunspot.index scraped_biography
+      Sunspot.commit      
+    elsif check_result == "do_nothing"
+      puts "DO_NOTHING => NI SE INSERTA NI SE ACTUALIZA EL BIOGRAPHY COMPROBAMOS TRADUCCIONES"
+      if Biography.where(:url => self.url).size != 0
+        biography = Biography.find_by_url(self.url)
+        locales_string = Array.new
+        biography.translated_locales.each do |locale|
+          locales_string << locale.to_s
+        end
+        idiomas_disponibles_string = Array.new
+        idiomas_disponibles.each do |idioma_disponible|
+          idiomas_disponibles_string << idioma_disponible.to_s          
+        end
+        if (idiomas_sin_traducciones = idiomas_disponibles_string - locales_string) != []
+          puts "ACTUALIZAMOS TRADUCCIONES"
+          idiomas_sin_traducciones.each do |idioma|
+            I18n.locale = idioma
+            puts I18n.locale
+            puts self.description
+            biography.name = self.name
+            biography.description = self.description
+            biography.link = self.link
+            biography.save
+          end
+        else
+          puts "LAS TRADUCCIONES ESTAN COMPLETAS. NO HACEMOS NADA"
+        end
+      end
+    end   
+  end
+   
+  def check_resource_storage_state(url,recent_hash)
+    result = "do_nothing"
+    biography = Biography.where(:url => url)
+    if biography.size > 0
+      puts "hash BD: " + biography[0].hash_resource
+      puts "hash actual: " + recent_hash
+      if biography[0].hash_resource != recent_hash
+        result = "update"
+      end
+    else
+      result = "insert"
+    end
+    return result
+  end #check_resource_storage_state
+  
+  def tag_list
+    self.tags.map { |t| t.name }.join(", ")
+  end
+
+  def tag_list=(new_value)
+    tag_names = new_value.split(/,\s+/)
+    self.tags = tag_names.map { |name| Tag.where('name = ?', name).first or Tag.create(:name => name.strip) }
+  end
+  
+end

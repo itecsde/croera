@@ -1,0 +1,27 @@
+<% content_for :meta do %>
+	<%= render :partial => "/generic_partials/meta", :locals => {:element => @application}%>
+<% end %>
+
+<%= render :partial => "header", :locals => {:section_title => (t :application), :actions => "application_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'home', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'application', :actions => "applications/application_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+
+	<% if current_user != nil %>
+		<%= render :partial => "generic_partials/header_show_resource", :locals => {:element => @application} %>	
+	<% end %>
+	
+	<div id="content_container" class="application_container">
+		<%= render "application" %>
+		<%= render :partial => "search_results/related_elements_same_type",:locals => {:related_title =>'related_applications'} %>		
+	</div> <!-- CONTENT -->
+	
+	<%= render :partial => "search_results/related_elements", :locals => {:element_type =>'application'} %>
+	
+	<script src="/javascript/applications_form.js"></script>
+
+<% end %>

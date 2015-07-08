@@ -1,0 +1,477 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+require "mechanize"
+require 'amazon/ecs'
+
+class ScraperBooks
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+  
+  #############################################################
+  ####### SCRAPE_GUTENBERG
+  ###########################################################
+  def scrape_gutenberg (*siguiente)
+    begin
+      source_name = __method__.to_s    
+      #Add new source, or select it if exists
+      source = Source.create_or_select_source(source_name, "Book", "http://www.amazon.com/")
+      
+      if siguiente[1]==1
+        reintentos = siguiente[2]
+      else
+        reintentos = 2
+      end    
+         
+      for i in 1..45795
+         scrape_book_gutenberg("http://www.gutenberg.org/ebooks/" + i.to_s)
+      end
+
+      source.correct_scrape
+    rescue  Exception => e
+      puts "Exception in scrape_gutenberg"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_gutenberg(1,reintentos)
+      end
+      source.incorrect_scrape
+    end
+  end #scrape_gutenberg
+  
+
+   def scrape_book_gutenberg(book_url, *reintentos)
+      begin
+         name = ""
+         description = ""
+         author = ""              
+         puts book_url
+         idiomas_disponibles = Array.new
+         manual_tags = Array.new
+         idiomas_disponibles = ['en']
+
+         if reintentos[0]==1
+            reintentos = reintentos[1].to_i
+         else
+            reintentos = 2
+         end
+
+         book_html_page = open(book_url, &:read)
+         book_page = Nokogiri::HTML(book_html_page)
+
+         scraped_book = Book.new
+
+         begin
+            name = book_page.css("div table.bibrec")[0].css("tr td[itemprop='headline']")[0].text.strip
+            puts "Name: " + name
+         rescue
+            puts "Exception name gutenberg"
+         end
+         
+         description, photo_url = search_book_on_amazon(name)
+                
+         begin
+            book_page.css("div table.bibrec")[0].css("tr td").each do |row|
+               if row.previous_element.text.strip == "Author"
+                  author = row.text.strip
+                  date = ""
+                  date = author.split(",").last
+                  author = author.gsub("," + date,"")
+                  manual_tags << author
+               end
+            end
+            puts "Author: " + author
+         rescue Exception => e
+            puts "Exception author gutenberg"
+            puts e.message
+            puts e.backtrace.inspect
+         end 
+         
+         begin
+            book_page.css("div table.bibrec")[0].css("tr td").each do |row|
+               if row.previous_element.text.strip == "Subject" or row.previous_element.text.strip == "LoC Class" 
+                  tag = row.text.strip   
+                  manual_tags << tag              
+               end
+            end
+         rescue Exception => e
+            puts "Exception tags gutenberg"
+            puts e.message
+            puts e.backtrace.inspect
+         end          
+            
+         prosa = name + ". " + description
+         
+         I18n.locale = "en"
+         scraped_from = "http://www.amazon.com"
+         scraped_book.name = name
+         scraped_book.author = author
+         scraped_book.description = description
+         scraped_book.url = book_url
+         scraped_book.link = book_url
+         scraped_book.raw_html = book_html_page
+         scraped_book.scraped_from = scraped_from
+         if photo_url!=nil
+            begin
+               scraped_book.element_image=URI.parse(photo_url)
+            rescue Exception => e
+               puts e.message
+               puts e.backtrace.inspect
+               puts "book: IMAGEN NO GUARDADA"
+               scraped_book.element_image.clear
+            end
+         end
+         scraped_book.persist(idiomas_disponibles, prosa, manual_tags)
+         reintentos = 2
+      rescue Exception => e
+         puts "Exception scrape_book_gutenberg"
+         puts e.backtrace.inspect
+         puts e.message
+         puts reintentos
+         if reintentos > 0
+            reintentos-=1
+            sleep 2
+            scrape_book_gutenberg(book_url,1,reintentos)
+         end
+      end
+   end #scrape_book_gutenberg
+   
+   
+   def scrape_forgotten_books(*siguiente)
+      begin
+         
+         available_categories =  ['Fiction Books', 'Drama Books', 'Poetry Books', 'Folklore & Mythology Books', 'Esoteric Books', 'Self Help Books',
+            'Philosophy Books', 'Religion Books', 'Ancient History Books', 'Medieval toEarly Modern History', 'Business & Economics Books', 
+            'Science Books', 'Social Science Books', 'Technology & Engineering Books', 'Medicine Books', 'Mathematics Books', 'Art Books', 'Music Books', 'Recreation Books', 
+            'Home & Household Books', 'Language Books', 'Biographies & Essays', 'Administrative Records', 'Miscellaneous Books', 'Foreign Language Books']
+            
+         categories_to_scrape = ['Science Books']
+         
+         source_name = __method__.to_s    
+         #Add new source, or select it if exists
+         source = Source.create_or_select_source(source_name, "Book", "http://www.amazon.com/")
+         
+         parent_categories = Array.new
+         
+         if siguiente[1]==1
+           reintentos = siguiente[2]
+         else
+           reintentos = 2
+         end    
+         
+         url = "http://www.forgottenbooks.org/"
+         
+         page = Nokogiri::HTML(open(url))
+         
+         page.css("div.grey ul#accordion-2.accordion li").each do |category|
+            if category.css("a")[0]['href'] == "#"               
+               parent_categories << category
+            end
+         end
+         
+         scrape_parent_category_forgotten_books parent_categories[11]
+=begin      
+      
+      parent_categories.each do |parent_category|
+         if searched_category = parent_category.css("a[href='#']").text
+            scrape_category_forgotten_books parent_category
+         end
+      end
+=end                
+      source.correct_scrape
+      rescue Exception => e
+         puts "Exception scrape_forgotten_books"
+         puts e.message
+         puts e.backtrace.inspect
+         if reintentos > 0
+           puts reintentos
+           reintentos-=1
+           sleep 2
+           scrape_forgotten_books(1,reintentos)
+         end
+         source.incorrect_scrape
+       end
+     end #scrape_forgotten_books
+     
+     
+   def scrape_parent_category_forgotten_books(parent_category, *siguiente)
+      begin
+
+         if siguiente[1]==1
+            reintentos = siguiente[2]
+         else
+            reintentos = 2
+         end
+         
+         parent_category.css("ul li a").each do |url|
+            category_url = "http://www.forgottenbooks.org/" + url['href']
+            scrape_category_forgotten_books category_url
+         end
+         
+      rescue Exception => e
+         puts "Exception scrape_parent_category_forgotten_books"
+         puts e.message
+         puts e.backtrace.inspect
+         if reintentos > 0
+            puts reintentos
+            reintentos-=1
+            sleep 2
+            scrape_parent_category_forgotten_books(parent_category, 1,reintentos)
+         end
+      end
+   end #scrape_parent_category_forgotten_books   
+   
+   def scrape_category_forgotten_books(category_url, *siguiente)
+      begin
+
+         if siguiente[1]==1
+            reintentos = siguiente[2]
+         else
+            reintentos = 2
+         end
+
+      puts category_url         
+             
+      rescue Exception => e
+         puts "Exception scrape_category_forgotten_books"
+         puts e.message
+         puts e.backtrace.inspect
+         if reintentos > 0
+            puts reintentos
+            reintentos-=1
+            sleep 2
+            scrape_category_forgotten_books(category_url, 1,reintentos)
+         end
+      end
+   end #scrape_category_forgotten_books      
+     
+   def scrape_thegreatestbooks(*siguiente)
+      begin
+         urls = Array.new
+         source_name = __method__.to_s
+         #Add new source, or select it if exists
+         source = Source.create_or_select_source(source_name, "Book", "http://thegreatestbooks.org/")
+
+         parent_categories = Array.new
+
+         if siguiente[1]==1
+            reintentos = siguiente[2]
+         else
+            reintentos = 2
+         end
+
+         urls << "http://thegreatestbooks.org/"
+         urls << "http://thegreatestbooks.org/nonfiction"
+         
+         urls.each do |url|
+            puts url
+            
+            page = Nokogiri::HTML(open(url))
+                           
+            page.css(".item_list li.hentry h3.item_title a").each do |book|
+               scrape_book_thegreatestbooks "http://www.thegreatestbooks.org" + book['href']
+            end
+            
+            if !page.css("div.pagination a.next_page").empty?
+               siguiente = "http://www.thegreatestbooks.org" + page.css("div.pagination a.next_page")[0]['href']
+            else
+               siguiente = nil
+            end
+   
+            while siguiente != nil
+               sleep 2
+               puts "URL_SIGUIENTE --> " + siguiente
+               page =  Nokogiri::HTML(open(siguiente))
+               reintentos = 2
+               page.css(".item_list li.hentry h3.item_title a").each do |book|
+                  scrape_book_thegreatestbooks "http://www.thegreatestbooks.org" + book['href']
+               end
+              if !page.css("div.pagination a.next_page").empty?
+                  siguiente = "http://www.thegreatestbooks.org" + page.css("div.pagination a.next_page")[0]['href']
+               else
+                  siguiente = nil
+               end
+            end
+         end         
+         source.correct_scrape   
+      rescue Exception => e
+         puts "Exception scrape_thegreatestbooks"
+         puts e.message
+         puts e.backtrace.inspect
+         if reintentos > 0
+            puts reintentos
+            reintentos-=1
+            sleep 2
+            scrape_thegreatestbooks(1,reintentos)
+         end
+      source.incorrect_scrape
+      end
+   end #scrape_thegreatestbooks
+     
+     
+   def scrape_book_thegreatestbooks(book_url, *reintentos)
+      begin
+         name = ""
+         description = ""
+         author = ""              
+         puts book_url
+         idiomas_disponibles = Array.new
+         manual_tags = Array.new
+         idiomas_disponibles = ['en']
+
+         if reintentos[0]==1
+            reintentos = reintentos[1].to_i
+         else
+            reintentos = 2
+         end
+
+         book_html_page = open(book_url, &:read)
+         book_page = Nokogiri::HTML(book_html_page)
+
+         scraped_book = Book.new
+
+         begin
+            name_and_author = book_page.css("div.container div.span-13 h2.alt")[0].text.strip
+            puts name_and_author
+            author = name_and_author.split("by").last.strip
+            name =  name_and_author.gsub("by " + author,"").strip
+            puts "Name: " + name
+            puts "Author: " + author
+         rescue
+            puts "Exception name and author thegreatestbooks"
+         end
+                 
+         begin
+            description = book_page.css("div.container div.span-13 div.item_description")[0].text.strip
+            puts "Description"
+            puts description
+         rescue
+            puts "Exception description thegreatestbooks"
+         end         
+         
+         manual_tags << author
+         
+         amazon_description, amazon_photo_url = search_book_on_amazon(name + " " + author)          
+            
+         prosa = name + ". " + description + ". " + amazon_description
+         
+         I18n.locale = "en"
+         scraped_from = "http://www.thegreatestbooks.org"
+         scraped_book.name = name
+         scraped_book.author = author
+         scraped_book.description = description
+         scraped_book.url = book_url
+         scraped_book.link = book_url
+         scraped_book.raw_html = book_html_page
+         scraped_book.scraped_from = scraped_from
+         photo_url = amazon_photo_url
+         if photo_url!=nil
+            begin
+               scraped_book.element_image=URI.parse(photo_url)
+            rescue Exception => e
+               puts e.message
+               puts e.backtrace.inspect
+               puts "book: IMAGEN NO GUARDADA"
+               scraped_book.element_image.clear
+            end
+         end
+         scraped_book.persist(idiomas_disponibles, prosa, manual_tags)
+         reintentos = 2
+      rescue Exception => e
+         puts "Exception scrape_book_thegreatestbooks"
+         puts e.backtrace.inspect
+         puts e.message
+         puts reintentos
+         if reintentos > 0
+            reintentos-=1
+            sleep 2
+            scrape_book_thegreatestbooks(book_url,1,reintentos)
+         end
+      end
+   end #scrape_book_gutenberg     
+     
+     
+   
+   def search_book_on_amazon(search_term)
+      begin
+         amazon_url = URI.encode("http://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Dstripbooks&field-keywords=" + search_term)
+         puts "Searching '" + search_term + "' in Amazon..."         
+         amazon_page = Nokogiri::HTML(open(amazon_url))         
+         puts "Found!" 
+                
+         File.open('amazon.html', 'w') do |f2|
+           # '\n' es el retorno de carro
+           f2.puts amazon_page
+         end                
+         
+         book_url = ""                
+         amazon_page.css("div#atfResults div").each do |result|
+            if result.text.include? "Paperback"
+               book_url = result.css(".image a")[0]['href']
+               break
+            end
+         end          
+         puts book_url         
+         book_page = Nokogiri::HTML(open(book_url))
+         
+         File.open('book.html', 'w') do |f2|
+           # '\n' es el retorno de carro
+           f2.puts book_page
+         end
+                         
+         begin
+           description = book_page.css("div#centerCol.centerColumn div#bookDescription_feature_div.feature noscript")[0].text.strip
+           puts
+           puts "Description:"
+           puts description
+         rescue Exception => e
+            puts "Exception description amazon"
+            puts e.message
+            puts e.backtrace.inspect
+         end
+       
+         begin
+             photo_url = book_page.css("div#main-image-container.a-column div#img-wrapper.maintain-height div#img-canvas.maintain-height img")[0]['src']
+             puts
+             puts "Photo: "
+             puts photo_url
+         rescue Exception => e
+            puts "Failed photo amazon"
+            puts e.message
+            puts e.backtrace.inspect
+            photo_url = nil
+         end         
+         
+         return description, photo_url
+                 
+      rescue Exception => e
+         puts "Exception search_books_on_amazon"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end 
+   
+   def search_books_on_amazon_gem(search_term)
+      begin
+         res = Amazon::Ecs.item_search('ruby', :search_index => 'All')        
+         puts res
+      rescue Exception => e
+         puts "Exception search_books_on_amazon"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end
+   
+   
+   
+   
+   
+   
+   
+end

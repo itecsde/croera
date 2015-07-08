@@ -1,0 +1,36 @@
+<%= render :partial => "header", :locals => {:section_title => (t :new_activity), :actions => "form_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'activities', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'new_activity', :actions => "activities/form_actions"} %>
+<% end -%>
+
+<% content_for :content do %>
+	<%= form_for(@activity,:html => { :class => "activity_form", :multipart => true }) do |f_activity| %>
+
+		<% if @current_tab == "activities" %>
+			<div id="element_header">
+				<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @activity,:element_type=>"activity"} %> 
+				<hr />
+				<div class="clear"></div>
+			</div>	
+		<% end %>
+		
+		<div id="content_container" class="activity_container new_activity">
+			<%= render :partial => "form" , :locals => {:f => f_activity, :is_in_guide => false, :is_in_sequence => false} %>
+			<%= render :partial => "submit", :locals => {:f => f_activity} %>
+			<input type="hidden" id="edition_mode" value="on"/>
+			<input type="hidden" id="template_edition_mode" value="off"/>
+			<div id="elements_library">
+				<%= render :partial => "adding_elements" %>
+			</div>
+			<div id="popups">
+				<%= render :partial => "adding_popups" %>
+			</div>
+		</div>
+	<% end %>	
+
+<script src="/javascript/bootstrap_tooltip.js"></script>
+<script src="/javascript/activities_form.js"></script>
+<script src="/javascript/activity_paginations.js"></script>
+<%end%>

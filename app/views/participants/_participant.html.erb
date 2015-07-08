@@ -1,0 +1,17 @@
+
+<div class="icon_logo_back">
+	<img onclick="goBack()" src="/images/back.png" />  
+</div>
+<br>
+
+
+<%= form_for(@participants, :html => { :class => "lre_form" }) do |fo| %>
+	<%= render :partial => "participants/form" , :locals => {:participant_form => fo} %>
+<% end %>
+<input type="hidden" id="edition_mode" value="off"/>
+
+<script>
+	function goBack() {
+    window.history.back();
+}
+</script>

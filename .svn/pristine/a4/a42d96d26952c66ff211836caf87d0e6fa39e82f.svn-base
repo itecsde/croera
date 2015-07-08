@@ -1,0 +1,10 @@
+<% related_same_type = @related_elements.get_related_elements(@resource_type) %>
+
+<div class="clear"></div>
+<% if related_same_type.size > 0 %>
+	<div class="related_element same_type related_<%= @resource_type.downcase %>">							
+		<%= render :partial => "search_results/partial_related_elements", :locals => {:related_elements => related_same_type, :element_type => @resource_type, :element_id => params[:id], :related_type => @resource_type } %>										
+	</div>
+<% end %>
+<div class="clear"></div>
+

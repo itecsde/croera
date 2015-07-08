@@ -1,0 +1,124 @@
+<% if @document.errors.any? %>
+<div id="error_explanation">
+	<h2><%= pluralize(@document.errors.count, "error") %> prohibited this artwork from being saved:</h2>
+
+	<ul>
+		<% @document.errors.full_messages.each do |msg| %>
+		<li>
+			<%= msg %>
+		</li>
+		<% end %>
+	</ul>
+</div>
+<% end %>
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="artwork_name field_body">
+		<% if @edition_mode==true %>
+		<textarea id="artwork_name" name="artwork[name]" placeholder="<%= t("title") %>"><%= @document.name %></textarea>
+		<i class="icon-pencil icon-grey"></i>
+		<% else %>
+		<span><%= @document.name %></span>
+		<% end %>
+	</div>
+
+	<div class="artwork_description description field_body">
+		<% if @edition_mode==true %>
+		<textarea id="artwork_description" name="artwork[description]" placeholder="<%= t("description") %>"><%= @document.description %></textarea>
+		<i class="icon-pencil icon-grey"></i>
+		<% else %>
+		<div>
+			<% if @document.description != nil %>
+			<%= raw @document.description.truncate(1000, :separator => " ", :omission => "...") %>
+			<% end %>
+		</div>
+		<% end %>
+	</div>
+
+	<div class="artwork_tags element_field_box">
+		<div class="field_prompt">
+			<%= t("keywords") %>
+		</div>
+		<div class="field_body">
+			<% if @edition_mode==true %>
+			<textarea id="artwork_tags" class="tags" name="artwork[tag_list]"><% if @document!=nil %><%= @document.document_tag_list %><% end %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+			<% else %>
+			<span class="tags"><% if @document!=nil %><%= @document.document_tag_list_with_links.html_safe %><% end %></span>
+			<% end %>
+		</div>
+	</div>
+
+	<div class="artwork_description description field_body">
+		<div class="field_prompt">
+			<%= t("original_category") %>
+		</div>
+		<% if @edition_mode==true %>
+		<textarea id="artwork_description" name="artwork[description]" placeholder="<%= t("category") %>"><%= @document.topics %></textarea>
+		<i class="icon-pencil icon-grey"></i>
+		<% else %>
+		<div>
+			<% if @document.original_category != nil %>
+			<%= raw @document.original_category.truncate(1000, :separator => " ", :omission => "...") %>
+			<% end %>
+		</div>
+		<% end %>
+	</div>
+	
+	<div class="artwork_description description field_body">
+		<div class="field_prompt">
+			<%= t("classified in category") %>
+		</div>
+		<% if @edition_mode==true %>
+		<textarea id="artwork_description" name="artwork[description]" placeholder="<%= t("category") %>"><%= @document.topics %></textarea>
+		<i class="icon-pencil icon-grey"></i>
+		<% else %>
+		<div>
+			<% if @document.classified_in_category != nil %>
+			<%= raw @document.classified_in_category.truncate(1000, :separator => " ", :omission => "...") %>
+			<% end %>
+		</div>
+		<% end %>
+	</div>	
+
+</div>
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<% if @edition_mode == false && @popup == nil %>
+	<div class="watermark_container_show">
+		<div class="watermark_show <%= @resource_type.downcase%>_watermark"></div>
+	</div>
+	<% end %>
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>
+		<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>
+		<% if @document.element_image.url() != "none" %>
+		<%= image_tag @document.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+		<% else %>
+		<%= image_tag "/images/watermarks/b_watermark_artwork.png", width:'100%', :class => "image_preview" %>
+		<% end %>
+		<div class= "file_upload">
+			<%= artwork_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+		</div>
+		<% else %>
+		<% if @document.element_image.url() != "none" %>
+		<%= image_tag @document.element_image.url(:medium), width:'100%', :class => "image_preview_show" %>
+		<% else %>
+		<%= image_tag "/images/no_photo.png", width:'100%', :class => "image_preview_show" %>
+		<% end %>
+		<% end %>
+	</div>
+
+</div>
+
+<% if @edition_mode==true %>
+<div id="snippets_library" style="display: none">
+	<div class="subject_item">
+		<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name"), :prompt => "", :class => "subject" %>
+		<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+	</div>
+</div>
+<% end %>
+

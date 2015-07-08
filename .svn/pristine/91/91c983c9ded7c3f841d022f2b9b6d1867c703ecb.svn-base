@@ -1,0 +1,68 @@
+classify = Classify.new
+
+date = ARGV[0]
+puts "Date:"
+puts date
+source = ARGV[1]
+puts "Source:"
+puts source
+
+reuters_sections = ["Business", "Technology", "Science", "Health", "Sport", "Art", "Fashion", "Politics", "Education", "Culture", "Economy"]         
+dailymail_sections = ["Sport", "Health", "Science", "Economy", "Fashion", "ShowBusiness"]
+
+if source.downcase == "reuters"
+   sections = reuters_sections
+elsif source.downcase == "dailymail"
+   sections = dailymail_sections
+end
+
+
+Report.all.each do |report|
+   report.section = nil
+   report.save
+end
+
+
+classify.classify_stored_reports("basic",sections)
+classify.classify_stored_reports("basic",sections)
+classify.classify_stored_reports("basic",sections)
+
+if source.downcase == "reuters"
+   classify.reuters_statistics(source,date,"basic",sections)
+elsif source.downcase == "dailymail"
+   classify.dailymail_statistics(source,date,"basic",sections)
+end
+
+
+Report.all.each do |report|
+   report.section = nil
+   report.save
+end
+
+classify.classify_stored_reports("with_weight",sections)
+classify.classify_stored_reports("with_weight",sections)
+classify.classify_stored_reports("with_weight",sections)
+if source.downcase == "reuters"
+   classify.reuters_statistics(source,date,"with_weight",sections)
+elsif source.downcase == "dailymail"
+   classify.dailymail_statistics(source,date,"with_weight",sections)
+end
+
+Report.all.each do |report|
+   report.section = nil
+   report.save
+end
+
+
+classify.classify_stored_reports("without_countries",sections)
+classify.classify_stored_reports("without_countries",sections)
+classify.classify_stored_reports("without_countries",sections)
+if source.downcase == "reuters"
+   classify.reuters_statistics(source,date,"without_countries",sections)
+elsif source.downcase == "dailymail"
+   classify.dailymail_statistics(source,date,"without_countries",sections)
+end
+
+
+
+

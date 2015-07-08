@@ -1,0 +1,22 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'editing_slideshow', :actions => "slideshows/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@slideshow, :html => { :class => "slideshow_form" }) do |f_slideshow| %>
+		<div id="element_header">
+			<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @slideshow,:element_type=>"slideshow"} %> 
+			<hr />
+			<div class="clear"></div>
+		</div>
+		<div id="content_container" class="slideshow_container">
+			<input type="hidden" id="edition_mode" value="on">
+				<%= render :partial => "form" , :locals => {:slideshow_form => f_slideshow} %>
+				<%= render :partial => "submit", :locals => {:slideshow_form => f_slideshow} %>			
+		</div>			
+		<span style="display:none" id="is_edition" data-value="true"></span>	
+		
+		<script src="/javascript/slideshows_form.js"></script>
+	<% end %>
+<% end %>

@@ -1,0 +1,67 @@
+<% if @experience.errors.any? %>
+<div id="error_explanation">
+  <h2><%= pluralize(@experience.errors.count, "error") %> prohibited this activity from being saved:</h2>
+  <ul>
+  <% @experience.errors.full_messages.each do |msg| %>
+    <li><%= msg %></li>
+  <% end %>
+  </ul>
+</div> 
+<% end %>
+<div id="experience_head">
+	<div class="experience_id">
+		<%= f.hidden_field :id %>
+	</div>
+	<div class="experience_name editable active name">
+		<%= f.text_field :name, :class => "experience_title", :placeholder => t("title")  %>
+		<i class="icon-pencil icon-grey"></i>
+	</div>
+	<div class="clear"></div>
+	
+	<div class= "description_container">
+		<div class="experience_image picture_container image ">
+			<div class="editable active">
+
+				<img class="image_preview" width="100%"/>
+
+				<div class= "file_upload">
+					<%= f.file_field :element_image, :onchange => "image_preview(this, event);", :class =>"input_element_image" %>
+				</div>
+			</div>
+		</div>
+
+		<div class="experience_description editable active description">
+
+			<textarea id="experience_description" name="experience[description]" placeholder="<%= t("description") %>"><%= @experience.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		</div>
+		<div class="clear"></div>
+		<!--
+		<div class= "select_element_picture_button has_edition_controls active">
+			<button onclick= "select_element_picture(this); return false;" class="edition_control"><%= t("Select_picture") %></button>
+		</div>
+		-->
+	</div>
+</div>
+<div class="clear"></div>
+<div id="experience_body">
+	<div id="experience_steps">
+		<% @experience.experience_steps.each_with_index do |experience_step, index|%>
+			<% if index == 0
+					if index == @experience.experience_steps.length - 1
+						@position = "unique"
+					else
+						@position = "first"
+					end
+				else
+					if index == @experience.experience_steps.length - 1
+						@position = "last"
+					else
+						@position = "middle"
+					end
+				end	%>
+			<%= render :partial => "experiences/experience_step" , :locals => {:experience_step => experience_step, :position => @position } %>
+		<% end %>	
+	</div>
+	<div class="clear"></div>
+</div>

@@ -1,0 +1,16 @@
+
+
+<%= render :partial => "documents/form"  %>
+
+<input type="hidden" id="edition_mode" value="off"/>
+
+
+
+<% if false %>
+	
+<%= form_for(@document, :html => { :class => "reuters_new_item_form" }) do |fo| %>
+	<%= render :partial => "documents/form" , :locals => {:lre_form => fo} %>
+<% end %>
+<input type="hidden" id="edition_mode" value="off"/>
+
+<% end %>

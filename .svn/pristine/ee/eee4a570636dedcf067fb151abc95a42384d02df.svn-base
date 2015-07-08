@@ -1,0 +1,25 @@
+	
+<div class="prompt">
+	<img src="/images/<%= date_range %>.png" width="50px"/>&nbsp;&nbsp;<%= t(date_range) %>
+	<% if elements.last_page? %>
+		<%= image_tag "/images/arrow_right_disabled.png",:class => "arrow_disabled" %>
+	<% else %>
+		<%= link_to_next_page elements, image_tag("/images/arrow_right.png") ,:remote => true, :params => {:controller => "reports",:action => "load_more_reports_by_section_and_date",:section => section,:date_range => date_range } %>
+	<% end %>
+	<% if elements.first_page? %>
+		<%= image_tag "/images/arrow_left_disabled.png", :class => "arrow_disabled"  %>
+	<% else %>
+		<%= link_to_previous_page elements, image_tag("/images/arrow_left.png") ,:remote => true, :params => {:controller => "reports",:action => "load_more_reports_by_section_and_date",:section => section,:date_range => date_range } %>
+	<% end %>
+	<%= link_to t("view_all"), index_all_reports_path(:section => section, :date_range => date_range, :search => params[:search]),:class => "view_all" %>
+</div>
+<div class="body">
+	<% if elements.size > 0 %>
+		<% elements.each do |element| %>
+			<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+		<% end %>
+	<% else %>
+		<div class="no_results"><%= t('no_results')%></div>	
+	<% end %>
+	<div class="clear"></div>
+</div>

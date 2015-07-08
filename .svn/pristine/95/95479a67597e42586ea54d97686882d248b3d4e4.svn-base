@@ -1,0 +1,156 @@
+<% 
+element_type = element.class.name.underscore
+element_path = element_type + "_path(element)"
+%>
+<% if element.element_image.url!="none"  %>
+	<div class="miniature_with_source" style="background-image: url('<%= element.element_image.url %>')"  onclick="window.location.href ='<%= eval(element_path) %>';return false;">
+<% else %>
+	<div class="miniature_with_source" style="background-image: url('/images/watermarks/b_watermark_<%= element_type %>.png')"  onclick="window.location.href ='<%= eval(element_path) %>';return false;">				
+<% end %>
+	 
+	
+	<div class="miniature_with_source_footer">
+		<div class="miniature_source_image">
+		<% if element.scraped_from != nil && element.scraped_from != "" %>							
+			<% if element.scraped_from == "https://www.spainisculture.com/" %>
+				<%= image_tag "../images/logos/spain_is_culture.jpeg" %>
+			<% elsif  element.scraped_from.include? "tripadvisor" %>
+				<%= image_tag "../images/logos/trip_advisor.jpeg" %>
+			<% elsif  element.scraped_from.include? "unesco" %>
+				<%= image_tag "../images/logos/unesco.jpeg" %>
+			<% elsif  element.scraped_from.include? "linkedin.com" %>
+				<%= image_tag "../images/logos/linkedin.png" %>
+			<% elsif  element.scraped_from.include? "scholar.google" %>
+				<%= image_tag "../images/logos/google_scholar.jpg" %>
+			<% elsif  element.scraped_from.include? "allconferences.com" %>
+				<%= image_tag "../images/logos/allconferences.png" %>
+			<% elsif  element.scraped_from.include? "spainisculture.com" %>
+				<%= image_tag "../images/logos/spain_is_culture.jpeg" %>
+			<% elsif  element.scraped_from.include? "spainisculture.com" %>
+				<%= image_tag "../images/logos/spain_is_culture.jpeg" %>
+			<% elsif  element.scraped_from.include? "globaleventslist" %>
+				<%= image_tag "../images/logos/globaleventslist.jpg" %>
+			<% elsif  element.scraped_from.include? "worldconferencecalendar.com" %>
+				<%= image_tag "../images/logos/worldconferencecalendar.jpg" %>	
+			<% elsif  element.scraped_from.include? "visit-hungary.com" %>
+				<%= image_tag "../images/logos/visithungary.jpg" %>
+			<% elsif  element.scraped_from.include? "visitportugal.com" %>
+				<%= image_tag "../images/logos/visitportugal.png" %>
+			<% elsif  element.scraped_from.include? "ulisboa.pt" %>
+				<%= image_tag "../images/logos/ulisboa.png" %>
+			<% elsif  element.scraped_from.include? "uio.no" %>
+				<%= image_tag "../images/logos/uoslo.png" %>
+			<% elsif  element.scraped_from.include? "google.com/calendar" %>
+				<%= image_tag "../images/logos/google_calendar.png" %>
+			<% elsif  element.scraped_from.include? "visitbudapest.travel" %>
+				<%= image_tag "../images/logos/visitbudapest.jpg" %>
+			<% elsif  element.scraped_from.include? "visitbrussels.be" %>
+				<%= image_tag "../images/logos/visitbrussels.jpeg" %>
+			<% elsif  element.scraped_from.include? "belgica-turismo.es" %>
+				<%= image_tag "../images/logos/belgicaturismo.png" %>	
+			<% elsif  element.scraped_from.include? "ualg.pt" %>
+				<%= image_tag "../images/logos/ualgarve.png" %>
+			<% elsif  element.scraped_from.include? "noticias.up.pt" %>
+				<%= image_tag "../images/logos/uporto.gif" %>
+			<% elsif  element.scraped_from.include? "conferencealerts.com" %>
+				<%= image_tag "../images/logos/conferencealerts.gif" %>			
+			<% elsif  element.scraped_from.include? "best.eu.org" %>
+				<%= image_tag "../images/logos/best.png" %>		
+			<% elsif  element.scraped_from.include? "discoveringfinland.com" %>
+				<%= image_tag "../images/logos/discoveringfinland.gif" %>		
+			<% elsif  element.scraped_from.include? "finnbay.com" %>
+				<%= image_tag "../images/logos/finnbay.png" %>
+			<% elsif  element.scraped_from.include? "openeducationeuropa.eu" %>
+				<%= image_tag "../images/logos/openeducationeuropa.jpeg" %>																			
+			<% elsif  element.scraped_from.include? "videolectures" %>
+				<%= image_tag "../images/logos/video_lectures.png" %>
+			<% elsif  element.scraped_from.include? "khanacademy" %>
+				<%= image_tag "../images/logos/kahn_academy.jpeg" %>
+			<% elsif  element.scraped_from.include? "ted.com" %>
+				<%= image_tag "../images/logos/ted.png" %>
+			<% elsif  element.scraped_from.include? "topdocumentaryfilms.com" %>
+				<%= image_tag "../images/logos/top_documentary_films.jpeg" %>	
+			<% elsif  element.scraped_from.include? "documentariosvarios.wordpress.com" %>
+				<%= image_tag "../images/logos/documentariosvarios.jpg" %>
+			<% elsif  element.scraped_from.include? "ciberdocumentales.com" %>
+				<%= image_tag "../images/logos/ciberdocumentales.png" %>
+			<% elsif  element.scraped_from.include? "documentaryaddict.com" %>
+				<%= image_tag "../images/logos/documentary_addict.gif" %>		
+			<% elsif  element.scraped_from.include? "documentaryheaven.com" %>
+				<%= image_tag "../images/logos/documentary_heaven.png" %>	
+			<% elsif  element.scraped_from.include? "docunet.nl" %>
+				<%= image_tag "../images/logos/docunet.png" %>			
+			<% elsif  element.scraped_from.include? "belgesell.com" %>
+				<%= image_tag "../images/logos/belgesel.png" %>	
+			<% elsif  element.scraped_from.include? "dokumentarne.sk" %>
+				<%= image_tag "../images/logos/dokumentarne.png" %>		
+			<% elsif  element.scraped_from.include? "magyarvagyok.com" %>
+				<%= image_tag "../images/logos/magyarvagyok.jpg" %>
+			<% elsif  element.scraped_from.include? "lrt.lt" %>
+				<%= image_tag "../images/logos/lrt.png" %>		
+			<% elsif  element.scraped_from.include? "nrk.no" %>
+				<%= image_tag "../images/logos/nrkskole.png" %>			
+			<% elsif  element.scraped_from.include? "docverdade.blogspot.com" %>
+				<%= image_tag "../images/logos/docverdade.jpg" %>	
+			<% elsif  element.scraped_from.include? "documentairenet.nl" %>
+				<%= image_tag "../images/logos/documentairenet.png" %>																																																																					
+			<% elsif  element.scraped_from.include? "coursera.org" %>
+				<%= image_tag "../images/logos/coursera.jpeg" %>																														
+			<% elsif  element.scraped_from.include? "mit.edu" %>
+				<%= image_tag "../images/logos/mit.png" %>
+			<% elsif  element.scraped_from.include? "edx.org" %>
+				<%= image_tag "../images/logos/edx.png" %>	
+			<% elsif  element.scraped_from.include? "sciencedaily.com" %>
+				<%= image_tag "../images/logos/sciencedaily.png" %>	
+			<% elsif  element.scraped_from.include? "lreforschools.eun.org" %>
+				<%= image_tag "../images/logos/lre.png" %>
+			<% elsif  element.scraped_from.include? "slideshare.net" %>
+				<%= image_tag "../images/logos/slideshare.png" %>	
+			<% elsif  element.scraped_from.include? "biography.com" %>
+				<%= image_tag "../images/logos/biography.png" %>
+			<% elsif  element.scraped_from.include? "klascement.be" %>
+				<%= image_tag "../images/logos/klascement.png" %>		
+			<% elsif  element.scraped_from.include? "wookie.eun.org" %>
+				<%= image_tag "../images/logos/itec.png" %>		
+			<% elsif  element.scraped_from.include? "https://www.google.com/culturalinstitute/project/art-project" %>
+				<%= image_tag "../images/logos/google_art_project.png" %>		
+			<% elsif  element.scraped_from.include? "mismuseos.net" %>
+				<%= image_tag "../images/logos/mismuseos.png" %>	
+			<% elsif  element.scraped_from.include? "wikipaintings.org" %>
+				<%= image_tag "../images/logos/wikipaintings.jpg" %>	
+			<% elsif  element.scraped_from.include? "edu.xunta.es/espazoAbalar" %>
+				<%= image_tag "../images/logos/espazo_abalar.png" %>	
+			<% elsif  element.scraped_from.include? "www.google.com/culturalinstitute/project/world-wonders" %>
+				<%= image_tag "../images/logos/google_world_wonders.jpg" %>	
+			<% elsif  element.scraped_from.include? "oercommons.org" %>
+				<%= image_tag "../images/logos/oercommons.png" %>	
+			<% elsif  element.scraped_from.include? "didactalia.net" %>
+				<%= image_tag "../images/logos/didactalia.png" %>																																																										
+			<% elsif  element_type == "report" %>
+				<% sources = Source.all %>
+				<% sources.each do |source| %>
+					<% if element.scraped_from == source.url && source.element_image.url() != "none" %>
+						<%= image_tag source.element_image.url(:medium), width:'50%', :class => "image_preview" %>
+					<% end %>
+				<% end %>																																								
+			<% elsif  element_type == "post" %>
+				<% sources = Source.all %>
+				<% sources.each do |source| %>
+					<% if element.scraped_from == source.url && source.element_image.url() != "none" %>
+						<%= image_tag source.element_image.url(:medium), width:'50%', :class => "image_preview" %>
+					<% end %>
+				<% end %>																																								
+			<% elsif  element_type == "application" %>
+				<%= image_tag element.icon.url(:medium), width:'100%', :class => "image_preview" %>																																																
+			<% end %>
+			
+		<% end %>
+		</div>
+		<div class="miniature_text">
+			<% if element.name != nil %>			
+				<p><%= raw element.name.truncate(80, :separator => " ", :omission => "...") %></p>
+			<% end %>
+		</div>
+														
+	</div>
+</div>

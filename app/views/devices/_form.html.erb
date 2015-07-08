@@ -1,0 +1,55 @@
+<% if @device.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@device.errors.count, "error") %> prohibited this device from being saved:</h2>
+	
+	  <ul>
+	  <% @device.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+<div class="device_name editable active">
+	<%= device_form.text_field :name, :class => "element_title", :placeholder => t("title") %>
+	<i class="icon-pencil icon-grey"></i>
+</div>
+	
+<div class= "description_container resources_view">
+	<% if @device.element_image.url() != "none" %>
+	<div class="device_description editable active description description_right">
+	<% else %>
+	<div class="device_description editable active description">
+	<% end %>
+		<textarea id="device_description" name="device[description]" placeholder="<%= t("Description") %>"><%= @device.description %></textarea>
+		<i class="icon-pencil icon-grey"></i>
+	</div>
+	<div class="device_image picture_container image ">
+		<div class="editable active">
+			<% if @device.element_image.url() != "none" %>
+			<%= image_tag @device.element_image.url(), width:'100%', :class => "image_preview" %>
+			<% else %>
+			<img class="image_preview" width="100%"/>
+			<% end %>
+			<div class= "file_upload">
+				<%= device_form.file_field :element_image, :onchange => "image_preview(this, event);", :class =>"input_element_image" %>
+			</div>
+		</div>
+	</div>
+	<div class="clear"></div>
+	<div class= "select_element_picture_button has_edition_controls active">
+		<button onclick= "select_element_picture(this); return false;" class="edition_control"><%= t("Select_picture") %></button>
+	</div>
+</div>
+<div class="clear"></div>
+
+<hr />
+
+<div class="field editable active">
+    <p class= "field_label"><%= t("url") %>:</p>
+    <div class="url_editor" style="position: relative;float: left; width: 80%;">
+    	<span><a href="<%= @device.url %>" target="_blank"><%= @device.url %></a></span>
+	    <%= device_form.text_field :url %>
+	    <i class="icon-pencil icon-grey"></i>
+	</div>
+</div>

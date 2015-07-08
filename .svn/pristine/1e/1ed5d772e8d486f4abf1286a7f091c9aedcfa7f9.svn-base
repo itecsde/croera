@@ -1,0 +1,23 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'new_lre', :actions => "lres/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@lre, :html => { :class => "lre_form" }) do |f_lre| %>
+		<div id="element_header">
+			<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @lre,:element_type=>"lre"} %> 
+			<hr />
+			<div class="clear"></div>
+		</div>
+		<div id="content_container" class="lre_container">
+			<input type="hidden" id="edition_mode" value="on">
+				<%= render :partial => "form" , :locals => {:lre_form => f_lre} %>
+				<%= render :partial => "submit", :locals => {:lre_form => f_lre} %>
+		</div>	
+		
+		<span style="display:none" id="is_edition" data-value="true"></span>	
+		
+		<script src="/javascript/lres_form.js"></script>
+	<% end%>
+<% end %>

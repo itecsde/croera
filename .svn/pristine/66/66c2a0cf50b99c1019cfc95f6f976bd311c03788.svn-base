@@ -1,0 +1,33 @@
+<%
+	if youtube_item_id == nil
+		@youtube_item = YoutubeItem.new
+		@box= Box.new
+		@box.box_type= "full_box"
+		@box.position= 1
+		@box.document_type= "YoutubeItem"
+		@component= Component.new
+		@component.component_type= "youtube_video"
+		@component.position= 1
+		@text = ActiveRecord::Base::Text.new
+		@component.texts << @text
+		@box.components << @component
+		@youtube_item.boxes << @box
+	else
+		@youtube_item= YoutubeItem.find(youtube_item_id)
+	end
+%>
+
+<%= fields_for @youtube_item do |f|%>
+	<%= f.hidden_field :id %>
+<% end %>
+<% @youtube_item.boxes.sort_by{|e| e[:position]}.each do |box| %>
+	<div class="box_container <%= box.box_type %>">
+		<%= hidden_field_tag :box_id, box.id %>
+		<%= hidden_field_tag :box_type, box.box_type %>
+		<% box.components.sort_by{|e| e[:position]}.each do |component| %>
+			<div class="component_container">				
+				<%= render :partial => "components/"+component.component_type, :locals => {:component => component}  %>
+			</div>
+		<%end%>
+	</div>
+<%end%>

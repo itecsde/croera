@@ -1,0 +1,138 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+require 'feedzirra'
+
+class ScraperSlideshows
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+  def scrape_slideshare(*siguiente)
+    begin
+            
+      if siguiente[1] == 1
+        reintentos = siguiente[2].to_i
+      else
+        reintentos = 2
+      end
+              
+      if siguiente[1] != 1   
+        languages = ["en","es","pt","tr","sk","no","fi","lt","nl","hu"]
+        pagina_actual = 0
+      else
+        puts siguiente[1]
+        languages = siguiente[3]
+        pagina_actual = siguiente[0]
+      end
+           
+      for j in 0..languages.length-1
+        sleep 1
+        I18n.locale = languages[0]
+        for i in pagina_actual..5264
+          sleep 0.5
+          pagina_actual = i 
+          url_json = "http://www.slideshare.net/popular/language/" + languages[0] + "/year?format=json&page_offset=" + i.to_s      
+          opened_json = open(url_json).read
+          parsed_json = JSON.parse opened_json
+          page_html = parsed_json['html']
+
+          page = Nokogiri::HTML(page_html)
+          reintentos = 2
+        
+          page.css("div.grid_thumbnail_content").each do |slideshow|
+            slideshow_url =  "http://www.slideshare.net" + slideshow.css("div.details a.title")[0]['href']
+            photo_url =  slideshow.css("a.iso_slideshow_link")[0]['data-imageurl']
+            photo_url[0] = ""
+            photo_url[0] = ""
+            photo_url = "http://" + photo_url
+            scrape_slideshow_slideshare slideshow_url, photo_url
+          end  
+        end
+        pagina_actual = 0
+        puts "eliminamos idioma " + languages[0]
+        languages.delete_if { |element| element == languages[0]}        
+      end
+      
+    rescue Exception => e
+      puts "Exception scrape_slideshare"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.message
+      puts e.backtrace.inspect
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_slideshare(pagina_actual,1,reintentos,languages)
+      end
+    end
+  end
+
+
+ def scrape_slideshow_slideshare(slideshow_url, photo_url, *reintentos)
+    begin
+      puts
+      puts "SLIDESHOW URL: " + slideshow_url
+      puts "PHOTO_URL: " + photo_url
+
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+
+      sleep 0.1
+
+      scraped_slideshow = Slideshow.new
+      slideshow_page = Nokogiri::HTML(open(slideshow_url))
+      reintentos = 2
+      begin
+        name = slideshow_page.css("div.title h1.h-slideshow-title")[0].text.strip
+        puts "Name: " + name
+      rescue
+        puts "Failed Name slideshare"
+      end
+
+      begin
+        description = slideshow_page.css("div.articleCore p.description")[0].text.strip
+        puts "Description: " + description
+      rescue
+        puts "Failed Description slideshare"
+      end
+
+      if photo_url!=nil
+        begin
+          scraped_slideshow.element_image = URI.parse(photo_url)
+        rescue
+          puts "slideshare:  IMAGEN NO GUARDADA"
+        scraped_slideshow.element_image.clear
+        end
+      end
+
+      info_to_wikify = slideshow_page.css("div.notranslate ul.transcripts")[0].text.gsub(/\n/," ").gsub(/\s+/,' ').gsub("&"," ").gsub("%"," ").truncate(63000)
+
+      scraped_from = "http://www.slideshare.net"
+
+      scraped_slideshow.name = name
+      scraped_slideshow.description = description
+      scraped_slideshow.url = slideshow_url
+      scraped_slideshow.link = slideshow_url
+      scraped_slideshow.scraped_from = scraped_from
+      scraped_slideshow.persist(["en"],info_to_wikify,[])
+
+    rescue Exception => e
+      puts "Exception scrape_slideshow_slideshare"
+      puts "Reintentamos dos veces, sino saltamos de slideshow"
+      puts e.message
+      puts e.backtrace.inspect
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_article_sciencedaily(slideshow_url, photo_url,1,reintentos)
+      end
+    end
+  end
+
+
+end

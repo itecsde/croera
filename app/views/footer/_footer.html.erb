@@ -1,0 +1,125 @@
+<div class="footer">
+	<div class="wraper_columns">
+		<div class="column first" >
+			<div class="prompt">
+				<%= t('resources').upcase %>
+			</div>
+			<div class="body">
+				<div class="subcolumn">
+					<ul>			
+						<li>
+							<%= link_to t('applications'), applications_path %>
+						</li>
+						<li>
+							<%= link_to t('biographies'), biographies_path %>
+						</li>
+						<li>
+							<%= link_to t('artworks'), artworks_path %>
+						</li>
+						<li>
+							<%= link_to t('books'), books_path %>
+						</li>								
+					<ul>	
+				</div>
+				<div class="subcolumn">
+					<ul>			
+						<li>
+							<%= link_to t('events'), events_path %>
+						</li>
+						<li>
+							<%= link_to t('sites'), sites_path %>
+						</li>
+						<li>
+							<%= link_to t('documentaries'), documentaries_path %>
+						</li>
+						<li>
+							<%= link_to t('lres'), lres_path %>
+						</li>								
+					<ul>
+				</div>
+				<div class="subcolumn">
+					<ul>			
+						<li>
+							<%= link_to t('courses'), courses_path %>
+						</li>
+						<li>
+							<%= link_to t('lectures'), lectures_path %>
+						</li>
+						<li>
+							<%= link_to t('slideshows'), slideshows_path %>
+						</li>
+						<li>
+							<%= link_to t('klascements'), klascements_path %>
+						</li>								
+					<ul>
+				</div>
+				<div class="subcolumn">
+					<ul>			
+						<li>
+							<%= link_to t('reports'), reports_path %>
+						</li>
+						<li>
+							<%= link_to t('articles'), articles_path %>
+						</li>
+						<li>
+							<%= link_to t('posts'), posts_path %>
+						</li>
+						<li>
+							<%= link_to t('widgets'), widgets_path %>
+						</li>								
+					<ul>
+				</div>														
+			</div>						
+		</div>
+		
+		<div class="column second">
+			<div class="prompt">
+				<%= t('designing', :default => "Designing").upcase %>
+			</div>
+			<div class="body">
+				<ul>					
+					<li>
+						<%= link_to t('scenarios'), scenarios_path %>
+					</li>		
+					<li>
+						<%= link_to t('activities'), activities_path %>
+					</li>
+					<li>
+						<%= link_to t('learning_stories'), experiences_path %>
+					</li>
+				<ul>			
+			</div>
+			
+		</div>
+		
+		
+		<div class="column third">
+			<div class="prompt">
+				<%= t('about',:default => "About").upcase %>
+			</div>
+			<div class="body">
+				<ul>
+					<li>
+						<%= link_to "FAQs", about_faqs_path %>
+					</li>
+					<li>
+						<%= link_to t('about_us'), about_about_us_path %>
+					</li>
+					<li>
+						<%= link_to t('contact'),about_contact_path %>
+					</li>				
+				<ul>
+			</div>
+		</div>
+		
+		<div class="column last">
+			<%= image_tag "../images/logo_footer2.png"%>
+		</div>
+		
+	</div>
+	
+	<div class="copyright">
+		Copyright www.itec-sde.eu 2014
+	</div>	
+</div>
+		

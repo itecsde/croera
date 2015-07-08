@@ -1,0 +1,41 @@
+#!/bin/bash
+
+rails runner script/scraper_spainisculture.rb RAILS_ENV=production >> /home/miguel/scrape_spainisculture.out &
+rails runner script/scraper_discoveringfinland.rb RAILS_ENV=production >> /home/miguel/scrape_discoveringfinland.out &
+rails runner script/scraper_unesco.rb RAILS_ENV=production >> /home/miguel/scrape_unesco.out &
+rails runner script/scraper_finnbay.rb RAILS_ENV=production >> /home/miguel/scrape_finnbay.out &
+rails runner script/scraper_openeducationeuropa.rb RAILS_ENV=production >> /home/miguel/scrape_openeducationeuropa.out &
+rails runner script/scraper_visitportugal.rb RAILS_ENV=production >> /home/miguel/scrape_visitportugal.out &
+rails runner script/scraper_ulisboa.rb RAILS_ENV=production >> /home/miguel/scrape_ulisboa.out &
+rails runner script/scraper_uoslo.rb RAILS_ENV=production >> /home/miguel/scrape_uoslo.out &
+rails runner script/scraper_google_calendar_pt.rb RAILS_ENV=production >> /home/miguel/scrape_google_calendar_pt.out &
+rails runner script/scraper_visithungary.rb RAILS_ENV=production >> /home/miguel/scrape_visithungary.out &
+rails runner script/scraper_visitbudapest.rb RAILS_ENV=production >> /home/miguel/scrape_visitbudapest.out &
+rails runner script/scraper_visitbrussels.rb RAILS_ENV=production >> /home/miguel/scrape_visitbrussels.out &
+rails runner script/scraper_universidad_algarve.rb RAILS_ENV=production >> /home/miguel/scrape_universidad_algarve.out &
+rails runner script/scraper_belgica_turismo.rb RAILS_ENV=production >> /home/miguel/scrape_belgica_turismo.out &
+rails runner script/scraper_universidad_porto.rb RAILS_ENV=production >> /home/miguel/scrape_universidad_porto.out &
+rails runner script/scraper_globalevents.rb RAILS_ENV=production >> /home/miguel/scrape_globalevents.out &
+rails runner script/scraper_conferencealerts_portugal.rb RAILS_ENV=production >> /home/miguel/scrape_conferencealerts_portugal.out &
+rails runner script/scraper_european_commission.rb RAILS_ENV=production >> /home/miguel/scrape_european_commission.out &
+rails runner script/scraper_allconferences.rb RAILS_ENV=production >> /home/miguel/scrape_allconferences.out &
+rails runner script/scraper_worldconferencecalendar.rb RAILS_ENV=production >> /home/miguel/scrape_worldconferencecalendar.out &
+rails runner script/scraper_best.rb RAILS_ENV=production >> /home/miguel/scrape_best.out &
+
+
+rails runner script/scraper_app_alternativeto.rb RAILS_ENV=production >> /home/miguel/scrape_app_alternativeto.out &
+rails runner script/scraper_app_softonic.rb RAILS_ENV=production >> /home/miguel/scrape_app_softonic.out &
+
+
+rails runner script/scraper_people_scholar.rb RAILS_ENV=production >> /home/miguel/scrape_people_scholar.out &
+rails runner script/scraper_people_linkedin.rb RAILS_ENV=production >> /home/miguel/scrape_people_linkedin.out &
+
+
+rails runner script/scraper_lecture_ted.rb RAILS_ENV=production >> /home/miguel/scrape_lecture_ted.out &
+rails runner script/scraper_lecture_videolectures.rb RAILS_ENV=production >> /home/miguel/scrape_lecture_videolectures.out &
+rails runner script/scraper_lecture_khanacademy.rb RAILS_ENV=production >> /home/miguel/scrape_lecture_khanacademy.out &
+
+
+
+
+

@@ -1,0 +1,4 @@
+<%= form_for(@lre, :html => { :class => "lre_form" }) do |fo| %>
+	<%= render :partial => "lres/form" , :locals => {:lre_form => fo} %>
+<% end %>
+<input type="hidden" id="edition_mode" value="off"/>

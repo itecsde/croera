@@ -1,0 +1,88 @@
+class SearchResultsController < ApplicationController
+  
+  def index
+    @search_text=params[:search]    
+    @disambiguation=Array.new
+    
+    wiki = Wikipediator.new
+    begin 
+      disamb_results=wiki.search(params[:search])
+      disamb_results.each do |alternative_search|
+        title = alternative_search['title']
+        definition = wiki.getDefinition(title)
+        @disambiguation << [title, definition] #[title, definition]
+      end      
+    rescue
+    end
+    
+    if @search_text != nil
+      @sites = get_search_elements('Site',@search_text)
+      @events = get_search_elements('Event',@search_text)
+      @lectures = get_search_elements('Lecture',@search_text)
+      @documentaries = get_search_elements('Documentary',@search_text)
+      @people = get_search_elements('Person',@search_text)
+      @applications = get_search_elements('Application',@search_text)
+      @courses = get_search_elements('Course',@search_text)
+      @articles = get_search_elements('Article',@search_text)
+      @lres = get_search_elements('Lre',@search_text)
+      @posts = get_search_elements('Post',@search_text)
+      @slideshows = get_search_elements('Slideshow',@search_text)
+    else 
+      @sites = []
+      @events = []
+      @lectures = []
+      @documentaries = []
+      @people = []
+      @applications = []
+      @courses = []
+      @articles = []
+      @lres = []
+      @posts = []
+      @slideshows = []
+    end
+    
+  end
+    
+  
+  def get_search_elements(element_type,search_text)
+    if I18n.locale.to_s == "gl"
+      search_languages=["gl","es"]
+    else 
+      search_languages=[I18n.locale.to_s]
+    end                  
+    @search = element_type.constantize.search do |query|                       
+        search_terms = search_text
+        #query.keywords search_terms, :fields => [:categories, :tags, :name] {minimum_match 1}
+        query.fulltext search_terms do
+          boost_fields :tags => 10.0
+          phrase_fields :tags => 20.0 
+        end
+        
+        if @element.class == element_type.constantize
+            query.without(:id, @element.id)
+        end
+        query.with(:translations, search_languages)  
+        query.paginate :per_page => 4
+     end
+     @result=@search.results       
+     return @result
+  end
+  
+  
+  
+  
+  def all_related_elements
+    @edition_mode=false
+    @element_id = params[:element_id]
+    @element_type = params[:element_type]
+    @related_type = params[:related_type]
+    @title = params[:title] 
+    @element = @element_type.constantize.find(@element_id)
+    if @element != nil
+      @related_elements=RelatedElement.new(@element)
+      @elements=@related_elements.get_all_related_elements(@related_type,params[:page])
+    end
+  end
+  
+    
+end

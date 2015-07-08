@@ -1,0 +1,250 @@
+#public_home_container{
+  width: 50%;
+  margin-left: 25%;
+  text-align: center;
+  margin-top: 200px;
+  float: left;
+  padding-bottom: 80px;
+}
+
+#public_home_container h1{
+  color: #AE947D;
+  font-size: 42px;
+  margin-bottom:35px;
+}
+
+#public_home_container h1.title_public{
+    font-family: "Trebuchet MS", Helvetica Neue, Helvetica, Arial, sans-serif;
+    color: #AE947D;
+    z-index: 1;
+    font-size: 48px;
+    margin-top: 37px;
+    margin-bottom:0;
+    position: relative;
+    top: 81px;
+}
+
+.web_title_public_image{
+    position: relative;
+    left: -110px;
+    top: -25px;
+}
+
+a.button{
+    border-width: 1px;
+    border-style: solid;
+    border-right: 1px solid rgb(203, 203, 203);
+    border-left: 1px solid rgb(203, 203, 203);
+    -moz-border-top-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    border-image: none;
+    border-color: rgb(209, 209, 209) rgb(203, 203, 203) rgb(190, 190, 190);
+    border-radius: 3px 3px 3px 3px;
+    color: rgb(68, 68, 68);
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Helvetica Neue",arial,sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    height: 25px;
+    padding: 12px 8px 6px;
+    text-shadow: 0px 1px rgb(255, 255, 255);
+    white-space: nowrap;
+    width: 119px;
+    text-decoration: none;
+    background-color: #F2F1F0;
+}
+
+#public_home_container h2{
+  margin-bottom: 15px;
+}
+
+.devise_alerts{
+  color: red;
+  position: relative;
+  top: 50px;
+  text-align: center;
+  font-family:"Arial";
+  font-weight:bold;
+}
+
+.home_language_selector{
+  list-style: none outside none;
+}
+.language_selector_container{
+  margin-right: 37px;
+}
+
+
+
+/******************** Nuevo ***********************/
+.container_access_control {
+  width: 1268px;
+  margin: 0 auto;
+  margin-top:100px;
+}
+.login_box, .forgot_password_box {
+    position:relative;
+    margin: 0 auto;
+    margin-top:150px;
+    -webkit-box-shadow: 2px 2px 5px 0px rgba(50, 50, 50, 0.5);
+    -moz-box-shadow:    2px 2px 5px 0px rgba(50, 50, 50, 0.5);
+    box-shadow:         2px 2px 5px 0px rgba(50, 50, 50, 0.5);
+    /*-webkit-box-shadow: 0px 0px 20px 0px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    0px 0px 20px 0px rgba(50, 50, 50, 0.75);
+    box-shadow:         0px 0px 20px 0px rgba(50, 50, 50, 0.75);*/
+    width:700px;
+    height:400px;
+    background-color:#FFFFFF;
+}
+
+.login_box .left_column_access_box, .forgot_password_box .left_column_access_box{
+  float:left;
+  width:250px;
+  height:inherit;
+  position:relative;
+}
+
+.login_box .separate_columns, .forgot_password_box .separate_columns{
+  float:left;
+  -webkit-box-shadow: 0px 0px 1px 0px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow:    0px 0px 1px 0px rgba(50, 50, 50, 0.75);
+  box-shadow:         0px 0px 1px 0px rgba(50, 50, 50, 0.75);
+  width:1px; 
+  margin-top:20px;  
+  height:360px;
+}
+
+.login_box .right_column_access_box, .forgot_password_box .right_column_access_box {
+  float:left;
+  width:360px;
+  height:inherit;
+  position:relative;
+  padding-left:50px;
+}
+
+.login_box .left_column_access_box .logo_image_public, .forgot_password_box .left_column_access_box .logo_image_public {
+    position: absolute;
+    left: 30px;
+    top: 140px;
+}
+
+
+.login_box .left_column_access_box  h1.logo_title_public, .forgot_password_box .left_column_access_box  h1.logo_title_public{
+    position: absolute;
+    top: 200px;
+    left:50px;
+    font-family: "Trebuchet MS", Helvetica Neue, Helvetica, Arial, sans-serif;
+    color: #2C2338;
+    z-index: 1;
+    font-size: 40px;    
+}
+
+.right_column_access_box .prompt{
+  margin-top:50px;
+  margin-bottom:20px;
+  font-size:26px;
+  font-weight:bold;
+  font-family:"Arial";
+  color: #2C2338;
+}
+
+.login_form_container .field_prompt, .forgot_password_form_container .field_prompt {
+    font-weight:bold;
+    font-family:"Arial";
+    font-size:15px;
+    color: #2C2338;
+    margin-bottom:5px;
+}
+.login_form_container input, .forgot_password_form_container input{
+  font-size:16px;
+  height:30px;
+  margin-bottom:5px;
+  
+}
+
+.login_form_container .remember_me {
+  margin-top:10px;
+  font-family:"Arial";
+  color: #2C2338;
+  font-size:13px;
+  font-weight:bold;
+
+}
+.login_form_container input[type="checkbox"] {
+    visibility: visible;
+}
+
+.login_form_container .button_login{
+  float:right;
+}
+
+.forgot_password_form_container .forgot_password_button{
+  margin-top:40px;
+  text-align:center;
+}
+
+
+
+.login_form_container input[type=submit], .forgot_password_form_container input[type=submit]  {
+    color:#FFFFFF;
+    font-weight:bold;
+    padding:5px 25px; 
+    background:#1382DE; 
+    border:0 none;
+    cursor:pointer;
+    min-height:40px;
+    max-width:355px;
+}
+
+
+.login_form_container .button_login:hover .login_form_container input[type=submit] {
+  background:black; 
+}
+    
+.access_control_links {
+  margin-top:70px;
+  font-size:13px;
+  width:inherit;
+  text-align:center;
+  font-family:"Arial";
+  color: #2C2338;
+}
+.access_control_links a  {
+    color: #2C2338;
+}
+
+
+.forgot_password_box .title_prompt {
+  margin-top:50px;
+  font-family:"Arial";
+  color: #2C2338;
+  margin-left:50px;
+  font-size:28px;
+}
+
+#container_access_control .error_messages {
+  color: red;
+  position: relative;
+  top: 50px;
+  text-align: center;
+  font-family:"Arial";
+  font-weight:bold;
+}
+
+.submit_sign_up {
+  text-align:center;
+  margin-top:20px;
+}
+.submit_sign_up input[type=submit] {
+    color:#FFFFFF;
+    font-weight:bold;
+    font-size:18px;
+    padding:5px 25px; 
+    background:#1382DE; 
+    border:0 none;
+    cursor:pointer;
+    height:40px;
+}

@@ -1,0 +1,295 @@
+# encoding: utf-8
+module Taggable
+  
+  def self.included(base)
+    base.class_eval do
+      has_many :taggable_tag_annotations, :as => :taggable, :dependent => :destroy
+      has_many :tags, :through => :taggable_tag_annotations
+    end
+  end
+  
+  def create_automatic_semantic_annotations(prosa)
+    begin
+      TaggableTagAnnotation.destroy_all(:taggable_id =>self.id, :type_tag =>"automatic")
+      automatic_tags_ids = Array.new
+      wikipediator = Wikipediator.new
+      entries = wikipediator.search(self.name)
+      if entries.length > 0
+        entries[0]['title']
+        if Tag.find_by_name(entries[0]['title'])!=nil
+          new_annotation = TaggableTagAnnotation.new
+          new_annotation.taggable = self
+          new_annotation.tag = Tag.find_by_name(entries[0]['title'])
+          new_annotation.type_tag = "automatic"
+          new_annotation.wikipedia_article_id = entries[0]['id']
+          new_annotation.weight = 1.0
+          new_annotation.save
+          #Sunspot.index new_annotation                    
+          #Sunspot.commit          
+        else
+          new_tag=Tag.new
+          new_tag.name=entries[0]['title']
+          new_tag.save
+          new_annotation = TaggableTagAnnotation.new
+          new_annotation.taggable = self
+          new_annotation.tag = new_tag
+          new_annotation.type_tag = "automatic"
+          new_annotation.wikipedia_article_id = entries[0]['id']            
+          new_annotation.weight = 1.0
+          new_annotation.save
+          Sunspot.index new_tag
+          #Sunspot.index new_annotation                    
+          Sunspot.commit          
+        end         
+      end
+      prosa = prosa #.force_encoding("binary")
+      puts "Proceeding to wikify. Text to wikify:"
+      puts prosa
+      tags_automatic = wikipediator.wikify(prosa)
+      puts tags_automatic
+      if tags_automatic != nil
+        puts "WIKIPEDIADO!!!!!!!!!!!!!!"
+        self.scraping_status.automatically_tagged = true
+        tags_automatic.each do |tag|
+          automatic_tags_ids << tag['id']                    
+          if Tag.find_by_name(tag['title'])!=nil
+            new_annotation = TaggableTagAnnotation.new
+            new_annotation.taggable = self
+            new_annotation.tag = Tag.find_by_name(tag['title'])
+            new_annotation.type_tag = "automatic"
+            new_annotation.wikipedia_article_id = tag['id']
+            new_annotation.weight=tag['weight']
+            new_annotation.save
+            #Sunspot.index new_annotation                    
+            #Sunspot.commit          
+          else
+            new_tag=Tag.new
+            new_tag.name=tag['title']
+            new_tag.save
+            new_annotation = TaggableTagAnnotation.new
+            new_annotation.taggable = self
+            new_annotation.tag = new_tag
+            new_annotation.type_tag = "automatic"
+            new_annotation.wikipedia_article_id = tag['id']            
+            new_annotation.weight=tag['weight']
+            new_annotation.save
+            Sunspot.index new_tag
+            #Sunspot.index new_annotation                    
+            Sunspot.commit         
+          end         
+        end #do |tag|
+        if Source.find_by_url(self.scraped_from) != nil
+          source = Source.find_by_url(self.scraped_from)  
+          source.last_tagged = Time.now
+          source.tagged_correct = true
+          source.save
+        end
+      else
+          puts "NO WIKIPEDIADO!!!!!!!!!!!!!!"
+          self.scraping_status.automatically_tagged = false
+      end
+      self.scraping_status.save
+      return automatic_tags_ids    
+    rescue Exception => e
+      puts "Failed automatic tags (wikify) --> Taggable"
+      puts e.message
+      puts e.backtrace.inspect
+      if Source.find_by_url(self.scraped_from) != nil
+        source = Source.find_by_url(self.scraped_from)
+        source.tagged_correct = false
+        source.save
+      end
+    end  
+  end #create_automatic_semantic_annotations
+  
+  def create_semantic_annotations(tags)
+    begin
+      TaggableTagAnnotation.destroy_all(:taggable_id =>self.id, :type_tag =>"human")
+      tags.each do |tag|           
+        tag = tag.strip
+        if Tag.find_by_name(tag)!=nil
+          new_annotation = TaggableTagAnnotation.new
+          new_annotation.taggable = self
+          new_annotation.tag = Tag.find_by_name(tag)
+          new_annotation.type_tag = "human"
+          new_annotation.save          
+        else
+          new_tag=Tag.new
+          new_tag.name=tag
+          new_tag.save
+          new_annotation = TaggableTagAnnotation.new
+          new_annotation.taggable = self
+          new_annotation.tag = new_tag
+          new_annotation.type_tag = "human"
+          new_annotation.save
+          Sunspot.index new_tag                    
+          Sunspot.commit
+         end          
+       end #do |tag|
+    rescue Exception => e
+      puts "Failed Human Tags --> Taggable"
+      puts e.message
+      puts e.backtrace.inspect
+    end      
+  end #create_semantic_annotations
+  
+  def create_translated_to_english_semantic_annotations(tags)
+    begin
+      tags.each do |tag|           
+        tag = tag.strip
+        if Tag.find_by_name(tag)!=nil
+          new_annotation = TaggableTagAnnotation.new
+          new_annotation.taggable = self
+          new_annotation.tag = Tag.find_by_name(tag)
+          new_annotation.type_tag = "human"
+          new_annotation.save          
+        else
+          new_tag=Tag.new
+          new_tag.name=tag
+          new_tag.save
+          new_annotation = TaggableTagAnnotation.new
+          new_annotation.taggable = self
+          new_annotation.tag = new_tag
+          new_annotation.type_tag = "human"
+          new_annotation.save
+          Sunspot.index new_tag                    
+          Sunspot.commit
+         end          
+       end #do |tag|
+    rescue Exception => e
+      puts "Failed Translated Human Tags --> Taggable"
+      puts e.message
+      puts e.backtrace.inspect
+    end      
+  end #create_translated_to_english_semantic_annotations
+    
+  
+  def tag_list_with_links
+    list_tags = ""
+    self.tags.each do |tag|        
+      if list_tags.size > 0 && tag.name != nil
+        list_tags += ", " + ActionController::Base.helpers.link_to("#"+tag.name , Rails.application.routes.url_helpers.search_results_path(:search => tag.name)) 
+      elsif tag.name != nil
+        list_tags += ActionController::Base.helpers.link_to("#"+tag.name , Rails.application.routes.url_helpers.search_results_path(:search => tag.name))
+      end        
+    end
+    return list_tags    
+  end
+  
+  
+  
+  
+  def refresh_automatic_semantic_annotations    
+    if self.taggable_tag_annotations.where(:type_tag => "automatic").size == 0
+      begin
+        automatic_tags_ids = Array.new
+        wikipediator = Wikipediator.new
+        ##Miramos de wikipediar el nombre con un peso mayor
+        if self.name != nil && self.name != ""
+          entries = wikipediator.search(self.name)
+          if entries.length > 0
+            entries[0]['title']
+            if Tag.find_by_name(entries[0]['title']) != nil
+              new_annotation = TaggableTagAnnotation.new
+              new_annotation.taggable = self
+              new_annotation.tag = Tag.find_by_name(entries[0]['title'])
+              new_annotation.type_tag = "automatic"
+              new_annotation.wikipedia_article_id = entries[0]['id']
+              new_annotation.weight = 1.0
+              new_annotation.save
+              #Sunspot.index new_annotation                    
+              #Sunspot.commit          
+            else
+              new_tag=Tag.new
+              new_tag.name=entries[0]['title']
+              new_tag.save
+              new_annotation = TaggableTagAnnotation.new
+              new_annotation.taggable = self
+              new_annotation.tag = new_tag
+              new_annotation.type_tag = "automatic"
+              new_annotation.wikipedia_article_id = entries[0]['id']            
+              new_annotation.weight = 1.0
+              new_annotation.save
+              Sunspot.index new_tag
+              #Sunspot.index new_annotation                    
+              Sunspot.commit          
+            end         
+          end
+        end
+        if self.info_to_wikify != nil && self.info_to_wikify != ""
+          prosa = self.info_to_wikify
+        else
+          if self.name != nil && self.description != nil
+            prosa = self.name + ". " + self.description
+          elsif self.name != nil
+            prosa = self.name
+          elsif self.description != nil
+            prosa = self.description
+          else
+            prosa = ""
+          end
+        end 
+        puts "Proceeding to wikify. Text to wikify:"
+        puts prosa
+        tags_automatic = wikipediator.wikify(prosa)
+        puts tags_automatic
+        if tags_automatic != nil
+          puts "WIKIPEDIADO!!!!!!!!!!!!!!"
+          self.scraping_status.automatically_tagged = true
+          tags_automatic.each do |tag|
+            automatic_tags_ids << tag['id']                    
+            if Tag.find_by_name(tag['title'])!=nil
+              new_annotation = TaggableTagAnnotation.new
+              new_annotation.taggable = self
+              new_annotation.tag = Tag.find_by_name(tag['title'])
+              new_annotation.type_tag = "automatic"
+              new_annotation.wikipedia_article_id = tag['id']
+              new_annotation.weight=tag['weight']
+              new_annotation.save
+              #Sunspot.index new_annotation                    
+              #Sunspot.commit          
+            else
+              new_tag=Tag.new
+              new_tag.name=tag['title']
+              new_tag.save
+              new_annotation = TaggableTagAnnotation.new
+              new_annotation.taggable = self
+              new_annotation.tag = new_tag
+              new_annotation.type_tag = "automatic"
+              new_annotation.wikipedia_article_id = tag['id']            
+              new_annotation.weight=tag['weight']
+              new_annotation.save
+              Sunspot.index new_tag
+              #Sunspot.index new_annotation                    
+              Sunspot.commit    
+            end         
+          end #do |tag|
+          if Source.find_by_url(self.scraped_from) != nil
+            source = Source.find_by_url(self.scraped_from)  
+            source.last_tagged = Time.now
+            source.tagged_correct = true
+            source.save
+          end
+        else
+          puts "NO WIKIPEDIADO!!!!!!!!!!!!!!"
+          self.scraping_status.automatically_tagged = false  
+        end
+        self.scraping_status.save
+        return automatic_tags_ids
+      rescue Exception => e
+        puts "Failed refresh automatic tags (wikify) --> Taggable"
+        puts e.message
+        puts e.backtrace.inspect
+        if Source.find_by_url(self.scraped_from) != nil
+          source = Source.find_by_url(self.scraped_from)
+          source.tagged_correct = false
+          source.save
+        end
+      end
+    end
+  end
+  
+    
+    
+  
+end

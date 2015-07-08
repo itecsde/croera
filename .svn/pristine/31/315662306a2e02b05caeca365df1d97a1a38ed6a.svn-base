@@ -1,0 +1,20 @@
+<li>
+	<%= link_to user_root_path do %>
+		<img src="/images/white_arrow_left.png" title="<%= t('back_to_home') %>"></img>
+	<% end %>	
+</li>
+
+
+<% if current_user != nil %>
+	<li>
+		<%= link_to request.path + "/new" do %>
+			<img src="/images/new_resource.png" title="New"></img>
+		<% end %>	
+	</li>
+<% end %>
+
+<li>
+	<%= form_tag request.path, :method => 'get' do %>  
+    	<%= text_field_tag :search, params[:search], :class => "subnavbar_search" %>&nbsp;&nbsp;<%= submit_tag t('search'),:class => "search_button_subnavbar" %>  
+	<% end %>
+</li>

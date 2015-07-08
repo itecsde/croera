@@ -1,0 +1,51 @@
+
+<% if @disambiguation != nil && @disambiguation != [] && @disambiguation.size > 0 && @disambigued_term_info == nil%>
+
+	<div class="disambiguation_box">
+		<div class="prompt"><%= t('see_results_about') %></div>
+		<div class="body">					
+		<% @disambiguation.each do |dis| %>
+			<div class="disambiguation_word">
+				<span class="title"><%= link_to dis[0], params.merge(:search => Util.to_hashtag(dis[0]), :article_id => dis[2],:page => 1) %></span>:&nbsp;
+				<span class="description"><% if dis[1] != nil && dis[1]!="" %><%= raw dis[1].truncate(150-dis[0].size, :separator => " ", :omission => "...") %><% end %></span>
+			</div>						
+		<% end %>
+		<div class="clear"></div>
+		</div>
+	</div>
+	
+<% elsif @disambigued_term_info != nil && @disambigued_term_info != {} %>
+
+	<div class="disambiguation_box">
+		<div class="prompt"><% if @disambigued_term_info[:title] != nil %><%= @disambigued_term_info[:title] %><% end %></div>
+		<div class="body">
+			<% if @disambigued_term_info[:image]!= nil %>
+			<div class="wikipedia_info_with_image">
+			<% else %>
+			<div class="wikipedia_info">
+			<% end %>
+				<div class="wikipedia_description"><% if @disambigued_term_info[:definition] != nil %><%=@disambigued_term_info[:definition] %><% end %></div>
+				<% if @disambigued_term_info[:info]!= nil && @disambigued_term_info[:info] != [] %>
+				<div class="wikipedia_properties short_info">
+				<% @disambigued_term_info[:info].each do |info| %>								
+					<p><span class="property_prompt"><%= info[:name] %>:&nbsp;</span><span class="property_body"><%= raw info[:content].gsub("\/wiki\/",request.env['PATH_INFO']+"?search=%23") %></span></p>					
+				<% end %>
+					<div class="button_wikipedia_info_display short_info" onClick="toogle_wikipedia_properties_height(this)" title="Show/hide"></div>
+				</div>
+				<% end %>
+			</div>
+			
+			<div class="watermark_container_disambiguation">
+				<div class="watermark_disambiguation wikipedia_watermark"></div>
+			</div>
+			
+			<% if @disambigued_term_info[:image]!= nil %>
+				<div class="wikipedia_image">				
+					<img src="<%= @disambigued_term_info[:image] %>"></img>				
+				</div>
+			<% end %>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+<% end %>

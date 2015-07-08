@@ -1,0 +1,22 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'editing_post', :actions => "posts/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@post, :html => { :class => "post_form" }) do |f_post| %>
+		<div id="element_header">
+			<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @post,:element_type=>"post"} %> 
+			<hr />
+			<div class="clear"></div>
+		</div>
+		<div id="content_container" class="post_container">
+			<input type="hidden" id="edition_mode" value="on">
+				<%= render :partial => "form" , :locals => {:post_form => f_post} %>
+				<%= render :partial => "submit", :locals => {:post_form => f_post} %>			
+		</div>			
+		<span style="display:none" id="is_edition" data-value="true"></span>	
+		
+		<script src="/javascript/posts_form.js"></script>
+	<% end %>
+<% end %>

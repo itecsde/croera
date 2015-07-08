@@ -1,0 +1,86 @@
+class Util
+  
+  
+  def self.to_hashtag(tag_text)
+    if tag_text != nil && tag_text != ""
+      return "#" + tag_text.strip().gsub(" ","_")
+    else 
+      return ""
+    end    
+  end
+  
+  
+  def self.to_hashtag_with_language(tag_text)
+    if tag_text != nil && tag_text != ""
+      case I18n.locale
+        when :en
+          return "#" + tag_text.strip().gsub(" ","_")
+        else
+          return "#" + tag_text.strip().gsub(" ","_") + "@"+I18n.locale.to_s      
+        end
+    else 
+      return ""
+    end    
+  end  
+  
+  
+  def self.to_tag(hashtag_text)
+    if hashtag_text != nil && hashtag_text != ""      
+      return hashtag_text.strip().gsub("_"," ").gsub("#","")
+    else 
+      return ""
+    end    
+  end
+  
+  
+  def self.get_text_help_tooltip(text_id)
+     begin     
+        text_locale = TextTranslation.where(:text_id => text_id).first.locale
+        text_content = TextTranslation.where(:text_id => text_id).first.content
+        #I18n.backend.send(:translations)[:en].key("Core purpose")
+        text_key = I18n.backend.send(:translations)[text_locale.to_sym].key(text_content)
+      
+        case text_key
+        #Scenarios
+        when :core_purpose
+           return :core_purpose_help_tooltip
+        when :narrative_overview
+           return :narrative_overview_help_tooltip
+        when :trends
+           return :trends_help_tooltip
+        when :possible_approaches_to_teaching
+           return :possible_approaches_to_teaching_help_tooltip
+        when :environment
+           return :environment_help_tooltip       
+        when :people_and_roles
+           return :people_and_roles_help_tooltip
+        when :activities
+           return :activities_help_tooltip
+        when :resources_including_technologies
+           return :resources_including_technologies_help_tooltip
+        #Acitivities
+        when :the_teacher_may_look_forward_to
+           return :the_teacher_may_look_forward_to_help_tooltip
+        when :the_students_may_learn
+           return :the_students_may_learn_help_tooltip
+        when :preparation
+           return :preparation_help_tooltip
+        when :introduction
+           return :introduction_help_tooltip
+        when :development
+           return :development_help_tooltip
+        when :assessment
+           return :assessment_help_tooltip           
+        when :ideas_for_using_technology
+           return :ideas_for_using_technology_help_tooltip
+        else
+           return nil        
+        end                               
+     rescue
+        return nil
+     end
+     
+  end
+  
+  
+end 

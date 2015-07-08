@@ -1,0 +1,29 @@
+<%
+	if box.id == nil
+		component_video = box.components.new
+		component_video.component_type = "video"
+		component_video.position = 1
+	else
+		box.components.each do |box_component|
+			case box_component.component_type
+			when "video"
+				component_video = box_component
+			end
+		end		
+	end
+%>
+
+<div class= "video_container">
+	<span class="change_video edition_control active">
+		<div class= "video_url">
+			<label for= "youtube_input"><%= t("Copy_here_video_url") %></label>
+			<input type="text" id="youtube_input" class="youtube_url"/>
+			<span class= "embed_video" onclick="change_video($(this).closest('.video_url').find('#youtube_input'));">
+				<i class="icon-play icon-white"></i>
+			</span>
+		</div>
+	</span>
+	<div class="video_preview">
+		<%= image_tag "/images/video.jpg", width:'100%' %>
+	</div>
+</div>

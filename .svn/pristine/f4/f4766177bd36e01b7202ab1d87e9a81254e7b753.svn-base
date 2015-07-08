@@ -1,0 +1,4 @@
+class NewSubjectAnnotation < ActiveRecord::Base
+  belongs_to :new
+  belongs_to :subject
+end

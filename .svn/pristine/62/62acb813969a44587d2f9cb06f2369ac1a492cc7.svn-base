@@ -1,0 +1,2 @@
+var details = ("<div id=\"content_container_popup\" class=\"sequence_details\"><%=j render :partial => 'activity_sequences/sequence' %></div>");
+

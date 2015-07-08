@@ -1,0 +1,253 @@
+class ActivitiesController < ApplicationController
+  # GET /activities
+  # GET /activities.json
+  def index
+    per_page = 32
+
+    @current_tab = "activities"
+    @page = "activities"
+    if I18n.locale.to_s == "gl" 
+      search_languages=["gl","es"]
+    else 
+      search_languages=[I18n.locale.to_s]
+    end
+
+    @search = Activity.search do
+      fulltext params[:search]
+        with :status, 'class' 
+        with :translations, search_languages
+        order_by :updated_at, :desc
+        #paginate :page => params[:activities_page], :per_page => per_page
+        paginate :page => params[:page], :per_page => per_page
+    end
+    @activities = @search.results
+    @num_results=@search.total
+
+    @tags = Tag.find(:all, :order => 'name')
+    @interactions = Interaction.find(:all)
+    @templates = Activity.find(:all,:conditions => { :template => true }) 
+    @previous_search_params=params
+    
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @activities }
+    end
+  end
+  
+  def search
+    @current_tab = "activities"
+    @activities = Activity.all(:conditions => { :status => 'instance' })
+    @tags = Tag.find(:all, :order => 'name')
+    @interactions = Interaction.find(:all)
+    @templates = Activity.find(:all,:conditions => { :template => true }) 
+    @page = "activities"
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  # GET /activities/1
+  # GET /activities/1.json
+  def show
+    @edition_mode=false;
+    @current_tab = "activities"
+    @activity = Activity.find(params[:id])
+    @functionalities = Functionality.all
+    @person_categories = PersonCategory.all
+    @person_roles = PersonRole.all
+    @event_types = EventType.all
+    @event_places = EventPlace.all
+    
+    if notice == 'Activity was successfully created.' || notice == 'Activity was successfully updated.'
+      @previous_action = 'saved'
+    else
+      @previous_action = 'list'
+    end
+        
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @activity }
+    end
+    
+  end
+
+  # GET /activities/new
+  # GET /activities/new.json
+  def new
+    if current_user != nil 
+      @edition_mode=true;
+      @current_tab = "activities"
+      #@activity_template = Activity.find(params[:template_id])
+      @activity_template = Activity.find(15)
+      @activity = Activity.new()
+      @activity_template.boxes.each do |box|
+        box_clone = box.clone
+        @activity.boxes << box_clone
+      end
+      @functionalities = Functionality.all
+      @person_categories = PersonCategory.all
+      @person_roles = PersonRole.all
+      @event_types = EventType.all
+      @event_places = EventPlace.all
+       
+      respond_to do |format|
+        format.html # new.html.erb
+        format.json { render json: @activity }
+      end
+    else
+      redirect_to activities_path
+    end
+  end
+
+  # GET /activities/1/edit
+  def edit
+    @edition_mode=true;
+    @current_tab = "activities"
+    @activity = Activity.find(params[:id])
+    if current_user != nil
+      @functionalities = Functionality.all
+      @person_categories = PersonCategory.all
+      @person_roles = PersonRole.all
+      @event_types = EventType.all
+      @event_places = EventPlace.all
+    else
+      redirect_to activity_path(@activity)
+    end
+   
+  end
+
+  # POST /activities
+  # POST /activities.json
+  def create
+    @current_tab = "activities"
+    @activity = Activity.new(params[:activity])
+    if (params[:activity][:owner_type]==nil)
+      @activity.owner_type="User"
+      @activity.owner=current_user
+    end
+    @activity.creator = current_user
+    @activity.status = 'class'
+    @activity.save
+    @activity.reload
+    @activity.trace_id = @activity.id
+    @activity.trace_version = 1
+        
+    respond_to do |format|
+      if @activity.save
+        format.html { redirect_to @activity, notice: 'Activity was successfully created.'}
+        format.json { render json: @activity, status: :created, location: @activity }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @activity.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /activities/1
+  # PUT /activities/1.json
+  def update
+    @current_tab = "activities"
+    @activity = Activity.find(params[:id])
+     if (params[:activity][:owner_type]==nil)
+      @activity.owner_type="User"
+      @activity.owner=current_user
+    end    
+    #if @activity.trace_id == @activity.id
+     # @activity.trace_version = @activity.trace_version + 1
+    #else
+    #  @activity.trace_id = @activity.id
+    #  @activity.trace_version = 1
+    #end
+    
+    respond_to do |format|
+      if @activity.update_attributes(params[:activity])
+        @activity.status = 'class'
+        @activity.save
+        format.html { redirect_to @activity, notice: 'Activity was successfully updated.'}
+        format.json { head :ok }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @activity.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /activities/1
+  # DELETE /activities/1.json
+  def destroy
+    @current_tab = "activities"
+    @activity = Activity.find(params[:id])
+    @activity.destroy
+
+    respond_to do |format|
+      format.html { redirect_to activities_url }
+      format.json { head :ok }
+    end
+  end
+  
+  def filter
+    @current_tab = "activities"
+    @tag = Tag.find(params[:tag_id])
+    @activities = @tag.activities
+    @tags = Tag.find(:all, :order => 'name')
+    @interactions = Interaction.find(:all)
+    respond_to do |format|
+      format.html {render 'index'}
+    end
+  end
+  
+  def filter_by_interaction
+    @current_tab = "activities"
+    @interaction = Interaction.find(params[:interaction_id])
+    @activities = @interaction.activities
+    @tags = Tag.find(:all, :order => 'name')
+    @interactions = Interaction.all
+    respond_to do |format|
+      format.html {render 'index'}
+    end
+  end
+  
+  def my_activities
+    @current_tab = "activities"
+    @search = Activity.search do
+      fulltext params[:search]
+      with :status, 'class'
+      with :owner_id, current_user.id
+      paginate :page => params[:activities_page], :per_page => 25
+    end
+    #@activities_by_status = Activity.find(:all,:conditions => { :owner_id => current_user.id,:status => 'class' })
+    @activities = @search.results
+    @tags = Tag.find(:all, :order => 'name')
+    @interactions = Interaction.find(:all)
+    @templates = Activity.find(:all,:conditions => { :template => true })
+    @page = "My_activities" 
+    respond_to do |format|
+      format.html {render 'index'}
+    end
+  end
+  
+  def pick_it
+    @current_tab = "activities"
+    @activity = Activity.find(params[:activity_id])
+    cloned_activity = @activity.clone_with_associations
+     current_user.activities_owned << cloned_activity
+       
+    respond_to do |format|
+      format.html { redirect_to edit_activity_path(cloned_activity.id) }
+    end
+  end
+  
+  def popup_show_activity
+    @edition_mode=false;
+    @current_tab = "activities"
+    @activity = Activity.find(params[:element_id])
+    @functionalities = Functionality.all
+    @person_categories = PersonCategory.all
+    @person_roles = PersonRole.all
+    @event_types = EventType.all
+    @event_places = EventPlace.all  
+    respond_to do |format|
+      format.js
+    end
+  end
+end

@@ -1,0 +1,365 @@
+<div id="content">
+<p>&#35;Creates iTEC activities</p>
+
+<% @activities.each do |activity| %>
+<div class="activity" style="margin-bottom: 50px;">
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>&#35;<%= activity.name %></p>
+
+<p><%= activity.name %> = Activity.create(</p>
+<p>timeToComplete: '1',</p>
+<p>name: '<%= activity.name %>',</p>
+<p>locale: 'gl',</p> 
+<p>description: '<%= activity.description %>'
+)</p>
+
+
+<p>&#35;Teacher motivations</p>
+<p>teacher_motivations = Box.create(</p>
+<p>	box_type: "left_half_box",</p>
+<p>	position: 1</p>
+<p>)</p>
+<p>header = Component.create(</p>
+	component_type: "header",</p>
+	position: 1</p>
+)</p>
+<p>text = Text.create(</p>
+<p>	content: "O profesor pode esperar...",</p>
+<p>	position: 1</p>
+<p>)</p>
+
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "You may look forward to..."</p>
+<p>text.save</p>
+
+<% I18n.locale = "gl" %>
+<p>I18n.locale = "gl"</p>
+<p>header.texts << text</p>
+<p>itemize = Component.create(</p>
+<p>	component_type: "itemize",</p>
+<p>	position: 2</p>
+<p>)</p>
+<% activity.teacher_motivations.each_with_index do |teacher_motivation, index| %>
+<p>text = Text.create(</p>
+<p>	content: "<%= teacher_motivation.name %>",</p>
+<p>	position: <%= index+1 %></p>
+<p>)</p>
+<% I18n.locale = "en" %>
+<p>I18n.locale = "en"</p>
+<p>text.content = "<%= teacher_motivation.name %>"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>itemize.texts << text</p>
+<% end %>
+<p>teacher_motivations.components << header</p>
+<p>teacher_motivations.components << itemize</p>
+<p><%= activity.name %>.boxes << teacher_motivations</p>
+
+<p># Learner motivations</p>
+<p>learner_motivations = Box.create(</p>
+<p>	box_type: "right_half_box",</p>
+<p>	position: 2</p>
+<p>)</p>
+<p>header = Component.create(</p>
+<p>component_type: "header",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>text = Text.create(</p>
+<p>  content: "Os estudantes poden aprender...",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "Students may learn"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>header.texts << text</p>
+<p>itemize = Component.create(</p>
+<p>  component_type: "itemize",</p>
+<p>  position: 2</p>
+<p>)</p>
+
+<% activity.learner_motivations.each_with_index do |learner_motivation, index| %>			
+<p>text = Text.create(</p>
+<p>  content: "<%= learner_motivation.name %>",</p>
+<p>  position: <%= index+1 %></p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "<%= learner_motivation.name %>"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>itemize.texts << text</p>
+<% end %>
+<p>learner_motivations.components << header</p>
+<p>learner_motivations.components << itemize</p>
+<p><%= activity.name %>.boxes << learner_motivations</p>
+
+<p>#Horizontal rule</p>
+<p>horizontal_rule_box = Box.create(</p>
+<p>  box_type: "full_box",</p>
+<p>  position: 3</p>
+<p>)</p>
+<p>horizontal_rule = Component.create(</p>
+<p>  component_type: "horizontal_rule",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>horizontal_rule_box.components << horizontal_rule</p>
+<p><%= activity.name %>.boxes << horizontal_rule_box</p>
+<p>#Guidelines</p>
+<p>guidelines_header_box = Box.create(</p>
+<p>  box_type: "full_box",</p>
+<p>  position: 4</p>
+<p>)</p>
+<p>header = Component.create(</p>
+<p>  component_type: "header",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>text = Text.create(</p>
+<p>  content: "Liñas de guía",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "Guidelines"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>header.texts << text</p>
+<p>guidelines_header_box.components << header</p>
+<p><%= activity.name %>.boxes << guidelines_header_box</p>
+
+<p>#Guidelines preparation</p>
+<p>guidelines_preparation_box = Box.create(</p>
+<p>  box_type: "left_half_box",</p>
+<p>  position: 5</p>
+<p>)</p>
+<p>header = Component.create(</p>
+<p>  component_type: "header",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>text = Text.create(</p>
+<p>  content: "1. Preparación",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "1. Preparation"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>header.texts << text</p>
+<p>itemize = Component.create(</p>
+<p>  component_type: "itemize",</p>
+<p>  position: 2</p>
+<p>)</p>
+<% activity.guidelines_preparation_items.each_with_index do |guideline_item, index| %>
+<p>text = Text.create(</p>
+<p>  content: "<%= guideline_item.description %>",</p>
+<p>  position: <%= index+1 %></p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "<%= guideline_item.description %>"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>itemize.texts << text</p>
+<% end %>
+<p>guidelines_preparation_box.components << header</p>
+<p>guidelines_preparation_box.components << itemize</p>
+<p><%= activity.name %>.boxes << guidelines_preparation_box</p>
+
+<p>#Guidelines introduction</p>
+<p>guidelines_introduction_box = Box.create(</p>
+<p>  box_type: "right_half_box",</p>
+<p>  position: 6</p>
+<p>)</p>
+<p>header = Component.create(</p>
+<p>  component_type: "header",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>text = Text.create(</p>
+<p>  content: "2. Introducción",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "2. Introduction"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>header.texts << text</p>
+<p>itemize = Component.create(</p>
+<p>  component_type: "itemize",</p>
+<p>  position: 2</p>
+<p>)</p>
+
+<% activity.guidelines_introduction_items.each_with_index do |guideline_item, index| %>
+<p>text = Text.create(</p>
+<p>  content: '<%= guideline_item.description %>',</p>
+<p>  position: <%= index+1 %></p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "<%= guideline_item.description %>"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>itemize.texts << text</p>
+<% end %>
+<p>guidelines_introduction_box.components << header</p>
+<p>guidelines_introduction_box.components << itemize</p>
+<p><%= activity.name %>.boxes << guidelines_introduction_box</p>
+
+<p>#Guidelines development</p>
+<p>guidelines_development_box = Box.create(</p>
+<p>  box_type: "left_half_box",</p>
+<p>  position: 7</p>
+<p>)</p>
+<p>header = Component.create(</p>
+<p>  component_type: "header",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>text = Text.create(</p>
+<p>  content: "3. Desenrolo",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "3. Development"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>header.texts << text</p>
+<p>itemize = Component.create(</p>
+<p>  component_type: "itemize",</p>
+<p>  position: 2</p>
+<p>)</p>
+
+<% activity.guidelines_activity_items.each_with_index do |guideline_item, index| %>
+<p>text = Text.create(</p>
+<p>  content: "<%= guideline_item.description %>",</p>
+<p>  position: <%= index+1 %></p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "<%= guideline_item.description %>"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>itemize.texts << text</p>
+<% end %>
+<p>guidelines_development_box.components << header</p>
+<p>guidelines_development_box.components << itemize</p>
+<p><%= activity.name %>.boxes << guidelines_development_box</p>
+
+<p>#Guidelines assessment</p>
+<p>guidelines_assessment_box = Box.create(</p>
+<p>  box_type: "right_half_box",</p>
+<p>  position: 8</p>
+<p>)</p>
+<p>header = Component.create(</p>
+<p>  component_type: "header",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>text = Text.create(</p>
+<p>  content: "4. Avaliación",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "4. Assessment"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>header.texts << text</p>
+<p>itemize = Component.create(</p>
+<p>  component_type: "itemize",</p>
+<p>  position: 2</p>
+<p>)</p>
+<% activity.guidelines_assessment_items.each_with_index do |guideline_item, index| %>
+<p>text = Text.create(</p>
+<p>  content: "<%= guideline_item.description %>",</p>
+<p>  position: <%= index+1 %></p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "<%= guideline_item.description %>"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>itemize.texts << text</p>
+<% end %>
+<p>guidelines_assessment_box.components << header</p>
+<p>guidelines_assessment_box.components << itemize</p>
+<p><%= activity.name %>.boxes << guidelines_assessment_box</p>
+
+<p>#Horizontal rule</p>
+<p>horizontal_rule_box = Box.create(</p>
+<p>  box_type: "full_box",</p>
+<p>  position: 9</p>
+<p>)</p>
+<p>horizontal_rule = Component.create(</p>
+<p> component_type: "horizontal_rule",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>horizontal_rule_box.components << horizontal_rule</p>
+<p><%= activity.name %>.boxes << horizontal_rule_box</p>
+
+<p>#Ideas</p>
+<p>ideas_box = Box.create(</p>
+<p>  box_type: "full_box",</p>
+<p>  position: 10</p>
+<p>)</p>
+<p>header = Component.create(</p>
+<p>  component_type: "header",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>text = Text.create(</p>
+<p>  content: "Ideas para empregar tecnoloxía",</p>
+<p>  position: 1</p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "Ideas for using technology"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>header.texts << text</p>
+<p>itemize = Component.create(</p>
+<p>  component_type: "itemize",</p>
+<p>  position: 2</p>
+<p>)</p>
+
+<% activity.technical_motivations.each_with_index do |technical_motivation, index| %>
+<p>text = Text.create(</p>
+<p>  content: "<%= technical_motivation.name %>",</p>
+<p>  position: <%= index+1 %></p>
+<p>)</p>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p>text.content = "<%= technical_motivation.name %>"</p>
+<p>text.save</p>
+<p>I18n.locale = "gl"</p>
+<% I18n.locale = "gl" %>
+<p>itemize.texts << text</p>
+<% end %>
+<p>ideas_box.components << header</p>
+<p>ideas_box.components << itemize</p>
+<p><%= activity.name %>.boxes << ideas_box</p>
+
+<% activity_name =  activity.name %>
+<p>I18n.locale = "en"</p>
+<% I18n.locale = "en" %>
+<p><%= activity_name %>.name = "<%= activity.name %>"</p>
+<p><%= activity_name %>.description = "<%= activity.description%>"</p>
+<p><%= activity_name %>.save</p>
+</div><!-- Activity -->
+<% end %>
+</div><!-- Content -->

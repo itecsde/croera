@@ -1,0 +1,30 @@
+<li>
+<% if @previous_action == "list" %>
+	<%=link_to  "javascript: history.back();" do %>
+		<img src="/images/white_arrow_left.png" title="Back to home"></img>
+	<% end %>
+<% else %>
+	<%=link_to  guides_path do %>
+		<img src="/images/white_arrow_left.png" title="Back to home"></img>
+	<% end %>
+<% end %>
+</li>
+
+<% if @guide.owner == current_user %>
+	<li>
+	<%=link_to edit_guide_path(@guide) do %>
+		<img src="/images/white_edit.png" title="Edit"></img>
+	<% end %>
+	</li>
+	<li>
+	<%=link_to @guide, confirm: t('Are_you_sure'), method: :delete do %>
+		 <img src="/images/white_delete.png" title="Delete"></img>
+	<% end %>
+	</li>
+<% end %>
+
+<li>
+<%=link_to url_for({:action =>'pick_it', :guide_id => @guide.id})  do %>
+			<img src="/images/white_create_copy.png" title="Copy"></img>
+<% end %>
+</li>

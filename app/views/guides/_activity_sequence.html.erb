@@ -1,0 +1,8 @@
+<div class="sequence_container">
+	<%= form_for(@activity_sequence) do |f_sequence| %>
+	<div class="sequence_form">
+		<%= render :partial => "activity_sequences/form" , :locals => {:f => f_sequence} %>
+	</div>
+	<% end %>
+</div>
+

@@ -1,0 +1,306 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+require "nokogiri"
+
+class ScraperReports
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+  
+  #############################################################
+  ####### SCRAPE_EL_PAIS
+  ###########################################################
+  def scrape_elpais
+    rss_feed = "http://ep00.epimg.net/rss/tags/c_ciencia.xml"
+    scrape_rss_report rss_feed
+    rss_feed = "http://elpais.com/tag/rss/conflictos/a/"
+    scrape_rss_report rss_feed
+      
+    source_name = __method__.to_s
+    if Source.find_by_name(source_name) != nil
+      source = Source.find_by_name(source_name)
+      source.number_of_resources = Report.where(:scraped_from => rss_feed).size
+      source.last_scraping = Time.now
+      source.save
+    else
+      source = Source.new
+      source.name = source_name
+      source.source_type = "Report"
+      source.scraped_from = rss_feed
+      source.number_of_resources = Report.where(:scraped_from => rss_feed).size
+      source.last_scraping = Time.now
+      source.url = "http://ep00.epimg.net/rss/tags/c_ciencia.xml"
+      source.save
+    end 
+  end
+   
+  def scrape_reuters
+    rss_feed = "http://feeds.reuters.com/reuters/scienceNews"
+    scrape_rss_report rss_feed
+      
+    source_name = __method__.to_s
+    if Source.find_by_name(source_name) != nil
+      source = Source.find_by_name(source_name)
+      source.number_of_resources =Report.where(:scraped_from => rss_feed).size
+      source.last_scraping = Time.now
+      source.save
+    else
+      source = Source.new
+      source.name = source_name
+      source.source_type = "Report"
+      source.number_of_resources = Report.where(:scraped_from => rss_feed).size
+      source.last_scraping = Time.now
+      source.url = "http://feeds.reuters.com/reuters/scienceNews"
+      source.save
+    end 
+  end 
+   
+  def scrape_faro_de_vigo
+    rss_feed = "http://www.farodevigo.es/elementosInt/rss/26"
+    scrape_rss_report rss_feed
+      
+    source_name = __method__.to_s
+    if Source.find_by_name(source_name) != nil
+      source = Source.find_by_name(source_name)
+      source.number_of_resources =Report.where(:scraped_from => rss_feed).size
+      source.last_scraping = Time.now
+      source.save
+    else
+      source = Source.new
+      source.name = source_name
+      source.source_type = "Report"
+      source.number_of_resources = Report.where(:scraped_from => rss_feed).size
+      source.last_scraping = Time.now
+      source.url = "http://www.farodevigo.es/elementosInt/rss/26"
+      source.save
+    end 
+  end     
+   
+  def scrape_rss_report(rss_feed, *reintentos)
+    begin   
+      report_name = ""
+      info_to_wikify = ""    
+      report_summary = ""
+      report_content = ""    
+      puts "RSS FEED " 
+      puts rss_feed
+      puts "FIN RSS FEED"
+      idiomas_disponibles = ["en"]
+      
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+  
+      # Reads the feed
+      feed = Feedzirra::Feed.fetch_and_parse(rss_feed,{ :max_redirects => 3 })
+      #feed_page = Nokogiri::XML(open(rss_feed))
+      #puts feed_page.xpath("img")
+      #sleep 10
+      begin
+        rss_feed_name = feed.title
+        rss_feed_description = feed.description
+        
+      rescue Exception => e
+        puts e.message
+        puts e.backtrace.inspect
+      end
+             
+      # Retrieves the reports, extracts the info, and saves them     
+      feed.entries.each_with_index do |reports,index|
+        begin
+          if Report.where(:url => reports.url).size == 0
+            scraped_report = Report.new
+            begin
+              puts index
+              report_name = reports.title.strip
+              report_summary = strip_tags reports.summary
+              report_content = strip_tags reports.content
+              report_url = reports.url
+            rescue Exception => e
+              puts e.message
+              puts e.backtrace.inspect
+            end
+                              
+            return_values = extract_info_from_report(report_url, report_name)
+            image_url = return_values[:image_url]
+            info_to_wikify = return_values[:info_to_wikify]
+            
+            if image_url != nil          
+              scraped_report.element_image = URI.parse(image_url)
+            end
+            
+            I18n.locale = idiomas_disponibles[0]
+            scraped_from = rss_feed
+            scraped_report.name = report_name
+            scraped_report.description = info_to_wikify
+            scraped_report.url = report_url
+            scraped_report.link = report_url
+            scraped_report.info_to_wikify = scraped_report.name + ". " + scraped_report.description
+            scraped_report.scraped_from = scraped_from
+            scraped_report.persist(idiomas_disponibles,scraped_report.info_to_wikify,[])
+          else
+            puts "Report ya existente."
+          end
+        rescue Exception => e
+          puts "Failed Report"
+          puts e.message
+          puts e.backtrace.inspect
+        end
+        #After correct finish, store the source in sources
+        if Source.find_by_name(rss_feed_name) != nil
+          source = Source.find_by_name(rss_feed_name)
+          source.number_of_resources =Report.where(:scraped_from => rss_feed).size
+          source.last_scraping = Time.now
+          source.save
+        else
+          source = Source.new
+          source.name = rss_feed_name
+          source.source_type = "Report"
+          source.number_of_resources = Report.where(:scraped_from => rss_feed).size
+          source.last_scraping = Time.now
+          source.url = rss_feed
+          source.save
+        end 
+      end 
+    rescue  Exception => e
+      puts "Failed scrape_rss_report"
+      puts e.message
+      puts e.backtrace.inspect
+      if reintentos > 0
+        puts reintentos
+        reintentos -= 1
+        sleep 2
+        scrape_rss_report(rss_feed, 1, reintentos)
+      end
+    end   
+  end #scrape_rss_report
+  
+  def extract_info_from_report(report_url, report_title)
+    return_values = Hash.new
+    puts report_url
+    puts report_title
+    # Builds report object
+    report_html = open(report_url,"User-Agent" => "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:26.0) Gecko/20100101 Firefox/26.0").read
+    report_html.gsub!("\n", "")
+    report_object = Nokogiri::HTML(report_html)      
+    # Cleans it
+    report_object.at_css("body").traverse do |node|
+      if node.text?
+        node.content = node.content.gsub("\r", "")
+        node.content = node.content.gsub("\n", "")
+        node.content = node.content.gsub("\t", "")
+        node.content = node.content.strip
+      end
+    end
+    report_object.encoding = 'UTF-8'
+    
+    begin     
+    # Finds nodes that contain post_title
+    report_title_matches = report_object.css("body")[0].search('[text()="' + report_title.strip + '"]')
+    rescue Exception => e
+      puts "Failed matches report title"
+      puts e.message
+      puts e.backtrace.inspect
+    end
+
+    # Gets the most suitable node
+    best_match = report_title_matches[0]
+    puts best_match
+    if report_title_matches[0].parent.name == "li" or report_title_matches[0].parent.parent.name == "li" or report_title_matches[0].parent.parent.parent.name == "li" 
+      best_match = report_title_matches[1]
+    end
+
+    # Extracts a representative image and the content of the post
+    if best_match != nil
+      if !best_match.parent.css("img").empty?
+        # Gets an array of images
+        image_matches = best_match.parent.css("img")
+        # Gets the first image with size higher than 2k
+        image_url = first_big_image(report_url, image_matches)
+        info_to_wikify = ""
+        best_match.parent.css("p").each do |parrafo|
+          info_to_wikify = info_to_wikify + parrafo.text
+        end
+      end
+      if image_url == nil
+        if !best_match.parent.parent.css("img").empty?
+          # Gets an array of images
+          image_matches = best_match.parent.parent.css("img")
+          # Gets the first image with size higher than 2k
+          image_url = first_big_image(report_url, image_matches)
+          info_to_wikify = ""
+          best_match.parent.parent.css("p").each do |parrafo|
+            info_to_wikify = info_to_wikify + parrafo.text
+          end
+        end
+        if image_url == nil
+          if !best_match.parent.parent.parent.css("img").empty?
+            # Gets an array of images
+            image_matches = best_match.parent.parent.parent.css("img")
+            info_to_wikify = strip_tags best_match.parent.parent.parent.text.gsub(/\n/," ").gsub(/\s+/,' ').gsub("&"," ").gsub("%"," ")
+            # Gets the first image with size higher than 2k
+            image_url = first_big_image(report_url, image_matches)
+            info_to_wikify = ""
+            best_match.parent.parent.parent.css("p").each do |parrafo|
+              info_to_wikify = info_to_wikify + parrafo.text
+            end
+          end
+        end
+      end
+      if info_to_wikify == "" or info_to_wikify == nil
+        info_to_wikify = ""
+        best_match.parent.css("p").each do |parrafo|
+          info_to_wikify = info_to_wikify + parrafo.text
+        end
+      end
+      if info_to_wikify == "" or info_to_wikify == nil
+        info_to_wikify = ""
+        best_match.parent.parent.css("p").each do |parrafo|
+          info_to_wikify = info_to_wikify + parrafo.text
+        end
+      end
+      if info_to_wikify == "" or info_to_wikify == nil
+        info_to_wikify = ""
+        best_match.parent.parent.parent.css("p").each do |parrafo|
+          info_to_wikify = info_to_wikify + parrafo.text
+        end
+      end         
+    end
+    return_values = {:image_url => image_url, :info_to_wikify => info_to_wikify}
+  end
+     
+  def first_big_image(report_url, image_matches)
+    begin
+      image_url = nil
+      image_matches.each do |match|
+        dummy_report = Report.new
+        # Builds the URL
+        if match['src'] != nil
+          url = match['src']
+          if !match['src'].include? "http"
+            url = "http://" + URI.parse(report_url).host + match['src']
+          end
+          # Parses it
+          dummy_report.element_image = URI.parse(url)
+          # Assigns the return value if the image is bigger than 2k
+          if dummy_report.element_image.size > 2500
+            image_url = url
+            break
+          end
+        end
+      end
+      return image_url
+    rescue Exception => e
+      puts "Failed first_big_image"
+      puts e.message
+      puts e.backtrace.inspect
+    end
+  end
+  
+  
+  
+end

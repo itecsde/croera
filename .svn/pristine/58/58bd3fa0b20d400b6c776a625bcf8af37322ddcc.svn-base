@@ -1,0 +1,28 @@
+<div class= "video_container">
+	<%= hidden_field_tag :component_id, component.id %>
+	<%= hidden_field_tag :component_type, component.component_type %>
+	<span class="change_video edition_control active">
+		<div class= "video_url">
+			<label for= "youtube_input"><%= t("Copy_here_video_url") %></label>
+			<input type="text" id="youtube_input" class="youtube_url"/>
+			<span class= "embed_video" onclick="change_video($(this).closest('.video_url').find('#youtube_input'));">
+				<i class="icon-play icon-white"></i>
+			</span>
+		</div>
+	</span>
+	<% component.texts.each do |text| %>
+		<div class="video_preview">
+			<% if (text.content != nil && text.content != "") %>
+				<div id="youtube_iframe">
+					<iframe width="560" height="315" src="https://www.youtube.com/embed/<%= text.content %>" frameborder="0" allowfullscreen></iframe>
+				</div>
+			<% else %>
+				<%= image_tag "/images/video.jpg", width:'100%' %>
+			<% end %>
+		</div>
+		<div class= "text_container">
+				<%= hidden_field_tag :text_id, text.id, :class => "text_id" %>
+				<%= hidden_field_tag :text_content, text.content, :class => "text_content" %>
+		</div>
+	<% end %>
+</div>

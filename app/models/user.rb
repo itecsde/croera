@@ -1,0 +1,155 @@
+class User < ActiveRecord::Base
+  # Include default devise modules. Others available are:
+  # :token_authenticatable, :confirmable,
+  # :lockable, :timeoutable and :omniauthable
+  
+  #after_create :initialize_boards
+  
+  devise :database_authenticatable, :registerable,
+         :recoverable, :rememberable, :trackable, :validatable
+
+
+  searchable do
+    text :email
+  end
+
+  # Setup accessible (or protected) attributes for your model
+  attr_accessible :email, :password, :password_confirmation, :remember_me, :first_name, :last_name, :preferred_language
+  
+  has_many :comments
+  
+  has_many :group_user_annotations
+  has_many :groups, :through => :group_user_annotations
+  
+  
+  has_many :user_tag_annotations, :dependent => :destroy
+  has_many :tags, :through => :user_tag_annotations
+  
+  # Relationships with Ownable elements
+  has_many :activities_owned, :class_name => "Activity", as: :owner
+  has_many :activity_sequences_owned, :class_name => "ActivitySequence", as: :owner
+  has_many :guides_owned, :class_name => "Guide", as: :owner
+  
+  has_many :applications_created, :class_name => "Application", :foreign_key => "creator_id"
+  has_many :events_created, :class_name => "Event", :foreign_key => "creator_id"
+  has_many :people_created, :class_name => "Person", :foreign_key => "creator_id"
+  has_many :lectures_created, :class_name => "Lecture", :foreign_key => "creator_id"
+  has_many :sites_created, :class_name => "Site", :foreign_key => "creator_id"
+  has_many :documentaries_created, :class_name => "Documentary", :foreign_key => "creator_id"
+  has_many :courses_created, :class_name => "Course", :foreign_key => "creator_id"  
+  has_many :articles_created, :class_name => "Article", :foreign_key => "creator_id"
+  has_many :lres_created, :class_name => "Lre", :foreign_key => "creator_id"
+  has_many :posts_created, :class_name => "Post", :foreign_key => "creator_id" 
+  has_many :slideshows_created, :class_name => "Slideshow", :foreign_key => "creator_id"      
+  has_many :biographies_created, :class_name => "Biography", :foreign_key => "creator_id"      
+  has_many :reports_created, :class_name => "Report", :foreign_key => "creator_id"      
+  has_many :widgets_created, :class_name => "Widget", :foreign_key => "creator_id"      
+  has_many :klascements_created, :class_name => "Klascement", :foreign_key => "creator_id"      
+  has_many :artworks_created, :class_name => "Artwork", :foreign_key => "creator_id"      
+  has_many :books_created, :class_name => "Book", :foreign_key => "creator_id"      
+
+
+  
+  has_many :scenarios_created, :class_name => "Scenario", :foreign_key => "creator_id"
+  has_many :activities_created, :class_name => "Activity", :foreign_key => "creator_id"
+  has_many :activity_sequences_created, :class_name => "ActivitySequence", :foreign_key => "creator_id"
+  has_many :guides_created, :class_name => "Guide", :foreign_key => "creator_id" 
+  has_many :experiences_created, :class_name => "Experience", :foreign_key => "creator_id"  
+ 
+  
+  has_many :circumstances, :class_name => "Circumstance", :foreign_key => "user_id"
+  
+  
+  # Relationship with bookmarked elements
+  has_many :bookmark_user_element_annotations, :dependent => :destroy
+  has_many :bookmarked_events, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Event"
+  has_many :bookmarked_people, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Person"
+  has_many :bookmarked_applications, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Application"
+  has_many :bookmarked_lectures, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Lecture"
+  has_many :bookmarked_sites, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Site"
+  has_many :bookmarked_documentaries, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Documentary"
+  has_many :bookmarked_courses, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Course"
+  has_many :bookmarked_articles, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Article"
+  has_many :bookmarked_lres, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Lre"
+  has_many :bookmarked_posts, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Post"
+  has_many :bookmarked_slideshows, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Slideshow"
+  has_many :bookmarked_biographies, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Biography"
+  has_many :bookmarked_reports, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Report"
+  has_many :bookmarked_widgets, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Widget"
+  has_many :bookmarked_klascements, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Klascement"
+  has_many :bookmarked_artworks, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Artwork"
+  has_many :bookmarked_books, :through => :bookmark_user_element_annotations, :source => :element,:source_type =>"Book"
+
+
+  
+  #Avatar
+  attr_accessible :avatar, :circumstances, :user_tag_annotations
+  has_attached_file :avatar, :styles => { :original => "300x300>", :medium => "200x200>", :thumb => "30x30>" }, :default_url => "/images/user/:style/user.png"
+  
+  
+    
+    
+  def add_preferences_to_user_history(resource_taggable_tag_annotations)
+    #human_tag_weight = 0.90
+    
+    if resource_taggable_tag_annotations != nil  
+      resource_taggable_tag_annotations.where(:type_tag => ["automatic","automatic_from_human"] ).each do |resource_taggable_tag_annotation|
+        user_tag = self.user_tag_annotations.where(:tag_id => resource_taggable_tag_annotation.tag_id).first      
+        if user_tag != nil && user_tag != []        
+          if user_tag.weight == nil
+              user_tag.weight = 0
+          end
+          if resource_taggable_tag_annotation.weight != nil #&& resource_taggable_tag_annotation.type_tag != "human"                
+            user_tag.weight = user_tag.weight + resource_taggable_tag_annotation.weight
+            user_tag.save
+          #else 
+          #  user_tag.weight = user_tag.weight + human_tag_weight
+          #  user_tag.save     
+          end
+  
+        else
+          annotation = UserTagAnnotation.new
+          annotation.user_id = self.id
+          annotation.tag_id = resource_taggable_tag_annotation.tag_id
+          #if resource_taggable_tag_annotation.type_tag == "human"        
+          #  annotation.weight = human_tag_weight
+          #else
+          annotation.weight = resource_taggable_tag_annotation.weight
+          #end        
+          annotation.type_tag = resource_taggable_tag_annotation.type_tag
+          annotation.wikipedia_article_id = resource_taggable_tag_annotation.wikipedia_article_id
+          annotation.save        
+        end
+      end
+    end
+  end
+  
+    
+  
+  def initialize_boards
+    puts self.email
+    itec = User.first
+    itec.activities_owned.each do |activity|
+      cloned_activity = activity.clone_with_associations
+      self.activities_owned << cloned_activity
+    end
+    
+    
+    if itec.activity_sequences_owned != nil && itec.activity_sequences_owned.length >= 1
+      itec.activity_sequences_owned.each do |sequence|
+        new_sequence = sequence.clone_with_associations
+        new_sequence.activity_instances.each do |step|
+          self.activities_owned.each do |activity|
+            if step.activity.is_equal_to activity
+              step.activity = activity
+              step.save
+            end
+          end
+        end
+        new_sequence.save
+        self.activity_sequences_owned << new_sequence
+      end  
+    end
+    #self.save
+  end
+end

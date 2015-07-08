@@ -1,0 +1,51 @@
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'experiences', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => (t ('learning_stories')), :actions => "experiences/list_actions"} %>
+<% end %>
+
+<% content_for :advanced_search do %>	
+	<%= render :partial =>"advanced_search" %>
+<% end %>
+
+<% content_for :content do %>
+
+		<div id="content_index">
+			<%= render :partial => "list", :locals => { :current_layout => "application" }%>
+		</div>
+		
+<div id="popups">
+	<%= render :partial => "adding_popups" %>
+</div>
+<script src="/javascript/experience_index.js"></script>
+<script src="/javascript/experience_index_paginations.js"></script>
+
+<link rel="stylesheet" href="/css/jquery-ui-1.10.3.custom.min.css" />
+<link rel="stylesheet" href="/css/chosen.min.css" />
+
+<script src="/javascript/jquery.ui.widget.js"></script>
+<script src="/javascript/jquery.ui.core.min.js"></script>
+<script src="/javascript/jquery.ui.mouse.min.js"></script>
+<script src="/javascript/jquery.ui.accordion.min.js"></script>
+<script src="/javascript/jquery.ui.draggable.min.js"></script>
+<script src="/javascript/jquery.ui.droppable.min.js"></script>
+<script src="/javascript/jquery.ui.sortable.min.js"></script>
+<script src="/javascript/chosen.jquery.min.js"></script>
+
+<script src="/javascript/activity_sequences_form.js"></script>
+<script src="/javascript/activities_form.js"></script>
+<script src="/javascript/guides_form.js"></script>
+<script src="/javascript/technological_setting_form.js"></script>
+
+<script src="/javascript/jquery.ui.position.js"></script>
+<script src="/javascript/jquery.ui.menu.js"></script>
+<script src="/javascript/jquery.ui.datepicker.js"></script>
+<script src="/javascript/jquery.ui.autocomplete.js"></script>
+<script src="/javascript/jquery.ui.effect.min.js"></script>
+<script src="/javascript/jquery.ui.effect-slide.min.js"></script>
+<script src="/javascript/jquery.ui.slider.min.js"></script>
+
+<script src="/javascript/guides_show.js"></script>
+<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script src="/javascript/map_control.js"></script>
+<% end %>

@@ -1,0 +1,70 @@
+<% if @experience.errors.any? %>
+<div id="error_explanation">
+  <h2><%= pluralize(@experience.errors.count, "error") %> prohibited this activity from being saved:</h2>
+  <ul>
+  <% @experience.errors.full_messages.each do |msg| %>
+    <li><%= msg %></li>
+  <% end %>
+  </ul>
+</div> 
+<% end %>
+<div id="experience_head">
+	<div class="experience_id">
+		<%= f.hidden_field :id %>
+	</div>
+	
+	<div class="left_column_group">
+		<div class="experience_name editable active name">
+			<%= f.text_field :name, :class => "experience_title", :placeholder => t("title")  %>
+			<i class="icon-pencil icon-grey"></i>
+		</div>
+		<div class="experience_description editable active description">
+
+			<textarea id="experience_description" name="experience[description]" placeholder="<%= t("description") %>"><%= @experience.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		</div>				
+	</div>
+			
+	
+	<div class="right_column_group">	
+		<div class="element_image_box picture_container">	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>
+			<% if @experience.element_image.url() != "none" %>
+				<%= image_tag @experience.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/no_photo.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= f.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		</div>
+	</div>	
+						
+</div>
+
+
+
+
+
+<div class="clear"></div>
+<div id="experience_body">
+	<div id="experience_steps">
+		<% @experience.experience_steps.each_with_index do |experience_step, index|%>
+			<% if index == 0
+					if index == @experience.experience_steps.length - 1
+						@position = "unique"
+					else
+						@position = "first"
+					end
+				else
+					if index == @experience.experience_steps.length - 1
+						@position = "last"
+					else
+						@position = "middle"
+					end
+				end	%>
+			<%= render :partial => "experiences/experience_step" , :locals => {:experience_step => experience_step, :position => @position } %>
+		<% end %>	
+	</div>
+	<div class="clear"></div>
+</div>

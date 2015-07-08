@@ -1,0 +1,30 @@
+<li>
+<% if @previous_action == "list" %>
+	<%=link_to  "javascript: history.back();", :class => "back_icon has_tooltip" do %>
+		 <img src="/images/white_arrow_left.png" title="<%= t('back_to_home') %>"></img>
+	<% end %>
+<% else %>
+	<%=link_to  activities_path, :class => "back_icon has_tooltip" do %>
+		 <img src="/images/white_arrow_left.png" title="<%= t('back_to_home') %>"></img>
+	<% end %>
+<% end %>
+</li>
+<% if current_user != nil && ((@activity.owner == current_user) or (@activity.owner_type=="Group" && @activity.owner.users.exists?(current_user)))%>
+	<li>
+	<%=link_to edit_activity_path(@activity), :class => "has_tooltip" do %>
+		<img src="/images/white_edit.png" title="<%= t('edit') %>"></img>
+	<% end %>
+	</li>
+	<li>
+	<%=link_to  @activity, confirm: t('are_you_sure'), method: :delete, :class => "has_tooltip" do %>
+		<img src="/images/white_delete.png" title="<%= t('delete') %>"></img>
+	<% end %>
+	</li>
+<%end%>
+<% if current_user != nil %>
+	<li>
+	<%=link_to url_for({:action =>'pick_it', :activity_id => @activity.id}), :class => "has_tooltip"  do %>
+		<img src="/images/white_create_copy.png" title="<%= t('copy') %>"></img>
+	<% end %>
+	</li>
+<% end %>

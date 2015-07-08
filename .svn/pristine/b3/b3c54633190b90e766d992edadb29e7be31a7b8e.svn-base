@@ -1,0 +1,16 @@
+<%	
+     element_type_plural = Util.get_resource_plural(element_type)
+     elements_path = element_type_plural + "_path"
+%>
+		
+<div class="prompt">
+	<img src="/images/black_<%= element_type.downcase %>_100.png" width="50px" height="30px"/>&nbsp;&nbsp;<%= t(element_type_plural) %><%= link_to_next_page elements, image_tag("/images/arrow_right.png") ,:remote => true, :params => {:controller => "search_results",:action => "load_more_search_results",:element_type => element_type,:search => search_text, :article_id => article_id} %><%= link_to_previous_page elements, image_tag("/images/arrow_left.png") ,:remote => true, :params => {:controller => "search_results",:action => "load_more_search_results",:element_type => element_type,:search => search_text, :article_id => article_id} %><%= link_to t("view_all"), eval("#{elements_path}(:search => '#{search_text}',:article_id => '#{params[:article_id]}')"),:class => "view_all" %>
+</div>
+<div class="body">
+	<% elements.each do |element| %>
+		<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+	<% end %>
+	<div class="clear"></div>
+</div>
+
+

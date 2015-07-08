@@ -1,0 +1,334 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+require "nokogiri"
+
+class ScraperReports
+   include ActionView::Helpers::SanitizeHelper
+   include Capybara::DSL
+   def scrape_reuters(*reintentos)
+      begin
+         if reintentos[0]==1
+         reintentos = reintentos[1].to_i
+         else
+         reintentos = 2
+         end
+         
+         category_urls = ["http://www.reuters.com/news/archive/healthNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/artsNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/politicsNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/sportsNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/scienceNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/technologyNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/GCA-Economy2010?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/businessNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/Fashion?view=page&pageSize=10&page="]
+       
+         category_urls.each do |category_url|
+            scrape_category_reuters category_url
+         end
+
+         reintentos = 2
+      rescue Exception => e
+         puts "Exception reuters"
+         puts e.message
+         puts e.backtrace.inspect
+         puts reintentos
+         if reintentos > 0
+            reintentos-=1
+            sleep 3
+            scrape_reuters(1, reintentos)
+         end
+      end
+   end
+
+   def scrape_category_reuters(category_url, *reintentos)
+      begin
+         if reintentos[0]==1
+         reintentos = reintentos[1].to_i
+         else
+         reintentos = 2
+         end
+
+         (1..50).each do |page|
+            puts category_url + page.to_s
+            category_page = Nokogiri::HTML(open(category_url + page.to_s))
+            category_page.css("div.section div.sectionContent div.sectionColumns div.column1 div#blogStyleNews div.module div.moduleBody div.feature h2 a").each do |report|
+               scrape_report_reuters "http://www.reuters.com" + report['href'], category_url
+            end
+         end
+
+         reintentos = 2
+      rescue Exception => e
+         puts "Exception category reuters"
+         puts e.message
+         puts e.backtrace.inspect
+         puts reintentos
+         if reintentos > 0
+            reintentos-=1
+            sleep 3
+            scrape_category_reuters(category_url,1, reintentos)
+         end
+      end
+   end
+
+   def scrape_report_reuters(report_url,category_url, *reintentos)
+      begin
+         puts report_url
+
+         languages = ["en"]
+         manual_tags = Array.new
+
+         if reintentos[0]==1
+            reintentos = reintentos[1].to_i
+         else
+            reintentos = 2
+         end
+
+         report_page = Nokogiri::HTML(open(report_url))
+
+         begin
+            name = report_page.css("div.section div.sectionContent div.sectionColumns div.column1 h1")[0].text.strip
+            puts "Name: " + name
+         rescue
+            puts "Exception name scrape_reuters"
+         end
+
+         begin
+            description = strip_tags report_page.css("div.section div.sectionContent div.sectionColumns div.column1 span#articleText")[0].text.strip
+            puts "Description: " + description
+         rescue
+            puts "Exception description scrape_reuters"
+         end
+
+         begin
+            photo_url = report_page.css("div.section div.sectionContent div.sectionColumns div.column1 div#articleImage.relatedPhoto img")[0]['src']
+            puts "photo_url: " + photo_url
+         rescue
+            puts "Exception photo_url scrape_reuters"
+            photo_url = nil
+         end
+
+         scraped_report = Report.new
+
+         info_to_wikify = name + ". " + description
+
+         scraped_report.name = name
+         scraped_report.description = description
+         scraped_report.info_to_wikify = info_to_wikify
+         scraped_report.url = report_url
+         scraped_report.scraped_from = category_url
+         if photo_url!=nil
+            begin
+               scraped_report.element_image=URI.parse(photo_url)
+            rescue
+               puts "reuters: img do not saved"
+               scraped_report.element_image.clear
+            end
+         end
+
+         scraped_report.persist(languages, info_to_wikify, manual_tags)
+
+         reintentos = 2
+      rescue Exception => e
+         puts "Exception scrape_report_reuters"
+         puts e.message
+         puts e.backtrace.inspect
+         puts reintentos
+         if reintentos > 0
+            reintentos-=1
+            sleep 3
+            scrape_report_reuters(report_url,category_url, 1, reintentos)
+         end
+      end
+   end
+   
+#############################################################################################################################
+## SCRAPER PARA HACER EL CORPUS DE 27000 NOTICIAS DE REUTERS, 3000 POR CATEGORÍAS PARA LOS EXPERIMENTOS DEL ARTICULO
+## SE TRATA DE UN CORPUS QUE CONTIENE NOTICIAS NO AMBIGUAS (QUE SOLO PERTENEZCAN A UNA CATEGORÍA) Y FORMADO POR LA NOTICIA
+## Y TAMBIÉN SE GUARDA EL ABSTRACT (QUE ES LO QUE VIENE EN EL FEED)
+## EL CORPUS SE GUARDA SIN CLASIFICAR Y SIN ANOTAR (LUEGO YA SE HARÁN LAS ANOTACIONES CON DISTINTOS MÉTODOS Y CANTIDAD DE 
+## TEXTO DE ENTRADA)
+#############################################################################################################################  
+   def scrape_reuters_to_create_27000_corpus(*reintentos)
+      begin
+         if reintentos[0] == 1
+            reintentos = reintentos[1].to_i
+         else
+            reintentos = 2
+         end
+=begin         
+         category_urls = ["http://www.reuters.com/news/archive/healthNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/artsNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/politicsNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/sportsNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/scienceNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/technologyNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/GCA-Economy2010?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/businessNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/Fashion?view=page&pageSize=10&page="]
+=end            
+            
+         category_urls = ["http://www.reuters.com/news/archive/artsNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/politicsNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/sportsNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/scienceNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/technologyNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/GCA-Economy2010?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/businessNews?view=page&pageSize=10&page=",
+            "http://www.reuters.com/news/archive/Fashion?view=page&pageSize=10&page="]
+                   
+       
+         category_urls.each do |category_url|
+            scrape_category_reuters_to_create_27000_corpus category_url
+         end
+
+         reintentos = 2
+      rescue Exception => e
+         puts "Exception scrape_reuters_to_create_27000_corpus"
+         puts e.message
+         puts e.backtrace.inspect
+         puts reintentos
+         if reintentos > 0
+            reintentos-=1
+            sleep 3
+            scrape_reuters_to_create_27000_corpus(1, reintentos)
+         end
+      end
+   end
+
+   def scrape_category_reuters_to_create_27000_corpus(category_url, *reintentos)
+      begin
+         if reintentos[0]==1
+            reintentos = reintentos[1].to_i
+         else
+            reintentos = 2
+         end
+         
+         counter = 0
+         page = 0
+         
+         while counter < 3000
+            page += 1
+            puts category_url + page.to_s
+            category_page = Nokogiri::HTML(open(category_url + page.to_s))
+            category_page.css("div.section div.sectionContent div.sectionColumns div.column1 div#blogStyleNews div.module div.moduleBody div.feature").each do |report|
+               if counter < 3000
+                  if report.css(".relatedInfo .relatedTopics").empty?
+                     scrape_report_reuters_to_create_27000_corpus "http://www.reuters.com" + report.css("h2 a")[0]['href'], category_url
+                     counter += 1;
+                  end
+               end
+            end
+         end
+
+         reintentos = 2
+      rescue Exception => e
+         puts "Exception scrape_category_reuters_to_create_27000_corpus"
+         puts e.message
+         puts e.backtrace.inspect
+         puts reintentos
+         if reintentos > 0
+            reintentos-=1
+            sleep 3
+            scrape_category_reuters_to_create_27000_corpus(category_url,1, reintentos)
+         end
+      end
+   end
+
+   def scrape_report_reuters_to_create_27000_corpus(report_url,category_url, *reintentos)
+      begin
+         puts report_url
+
+         languages = ["en"]
+         manual_tags = Array.new
+
+         if reintentos[0]==1
+            reintentos = reintentos[1].to_i
+         else
+            reintentos = 2
+         end
+
+         report_page = Nokogiri::HTML(open(report_url))
+
+         begin
+            name = report_page.css("div.section div.sectionContent div.sectionColumns div.column1 h1")[0].text.strip
+            puts "Name: " + name
+         rescue
+            puts "Exception name scrape_reuters"
+         end
+
+         begin
+            abstract = strip_tags report_page.css("div.section div.sectionContent div.sectionColumns div.column1 span#articleText span.focusParagraph p")[0].text.strip
+            puts "Abstract: " + abstract
+         rescue
+            puts "Exception abstract scrape_reuters"
+         end 
+
+         begin
+            description = strip_tags report_page.css("div.section div.sectionContent div.sectionColumns div.column1 span#articleText")[0].text.strip
+            description = description.gsub(abstract,"")
+            puts "Description: " + description
+         rescue
+            puts "Exception description scrape_reuters"
+         end
+         
+         begin
+            clean_abstract = ""
+            tokens = abstract.split(" - ")
+            for i in 1..tokens.size-1
+               clean_abstract = clean_abstract + tokens[i]
+            end
+            abstract = clean_abstract
+            puts "Abstract" + abstract
+         rescue
+            puts "Exception abstract scrape_reuters_2"
+         end
+
+         begin
+            photo_url = report_page.css("div.section div.sectionContent div.sectionColumns div.column1 div#articleImage.relatedPhoto img")[0]['src']
+            puts "photo_url: " + photo_url
+         rescue
+            puts "Exception photo_url scrape_reuters"
+            photo_url = nil
+         end
+
+         scraped_report = Report.new
+         info_to_wikify = nil
+         scraped_report.name = name
+         scraped_report.description = description
+         scraped_report.abstract = abstract
+         scraped_report.url = report_url
+         scraped_report.scraped_from = category_url
+         if photo_url!=nil
+            begin
+               scraped_report.element_image=URI.parse(photo_url)
+            rescue
+               puts "reuters: img do not saved"
+               scraped_report.element_image.clear
+            end
+         end
+
+         scraped_report.persist(languages, info_to_wikify, manual_tags)
+
+         reintentos = 2
+      rescue Exception => e
+         puts "Exception scrape_report_reuters"
+         puts e.message
+         puts e.backtrace.inspect
+         puts reintentos
+         if reintentos > 0
+            reintentos-=1
+            sleep 3
+            scrape_report_reuters_to_create_27000_corpus(report_url,category_url, 1, reintentos)
+         end
+      end
+   end      
+#############################################################################################################################
+## FIN
+#############################################################################################################################
+      
+
+end

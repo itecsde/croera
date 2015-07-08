@@ -1,0 +1,9 @@
+<% if current_layout == "popup" %>
+<a class="extract_box popup_new_contextual_setting_box new_extract_box" onclick="new_contextual_setting();">+</a>
+<% else %>
+<%= link_to "+", new_contextual_setting_path, html_options = {:class => "extract_box new_contextual_setting_box new_extract_box"} %>
+<% end %>
+
+<% @contextual_settings.each do |contextual_setting| %>
+	<%= render :partial => "elements/element", :locals => {:element => contextual_setting, :current_layout => current_layout} %>
+<% end %>

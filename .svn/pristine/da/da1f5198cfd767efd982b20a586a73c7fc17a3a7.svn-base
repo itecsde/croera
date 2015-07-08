@@ -1,0 +1,11 @@
+<%= render :partial => "header", :locals => {:section_title => (t :picture), :actions => "form_actions"} %>
+
+<div id="content_container" class="picture_form">
+	<%= form_for(@picture, :html => { :class => "picture_form", :multipart => true }) do |fo| %>
+		<%= render :partial => "pictures/form", :locals => {:picture_id => @picture_id, :layout => 'application'} %>
+		<%= render :partial => "submit", :locals => {:f => fo} %>
+	<% end %>	
+	<input type="hidden" id="edition_mode" value="on"/>
+</div>
+
+<script src="/javascript/picture_form.js"></script>

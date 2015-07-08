@@ -1,0 +1,12 @@
+<% component.texts.each do |text| %>
+	<div class= "text_container header template_editable editable active">
+		<%= hidden_field_tag :text_id, text.id, :class => "text_id" %>
+		<%= hidden_field_tag :text_content, text.content, :class => "text_content"%>	
+		<span style="margin-left:2px;font-size: 16px;font-weight: bold;" class="text_content"><%= text.content %></span>
+		<% tooltip = Util.get_text_help_tooltip(text.id) %>	
+		<% if tooltip != nil %> 		
+			<a class="help_tooltip" href="#" onClick="event.preventDefault();" data-content="<%= t(tooltip , :default => tooltip.to_s) %>" data-placement="right" data-toggle="popover"><img style="margin-top:-3px;margin-left:5px;" class="help_icon" src="/images/help.png"/></a>
+		<% end %>
+		<i class="icon-pencil icon-grey"></i>
+	</div>
+<% end %>

@@ -1,0 +1,41 @@
+<%
+	if negative_comment_id == nil
+		@negative_comment = NegativeComment.new
+		@box= Box.new
+		@box.box_type= "full_box"
+		@box.position= 1
+		@box.document_type= "NegativeComment"
+		@component= Component.new
+		@component.component_type= "header"
+		@component.position= 1
+		@text = ActiveRecord::Base::Text.new
+		@component.texts << @text
+		@box.components << @component
+		@component= Component.new
+		@component.component_type= "itemize"
+		@component.position= 2
+		@text = ActiveRecord::Base::Text.new
+		@component.texts << @text
+		@box.components << @component
+		@negative_comment.boxes << @box
+	else
+		@negative_comment= NegativeComment.find(negative_comment_id)
+	end
+%>
+
+<%= fields_for @negative_comment do |f|%>
+	<%= f.hidden_field :id %>
+<% end %>
+<% @negative_comment.boxes.sort_by{|e| e[:position]}.each do |box| %>
+	<div class="box_container <%= box.box_type %>">
+		<%= hidden_field_tag :box_id, box.id %>
+		<%= hidden_field_tag :box_type, box.box_type %>
+		<% box.components.sort_by{|e| e[:position]}.each do |component| %>
+			<div class="component_container">
+				<%= hidden_field_tag :component_id, component.id %>
+				<%= hidden_field_tag :component_type, component.component_type %>				
+				<%= render :partial => "components/"+component.component_type, :locals => {:component => component}  %>
+			</div>
+		<%end%>
+	</div>
+<%end%>

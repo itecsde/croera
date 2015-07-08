@@ -1,0 +1,17 @@
+<%= render :partial => "header", :locals => {:section_title => (t :profile), :actions => "user_actions"} %>
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'users', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => (t ('users')), :actions => "users/user_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<div id="content_user" class="profile_container">
+		<%= form_for(@user,:html => { :class => "user_form" }) do |f_user| %>
+			<%= render :partial => "form" , :locals => {:f => f_user} %>
+		<% end %>
+	</div>
+	<%= render :partial => "circumstances/show" %>
+			
+	<script src="/javascript/jquery.masonry.min.js"></script>
+	<script src="/javascript/user_profile.js"></script>
+<% end %>

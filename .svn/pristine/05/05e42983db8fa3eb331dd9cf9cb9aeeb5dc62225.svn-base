@@ -1,0 +1,8 @@
+class AddTranslationReutersNewItem < ActiveRecord::Migration
+  def up
+      ReutersNewItem.create_translation_table! :name => :string, :description => :text, :link => :string, :raw_html => :text  
+  end
+
+  def down
+  end
+end

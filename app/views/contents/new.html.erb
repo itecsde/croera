@@ -1,0 +1,11 @@
+<%= render :partial => "header", :locals => {:section_title => (t :new_content), :actions => "form_actions"} %>
+
+<div id="content_container" class="external_content_container">
+	<input type="hidden" id="edition_mode" value="on">
+	<%= form_for(@content, :html => { :class => "content_form" }) do |f_content| %>
+		<%= render :partial => "form" , :locals => {:content_form => f_content} %>
+		<%= render :partial => "submit", :locals => {:content_form => f_content} %>
+	<% end %>
+</div>	
+
+<script src="/javascript/contents_form.js"></script>

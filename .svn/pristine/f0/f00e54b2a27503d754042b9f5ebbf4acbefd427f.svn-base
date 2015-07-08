@@ -1,0 +1,3 @@
+
+
+jQuery("#content_index").append(<% @applications.each do |application| %><%= escape_javascript(render :partial => "elements/element", :locals => {:element => application, :current_layout => current_layout}) 

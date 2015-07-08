@@ -1,0 +1,83 @@
+# spec/features/visitor_signs_up_spec.rb
+require 'spec_helper'
+
+feature 'User logs in' do
+  
+=begin  
+  Steps "Signing in with correct credentials" do
+    When "I go to sign in page" do
+      page.visit "http://localhost:3000/"
+      page.find("div.login div.section_title").click
+    end
+    And "I fill in right email" do
+      page.fill_in "user_email", :with => "marcosmourino@gmail.com"
+    end
+    And "I fill in  right password" do
+      page.fill_in "user_password", :with => "1111"
+    end
+    And "I click login" do
+      page.click_button "login"
+    end
+    Then "I should see greeting" do
+      page.should have_content("Recommended Reports")
+    end
+  end
+=end
+  
+ # background do
+  #  User.create(:email => 'admin@example.com', :password => 'password')
+  #end
+   
+  scenario 'with valid email and password', :js => true do
+    log_in_sde("marcosmourino@gmail.com","1111")
+    expect(page).to have_content("Recommended Reports")
+  end
+
+  scenario 'with invalid email', :js => true do
+    log_in_sde("invalid_email","1111")
+    expect(page).to have_content("Login")
+  end
+   
+  scenario 'with incorrect password', :js => true do
+    log_in_sde("marcosmourino@gmail.com","")
+    expect(page).to have_content("Login")    
+  end
+    
+=begin  
+  scenario 'page does not have JavaScript errors', :js => true do
+    visit(root_path)
+    expect(page).not_to have_errors
+  end
+   
+  
+=end
+    
+=begin    
+  scenario 'user switches off enriched mode', :js => true do
+    #User.create(:email => 'admin@example.com', :password => 'password')
+    visit root_path
+    page.find("#flag_en").click
+    page.find("#log_in").click
+    
+    fill_in 'user_email', :with => 'admin@example.com'
+    fill_in 'user_password', :with => 'password'
+    click_button 'Sign in'
+    
+    assert_equal current_path, "/" + I18n.locale.to_s + user_root_path  
+    
+    click_link "Resources"
+    click_link "All"
+    click_link "Events"
+    
+    assert_equal "/" + I18n.locale.to_s + events_path, current_path  
+    page.should have_content('Enriched On')
+    page.should_not have_content('Enriched Off')
+    
+    click_on "Enriched On"    
+    
+    page.should have_content('Enriched Off')                     
+  end
+=end  
+  
+  
+end

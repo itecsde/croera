@@ -1,0 +1,12 @@
+<div id="<%=slider_id%>" class="area_slider <%=slider_location%>">
+	<div class="slider_header">
+		<span><%= t(slider_header) %></span>
+	</div>
+	<div class="slider_body">
+		<%= yield %>
+	</div>
+	
+	<div class="area_slider_close" onclick="close_area_slider('#<%=slider_id%>')"></div>
+	<input type="hidden" class="callback"  value="<%= callback %>"/>
+	<div class="selected_elements" style="display: none;"></div>
+</div>

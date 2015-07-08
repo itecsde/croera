@@ -1,0 +1,6 @@
+class Source < ActiveRecord::Base
+  has_many :tasks  
+  has_many :comments, :as => :commentable, :dependent => :destroy
+  has_attached_file :element_image, :styles => { :original => "300x300>", :medium => "200x200>", :thumb => "30x30>" }, :default_url => "none"
+  include Ownable
+end

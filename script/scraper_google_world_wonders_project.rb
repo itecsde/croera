@@ -1,0 +1,2 @@
+scraper_world_wonders = ScraperArtworks.new
+scraper_world_wonders.scrape_google_world_wonders_project

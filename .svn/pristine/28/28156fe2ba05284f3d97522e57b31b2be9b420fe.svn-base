@@ -1,0 +1,5 @@
+<%= link_to "+", new_guide_path, html_options = {:class => "extract_box new_guide_box new_extract_box"} %>
+
+<% @guides.each do |guide| %>
+	<%= render :partial => "elements/element", :locals => {:element => guide, :current_layout => current_layout} %>
+<% end %>

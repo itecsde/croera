@@ -1,0 +1,113 @@
+<div class="related_elements_container">
+	
+	
+	<div class="related_element">		
+		<div class="prompt"><img src="/images/black_site_100.png" width="30px" height="30px"/><%= t("related_sites") %><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => 'Site',:title =>'related_sites') %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% @related_elements.get_related_elements('Site').each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 				
+			<% end %>										
+		</div>
+	</div>	
+	
+	<div class="related_element">		
+		<div class="prompt"><img src="/images/black_event_100.png" width="30px" height="30px"/><%= t("related_events") %><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => 'Event',:title =>'related_events') %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% @related_elements.get_related_elements('Event').each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 				
+			<% end %>										
+		</div>
+	</div>	
+	
+	
+	<div class="related_element">		
+		<div class="prompt"><img src="/images/black_lecture_100.png" width="30px" height="30px"/><%= t("related_lectures") %><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => 'Lecture',:title =>'related_lectures') %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% @related_elements.get_related_elements('Lecture').each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 				
+			<% end %>										
+		</div>
+	</div>	
+	
+	<div class="related_element">		
+		<div class="prompt"><img src="/images/black_documentary_100.png" width="30px" height="30px"/><%= t("related_documentaries") %><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => 'Documentary',:title =>'related_documentaries') %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% @related_elements.get_related_elements('Documentary').each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 				
+			<% end %>										
+		</div>
+	</div>
+	
+	<div class="related_element">		
+		<div class="prompt"><img src="/images/black_course_100.png" width="30px" height="30px"/><%= t("related_courses") %><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => 'Course',:title =>'related_courses') %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% @related_elements.get_related_elements('Course').each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 								
+			<% end %>										
+		</div>
+	</div>
+	
+	<div class="related_element">		
+		<div class="prompt"><img src="/images/black_article_100.png" width="30px" height="30px"/><%= t("related_articles") %><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => 'Article',:title =>'related_articles') %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% @related_elements.get_related_elements('Article').each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 								
+			<% end %>										
+		</div>
+	</div>		
+	
+	<div class="related_element">		
+		<div class="prompt"><img src="/images/black_lre_100.png" width="30px" height="30px"/><%= t("related_lres") %><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => 'Lre',:title =>'related_lres') %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% @related_elements.get_related_elements('Lre').each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 								
+			<% end %>										
+		</div>
+	</div>			
+	
+	<div class="related_element">		
+		<div class="prompt"><img src="/images/black_application_100.png" width="30px" height="30px"/><%= t("related_applications") %><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => 'Application',:title =>'related_applications') %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% @related_elements.get_related_elements('Application').each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 								
+			<% end %>										
+		</div>
+	</div>							
+
+	<div class="related_element">		
+		<div class="prompt"><img src="/images/black_post_100.png" width="30px" height="30px"/><%= t("related_posts") %><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => 'Post',:related_type => 'Post',:title =>'related_posts') %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% @related_elements.get_related_elements('Post').each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 								
+			<% end %>										
+		</div>
+	</div>				
+				
+	<div class="related_element">		
+		<div class="prompt"><img src="/images/black_slideshow_100.png" width="30px" height="30px"/><%= t("related_slideshows") %><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => 'Slideshow',:title =>'related_slideshows') %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% @related_elements.get_related_elements('Slideshow').each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 								
+			<% end %>										
+		</div>
+	</div>		
+						
+	<div class="related_element">		
+		<div class="prompt"><img src="/images/black_biography_100.png" width="30px" height="30px"/><%= t("related_biographies") %><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => 'Biography',:title =>'related_biographies') %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% @related_elements.get_related_elements('Biography').each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 								
+			<% end %>										
+		</div>
+	</div>
+	
+	<div class="related_element">		
+		<div class="prompt"><img src="/images/black_biography_100.png" width="30px" height="30px"/><%= t("related_reports") %><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => 'Report',:title =>'related_reports') %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% @related_elements.get_related_elements('Report').each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 								
+			<% end %>										
+		</div>
+	</div>		
+						
+</div>

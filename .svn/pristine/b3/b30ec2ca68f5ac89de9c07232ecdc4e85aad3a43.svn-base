@@ -1,0 +1,41 @@
+class Recommender
+  def get_recommended_tools(functionality_id)
+          
+     @annotations=ApplicationFunctionalityAnnotation.where(:functionality_id => functionality_id).order("level DESC").limit(5)
+     #puts @requirement.functionality.id
+     @recommended_tools ||= Array.new
+     #@annotations.reverse_each do |annotation|
+     @annotations.each do |annotation|
+       @recommended_tools.push(annotation.application)
+       puts annotation
+     end
+     return @recommended_tools
+     
+  end
+  
+  
+  def validate_tool_assignment(functionality_id,element_class,element_id)
+    case element_class
+      when "Application"
+        @application=Application.find(element_id)
+        @annotations=ApplicationFunctionalityAnnotation.where(:application_id=>element_id,:functionality_id=>functionality_id)
+        @result=false
+        if @annotations.size>0
+          @result="true"
+         else @result= "false"
+        end
+        return @result
+              
+      else 
+        return "incomplete"        
+    end    
+  end
+  
+  
+  def get_recommended_events(contextual_setting)
+    
+  end
+    
+  
+  
+end

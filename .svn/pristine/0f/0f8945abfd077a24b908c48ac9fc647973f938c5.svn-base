@@ -1,0 +1,416 @@
+# encoding: utf-8
+class Scraper  
+  include ActionView::Helpers::SanitizeHelper
+  def make_readable(url)
+    source = open(url).read
+    puts Readability::Document.new(source).content
+  end
+
+
+
+  def geolocate_address_cloudmade(address)
+    arr_coordinates=[]
+    puts "Proceeding to Geolocate"
+    begin
+        cm = CloudMade::Client.from_parameters('a19d1d45661e468697514deaf502669f')
+                        
+        coordinates = cm.geocoding.find(URI::encode(address.gsub(/[^a-z,A-Z,0-9,\s]+/,"")))
+        if coordinates.results != nil
+          latitude=coordinates.results[0].centroid.lat
+          longitude=coordinates.results[0].centroid.lon
+          arr_coordinates << latitude
+          arr_coordinates << longitude          
+        end 
+        
+        puts "GEOLOCATED ******************************************"
+    rescue Exception => e
+      puts "RESCUEEE geolacated adresss !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+      puts e.backtrace.inspect
+      puts e.message
+    end
+    return arr_coordinates
+  end
+  
+
+    
+  def geolocate_address_with_google(address)
+    arr_coordinates=[]
+    if address !=nil && address != ""
+      clean_address=address.gsub(/[^a-z,A-Z,0-9,á-ú,Á,É,Í,Ó,Ú,ñ,ç,\s]+/,"")
+      puts clean_address
+      
+      begin                                     
+        coordinates=Geocoder.coordinates(clean_address, :lookup => :google)                   
+                 
+        if coordinates != nil 
+          arr_coordinates = coordinates
+        end
+        puts "GEOLOCATED WITH GOOGLE!!!!"
+        puts arr_coordinates
+        arr_coordinates << geocoder_service.to_s
+        return arr_coordinates  
+             
+      rescue Exception => e  
+          #puts e.backtrace.inspect
+          puts e.message
+          puts "FAILED GEOLOCATION WITH GOOGLE"
+          # Si no llego al utlimo probamos con el siguiente servicio para que geolocalice ya que el actual no funciono          
+          return arr_coordinates                                           
+      end
+    else #del if de address
+       return arr_coordinates
+    end
+      
+  end
+                  
+        
+          
+  
+  def geolocate_address(address,options={})       
+      arr_coordinates=[]
+      list_services=[:google,:cloudmade,:esri,:bing,:mapquest,:yandex,:nominatim]
+      #Si no envia el servicio de geocoder que quiere le ponemos google por defecto   
+      if options[:geocoder_service] 
+          geocoder_service=options[:geocoder_service]
+      else
+          geocoder_service=:google;
+      end    
+      puts "Proceeding to Geolocate with "+ geocoder_service.to_s             
+                    
+      if address !=nil && address != ""
+          clean_address=address.gsub(/[^a-z,A-Z,0-9,á-ú,Á,É,Í,Ó,Ú,ñ,ç,\s]+/,"")
+          puts clean_address
+          #Si es cloudmade y tinene algun caracter raro pasamos al siguiente servicio porque cloudmade lo va a hacer mal        
+          if geocoder_service==:cloudmade
+              expr_regular=/[á-úÁÉÍÓÚñç]/
+              m = expr_regular.match(clean_address) 
+              if m
+                geocoder_service=list_services[list_services.index(geocoder_service)+1]
+                puts "Extrange chareacter for cloudmade proceeding to Geolocate with "+ geocoder_service.to_s
+              end  
+          end
+                  
+          begin             
+              if list_services.include?(geocoder_service)                
+                 coordinates=Geocoder.coordinates(clean_address, :lookup => geocoder_service)                   
+              else
+                puts "NO EXISTE EL SERVICIO DE GEOLOCALIZAZION "+ geocoder_service.to_s
+                arr_coordinates=[]   
+              end            
+              if coordinates!=nil 
+                arr_coordinates=coordinates
+              end
+              puts "GEOLOCATED !!!!"
+              puts arr_coordinates
+              arr_coordinates << geocoder_service.to_s
+              return arr_coordinates  
+                 
+          rescue Exception => e  
+              #puts e.backtrace.inspect
+              puts e.message
+              puts "Failed location service trying with other"
+              # Si no llego al utlimo probamos con el siguiente servicio para que geolocalice ya que el actual no funciono
+              if list_services.index(geocoder_service) < (list_services.size-1)               
+                 geolocate_address(address,:geocoder_service => list_services[list_services.index(geocoder_service)+1])
+              else
+                return arr_coordinates
+              end
+                                 
+          end
+      else #del if de address
+         return arr_coordinates
+      end
+    end
+    
+  def scrape_rss_feed(rss_feed, element_type, *reintentos)
+    begin   
+      element_type = element_type.capitalize.constantize
+      puts "element_type"
+      puts element_type
+      puts "RSS FEED " 
+      puts rss_feed
+      puts "FIN RSS FEED"
+      available_languages = []
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+  
+      feed = Feedjira::Feed.fetch_and_parse(rss_feed,{ :max_redirects => 3 })
+      html_page = Nokogiri::HTML(open(rss_feed))
+
+      begin
+        rss_feed_name = feed.title
+        rss_feed_description = feed.description
+        rss_feed_url_image = html_page.css("image url").text.strip
+        puts rss_feed_url_image       
+        rss_feed_language = html_page.css("language").text.strip.split("-")[0]
+        available_languages << rss_feed_language 
+      rescue Exception => e
+        puts e.message
+        puts e.backtrace.inspect
+      end
+             
+      source_name = rss_feed_name    
+      #Add new source, or select it if exists
+      source = Source.create_or_select_source(source_name, element_type.name, rss_feed)
+      begin
+        if rss_feed_url_image != nil          
+          source.element_image = URI.parse(rss_feed_url_image)
+          source.save
+        end
+      rescue
+      end
+             
+      # Retrieves the elements, extracts the info, and saves them     
+      feed.entries.each_with_index do |entry,index|
+        begin
+          if element_type.where(:url => entry.url).size == 0
+            scraped_element = element_type.new
+            begin
+              puts index
+              summary_content = ""
+              entry_name = ""
+              entry_summary = ""
+              entry_content = ""
+              info_to_wikify = ""
+              entry_name = entry.title.strip
+              entry_summary = strip_tags entry.summary
+              entry_content = strip_tags entry.content
+              begin
+                entry_image_url = entry.image
+              rescue
+              end
+              if entry_image_url == nil
+                begin
+                  entry_image_url = entry.enclosure_url
+                rescue
+                end
+              end
+              if entry_image_url == nil
+                begin
+                  entry_image_url = entry.media_content_url
+                rescue
+                end
+              end
+              entry_url = entry.url
+              entry_publication_date = entry.published
+              if entry_summary != nil
+                summary_content = summary_content + entry_summary
+              end
+              if entry_content != nil
+                summary_content = summary_content + ". " + entry_content
+              end
+            rescue Exception => e
+              puts e.message
+              puts e.backtrace.inspect
+            end
+                              
+            return_values = extract_info_from_entry_url(entry_url, entry_name, element_type)
+            if return_values != nil
+              image_url = return_values[:image_url]
+              info_to_wikify = return_values[:info_to_wikify]
+            end
+            if info_to_wikify == nil
+              info_to_wikify = summary_content
+              description = info_to_wikify
+            elsif info_to_wikify.size < summary_content.size
+              info_to_wikify = summary_content
+              description = info_to_wikify
+            end 
+            
+            if image_url == nil
+              image_url = entry_image_url
+            end
+
+            if image_url != nil          
+              scraped_element.element_image = URI.parse(image_url)
+            end
+            
+            I18n.locale = available_languages[0]
+            scraped_from = rss_feed
+            scraped_element.name = entry_name
+            scraped_element.description = info_to_wikify
+            scraped_element.publication_date = entry_publication_date
+            scraped_element.url = entry_url
+            scraped_element.link = entry_url
+            scraped_element.info_to_wikify = ""
+
+            if entry_name != nil
+              scraped_element.info_to_wikify = scraped_element.info_to_wikify + entry_name
+            end
+            if info_to_wikify != nil
+              scraped_element.info_to_wikify = scraped_element.info_to_wikify + info_to_wikify
+            end
+            
+            scraped_element.scraped_from = scraped_from
+            scraped_element.persist(available_languages,scraped_element.info_to_wikify,[])
+          else
+            puts "This entry already exists"
+          end
+        rescue Exception => e
+          puts "Failed Entry"
+          puts e.message
+          puts e.backtrace.inspect
+        end
+      end 
+      #After correct finish, store the source in sources
+      source.correct_scrape
+    rescue  Exception => e
+      puts "Failed scrape_rss_feed"
+      puts e.message
+      puts e.backtrace.inspect
+      if reintentos > 0
+        puts reintentos
+        reintentos -= 1
+        sleep 2
+        scrape_rss_feed(rss_feed,element_type, 1, reintentos)
+      end
+      source.incorrect_scrape
+    end   
+  end #scrape_rss_feed
+  
+  def extract_info_from_entry_url(entry_url, entry_title, element_type)
+    begin
+      return_values = Hash.new
+      puts entry_url
+      puts entry_title
+      # Builds entry object
+      entry_html = open(entry_url,"User-Agent" => "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:26.0) Gecko/20100101 Firefox/26.0").read
+      entry_html.gsub!("\n", "")
+      entry_object = Nokogiri::HTML(entry_html)      
+      # Cleans it
+      entry_object.at_css("body").traverse do |node|
+        if node.text?
+          node.content = node.content.gsub("\r", "")
+          node.content = node.content.gsub("\n", "")
+          node.content = node.content.gsub("\t", "")
+          node.content = node.content.strip
+        end
+      end
+      entry_object.encoding = 'UTF-8'
+      
+      begin     
+      # Finds nodes that contain entry_title
+      entry_title_matches = entry_object.css("body")[0].search('[text()="' + entry_title.strip + '"]')
+      rescue Exception => e
+        puts "Failed matches entry_title"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+  
+      # Gets the most suitable node
+      best_match = entry_title_matches[0]
+      puts best_match
+      if entry_title_matches[0].parent.name == "li" or entry_title_matches[0].parent.parent.name == "li" or entry_title_matches[0].parent.parent.parent.name == "li" 
+        best_match = entry_title_matches[1]
+      end
+  
+      # Extracts a representative image and the content of the entry_url
+      if best_match != nil
+        if !best_match.parent.css("img").empty?
+          # Gets an array of images
+          image_matches = best_match.parent.css("img")
+          # Gets the first image with size higher than 2k
+          image_url = first_big_image(entry_url, element_type, image_matches)
+          info_to_wikify = ""
+          best_match.parent.css("p").each do |parrafo|
+            if parrafo['class'] == nil
+              info_to_wikify = info_to_wikify + parrafo.text
+            end
+          end
+        end
+        if image_url == nil
+          if !best_match.parent.parent.css("img").empty?
+            # Gets an array of images
+            image_matches = best_match.parent.parent.css("img")
+            # Gets the first image with size higher than 2k
+            image_url = first_big_image(entry_url, element_type, image_matches)
+            info_to_wikify = ""
+            best_match.parent.parent.css("p").each do |parrafo|
+              if parrafo['class'] == nil
+                info_to_wikify = info_to_wikify + parrafo.text
+              end
+            end
+          end
+          if image_url == nil
+            if !best_match.parent.parent.parent.css("img").empty?
+              # Gets an array of images
+              image_matches = best_match.parent.parent.parent.css("img")
+              info_to_wikify = strip_tags best_match.parent.parent.parent.text.gsub(/\n/," ").gsub(/\s+/,' ').gsub("&"," ").gsub("%"," ")
+              # Gets the first image with size higher than 2k
+              image_url = first_big_image(entry_url, element_type, image_matches)
+              info_to_wikify = ""
+              best_match.parent.parent.parent.css("p").each do |parrafo|
+                if parrafo['class'] == nil
+                  info_to_wikify = info_to_wikify + parrafo.text
+                end
+              end
+            end
+          end
+        end
+        if info_to_wikify == "" or info_to_wikify == nil
+          info_to_wikify = ""
+          best_match.parent.css("p").each do |parrafo|
+            if parrafo['class'] == nil          
+              info_to_wikify = info_to_wikify + parrafo.text
+            end
+          end
+        end
+        if info_to_wikify == "" or info_to_wikify == nil
+          info_to_wikify = ""
+          best_match.parent.parent.css("p").each do |parrafo|
+            if parrafo['class'] == nil          
+              info_to_wikify = info_to_wikify + parrafo.text
+            end
+          end
+        end
+        if info_to_wikify == "" or info_to_wikify == nil
+          info_to_wikify = ""
+          best_match.parent.parent.parent.css("p").each do |parrafo|
+            if parrafo['class'] == nil          
+              info_to_wikify = info_to_wikify + parrafo.text
+            end
+          end
+        end         
+      end
+      return_values = {:image_url => image_url, :info_to_wikify => info_to_wikify}
+    rescue
+      puts "Failed extract_info_from_entry_url"
+    end
+  end #extract_info_from_entry_url
+  
+  def first_big_image(entry_url, element_type, image_matches)
+    begin
+      image_url = nil
+      image_matches.each do |match|
+        dummy_element_type = element_type.new
+        # Builds the URL
+        if match['src'] != nil
+          url = match['src']
+          if !match['src'].include? "http"
+            url = "http://" + URI.parse(entry_url).host + match['src']
+          end
+          # Parses it
+          dummy_element_type.element_image = URI.parse(url)
+          # Assigns the return value if the image is bigger than 2k
+          if dummy_element_type.element_image.size > 2500
+            image_url = url
+            break
+          end
+        end
+      end
+      return image_url
+    rescue Exception => e
+      puts "Failed first_big_image"
+      puts e.message
+      puts e.backtrace.inspect
+    end
+  end
+  
+              
+  
+ end
+

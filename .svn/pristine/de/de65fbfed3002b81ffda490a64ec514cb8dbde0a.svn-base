@@ -1,0 +1,103 @@
+# spec/features/visitor_signs_up_spec.rb
+require 'spec_helper'
+
+feature 'Visitor logs in' do
+ # background do
+  #  User.create(:email => 'admin@example.com', :password => 'password')
+  #end
+  
+  Capybara.register_driver :selenium do |app|
+    Capybara::Selenium::Driver.new(app)
+  end
+  Capybara.javascript_driver = :selenium
+  session = Capybara::Session.new(:selenium)   
+    
+=begin  
+  scenario 'page does not have JavaScript errors', :js => true do
+    visit(root_path)
+    expect(page).not_to have_errors
+  end
+
+  scenario 'search without login', :js => true do
+    url = "http://localhost:3000/"
+    session.visit url
+    text_to_search = "Nikola Tesla"
+    session.fill_in 'search', :with => text_to_search 
+    session.all("div.home_search div.home_search_bar_public form input")[2].click
+    sleep 4
+    text_searched = session.find(".actions_menu_items .action_list li form input#search.subnavbar_search")['value']
+    assert_equal text_to_search, text_searched    
+  end
+
+  scenario 'user logs in correctly', :js => true do
+    #User.create(:email => 'admin@example.com', :password => 'password')
+    url = "http://localhost:3000/"
+    visit url
+    page.find("div.login div.section_title").click
+    fill_in 'user_email', :with => 'marcosmourino@gmail.com'
+    fill_in 'user_password', :with => '1111'
+    click_button 'login'
+    language = current_path.split("/")[1]  
+    assert_equal current_path, "/" + language + user_root_path    
+  end
+   
+  scenario 'user signs up correctly', :js => true do
+    url = "http://localhost:3000/"
+    visit url
+    page.find("div.sign_up div.section_title").click
+    fill_in 'user_first_name', :with => 'Marcos Antonio'
+    fill_in 'user_last_name', :with => 'Mourino Garcia'
+    fill_in 'user_email', :with => 'robot@gmail.com' 
+    fill_in 'user_password', :with => '1111'
+    fill_in 'user_password_confirmation', :with => '1111'
+    page.find("div.content_container div.pagewrap div.submit_sign_up input").click
+    language = current_path.split("/")[1]  
+    assert_equal "/" + language + user_root_path, current_path
+  end   
+=end
+  
+  scenario 'with valid email and password', :js => true do
+    log_in_sde("marcosmourino@gmail.com","1111")
+    expect(page).to have_content("Recommended Reports")
+  end
+
+  scenario 'with invalid email', :js => true do
+    log_in_sde("invalid_email","1111")
+    expect(page).to have_content("Login")
+  end
+   
+  scenario 'with incorrect password', :js => true do
+    log_in_sde("marcosmourino@gmail.com","")
+    expect(page).to have_content("Login")    
+  end
+    
+      
+=begin    
+  scenario 'user switches off enriched mode', :js => true do
+    #User.create(:email => 'admin@example.com', :password => 'password')
+    visit root_path
+    page.find("#flag_en").click
+    page.find("#log_in").click
+    
+    fill_in 'user_email', :with => 'admin@example.com'
+    fill_in 'user_password', :with => 'password'
+    click_button 'Sign in'
+    
+    assert_equal current_path, "/" + I18n.locale.to_s + user_root_path  
+    
+    click_link "Resources"
+    click_link "All"
+    click_link "Events"
+    
+    assert_equal "/" + I18n.locale.to_s + events_path, current_path  
+    page.should have_content('Enriched On')
+    page.should_not have_content('Enriched Off')
+    
+    click_on "Enriched On"    
+    
+    page.should have_content('Enriched Off')                     
+  end
+=end  
+  
+  
+end

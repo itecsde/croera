@@ -1,0 +1,18 @@
+# encoding: utf-8
+require 'net/http'
+require 'net/https'
+require 'uri'
+    
+class ScraperWidgets
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+  
+  #########################################################
+  ## scrape_widgets
+  ##################################################
+  
+  def scrape_widgets
+    
+  end
+  
+end

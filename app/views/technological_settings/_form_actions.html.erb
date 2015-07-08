@@ -1,0 +1,5 @@
+<a class="back_icon has_tooltip" href="javascript: history.back();"><img src="/images/icons/atras_30.png" /><span class="tooltip"><%= t("Back")%></span></a>
+<%=link_to "", :class => "has_tooltip", :onclick => "save_technological_setting_form();return false;" do %>
+	 <%= image_tag("/images/icons/save.png") %>
+	<span class="tooltip"><%= t("Save")%></span>
+<% end %>

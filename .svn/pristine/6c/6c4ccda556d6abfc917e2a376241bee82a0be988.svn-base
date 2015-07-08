@@ -1,0 +1,3 @@
+<div class="lre_form_actions form_actions">
+	<%= lre_form.submit t("save"), :class => 'lre_save' %>
+</div>	

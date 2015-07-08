@@ -1,0 +1,22 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'editing_book', :actions => "books/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@book, :html => { :class => "book_form" }) do |f_book| %>
+		<div id="element_header">
+			<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @book,:element_type=>"book"} %> 
+			<hr />
+			<div class="clear"></div>
+		</div>
+		<div id="content_container" class="book_container">
+			<input type="hidden" id="edition_mode" value="on">
+				<%= render :partial => "form" , :locals => {:book_form => f_book} %>
+				<%= render :partial => "submit", :locals => {:book_form => f_book} %>			
+		</div>			
+		<span style="display:none" id="is_edition" data-value="true"></span>	
+		
+		<script src="/javascript/books_form.js"></script>
+	<% end %>
+<% end %>

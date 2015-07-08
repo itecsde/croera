@@ -1,0 +1,30 @@
+<%= render :partial => "header", :locals => {:section_title => (t :new_scenario), :actions => "form_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'scenarios', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'new_scenario', :actions => "scenarios/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	
+	<%= form_for(@scenario,:html => { :class => "scenario_form", :multipart => true }) do |f_scenario| %>
+		<div id="element_header">
+			<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @scenario,:element_type=>"scenario"} %> 
+			<hr />
+			<div class="clear"></div>
+		</div>
+		<div id="content_container" class="scenario_container">
+				
+				<%= render :partial => "form" , :locals => {:f => f_scenario} %>
+				<%= render :partial => "submit", :locals => {:f => f_scenario} %>
+			<input type="hidden" id="edition_mode" value="on"/>
+			<input type="hidden" id="template_edition_mode" value="off"/>
+			<div id="elements_library">
+				<%= render :partial => "adding_elements" %>
+			</div>	
+		</div>
+	<% end %>	
+
+	
+	<script src="/javascript/scenarios_form.js"></script>
+<% end %>

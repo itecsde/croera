@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ RAILS_ENV=development rails r script/admin_task.rb "{:task=>'classify',:element_type=>'Report'}" > log/administration/classify_reports.log
+ RAILS_ENV=development rails r script/admin_task.rb "{:task=>'classify',:element_type=>'Report'}" > log/administration/classify_reports.log
+ RAILS_ENV=development rails r script/admin_task.rb "{:task=>'classify',:element_type=>'Report'}" > log/administration/classify_reports.log
+ RAILS_ENV=development rails r script/admin_task.rb "{:task=>'classify',:element_type=>'Report'}" > log/administration/classify_reports.log
+ RAILS_ENV=development rails r script/admin_task.rb "{:task=>'classify',:element_type=>'Report'}" > log/administration/classify_reports.log

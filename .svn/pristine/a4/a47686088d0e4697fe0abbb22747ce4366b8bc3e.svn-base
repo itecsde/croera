@@ -1,0 +1,100 @@
+<div class="experience_box_container <%= contribution_annotation.contribution_type %> full_box has_edition_controls">
+	<div class= "draggable_button edition_control active"></div>
+	<div class= "remove_button edition_control active" onclick="remove_experience_contribution(this);"><i class="icon-remove-sign icon-grey"></i></div>
+	<%= fields_for contribution_annotation do |contribution_annotation_fields| %>
+		<%= contribution_annotation_fields.hidden_field :id %>
+		<%= contribution_annotation_fields.hidden_field :position %>
+		<%= contribution_annotation_fields.hidden_field :contribution_type %>
+		<%= contribution_annotation_fields.hidden_field :contribution_id %>
+	<% end %>
+	<% case contribution_annotation.contribution_type %>
+	<% when "Picture" %>
+		<%= render :partial => "pictures/form", :locals => {:picture_id => contribution_annotation.contribution_id, :layout => 'embedded'} %>
+	<% when "FreeText" %>
+		<%= render :partial => "free_texts/form", :locals => {:free_text_id => contribution_annotation.contribution_id} %>
+	<% when "PositiveComment" %>
+		<%= render :partial => "positive_comments/form", :locals => {:positive_comment_id => contribution_annotation.contribution_id} %>
+	<% when "NegativeComment" %>
+		<%= render :partial => "negative_comments/form", :locals => {:negative_comment_id => contribution_annotation.contribution_id} %>
+	<% when "YoutubeItem" %>
+		<%= render :partial => "youtube_items/form", :locals => {:youtube_item_id => contribution_annotation.contribution_id} %>
+	<% when "Event" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Event.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Event.first, :current_layout => "Application"} %>
+		<% end %>
+	<% when "Application" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Application.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Application.first, :current_layout => "Application"} %>
+		<% end %>			
+	<% when "Biography" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Biography.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Biography.first, :current_layout => "Application"} %>
+		<% end %>
+	<% when "Lecture" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Lecture.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Lecture.first, :current_layout => "Application"} %>
+		<% end %>
+	<% when "Site" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Site.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Site.first, :current_layout => "Application"} %>
+		<% end %>
+	<% when "Documentary" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Documentary.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Documentary.first, :current_layout => "Application"} %>
+		<% end %>
+	<% when "Course" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Course.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Course.first, :current_layout => "Application"} %>
+		<% end %>
+	<% when "Article" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Article.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Article.first, :current_layout => "Application"} %>
+		<% end %>
+	<% when "Lre" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Lre.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Lre.first, :current_layout => "Application"} %>
+		<% end %>
+	<% when "Post" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Post.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Post.first, :current_layout => "Application"} %>
+		<% end %>										
+	<% when "Slideshow" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Slideshow.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Slideshow.first, :current_layout => "Application"} %>
+		<% end %>
+	<% when "Report" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Report.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Report.first, :current_layout => "Application"} %>
+		<% end %>						
+	<% when "Activity" %>
+		<% if contribution_annotation.contribution_id != nil && contribution_annotation.contribution_id != "" %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Activity.find(contribution_annotation.contribution_id), :current_layout => "Application"} %>
+		<% else %>
+			<%= render :partial => "elements/excerpt", :locals => {:element => Activity.first, :current_layout => "Application"} %>
+		<% end %>
+	<% end %>
+</div>

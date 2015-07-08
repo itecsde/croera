@@ -1,0 +1,23 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'slideshow', :actions => "slideshows/slideshow_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+
+	<% if current_user != nil%>
+		<%= render :partial => "generic_partials/header_show_resource", :locals => {:element => @slideshow} %>	
+	<% end %>
+
+	<div id="content_container" class="documentary_container">		
+		<%= render "slideshow" %>
+		<%= render :partial => "generic_partials/related_elements_same_type",:locals => {:related_title =>'related_slideshows'} %>				
+	</div> <!-- CONTENT -->
+	<%= render :partial => "generic_partials/related_elements", :locals => {:element_type =>'Course'} %>
+
+	
+	<span style="display:none" id="is_edition" data-value="false"></span>	
+	
+	
+	<script src="/javascript/slideshows_form.js"></script>
+<% end %>

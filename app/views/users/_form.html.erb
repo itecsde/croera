@@ -1,0 +1,140 @@
+<% if @user.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@user.errors.count, "error") %> prohibited this activity from being saved:</h2>
+	
+	  <ul>
+	  <% @user.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+<div class="profile_box">
+	<div class= "profile_image">
+		<% if @edition_mode %>
+			<span class="change_profile_avatar active" onclick= "change_profile_image('<%= current_user.id %>', '<%= @user.id %>')"><%= t('change_image') %></span>
+			<%= image_tag @user.avatar.url(:medium), :class => 'profile_image_preview' %>
+		<% else %>
+			<%= image_tag @user.avatar.url(:medium), :class => 'profile_image_preview_noedit' %>
+		<% end %>
+		<div class="clear"></div>
+	</div>
+	
+	<div class= "profile_information">
+		<div class="prompt">
+			<%= t("first_name") %>
+		</div>
+		<div class="user_first_name editable active">
+			<% if @edition_mode %>
+				<%= f.text_field :first_name, :placeholder => t("first_name") %>
+				<i class="icon-pencil icon-grey"></i>
+			<% else %>
+				<div><%= @user.first_name %></div>
+			<% end %>
+		</div>
+		<div class="clear"></div>
+		<div class="prompt">
+			<%= t("last_name") %>
+		</div>
+		<div class="user_last_name editable active">
+			<% if @edition_mode %>
+				<%= f.text_field :last_name, :placeholder => t("last_name")%>
+				<i class="icon-pencil icon-grey"></i>
+			<% else %>
+				<div><%= @user.last_name %></div>
+			<% end %>
+		</div>
+		<div class="clear"></div>
+		<div class="prompt">
+			<%= t("email") %>
+		</div>
+		<div class="user_email editable active">
+			<% if @edition_mode %>
+				<%= f.text_field :email, :placeholder => "email"%>
+				<i class="icon-pencil icon-grey"></i>
+			<% else %>
+				<div><%= @user.email %></div>
+			<% end %>		
+		</div>		
+	</div>
+	<% if @edition_mode %>
+		<div class= "profile_language">
+			<div class="prompt"><%= t('language') %></div>
+			<div>
+				<%
+				selected_en="" 
+				selected_es=""
+				selected_gl=""
+				selected_pt=""
+				selected_fr=""
+				selected_fi=""
+				selected_no=""
+				selected_lt=""
+				selected_tr=""
+				selected_nl=""
+				selected_sk=""
+				selected_hu=""
+				
+				
+				
+				case I18n.locale.to_s.underscore
+				when "en"
+					selected_en="selected"
+				when "es"
+					selected_es="selected" 
+				when "gl"
+					selected_gl="selected"
+				when "pt"
+					selected_pt="selected"
+				when "fr"
+					selected_fr="selected"
+				when "fi"
+					selected_fi="selected"
+				when "no"
+					selected_no="selected"
+				when "lt"
+					selected_lt="selected"
+				when "tr"
+					selected_tr="selected"
+				when "nl"
+					selected_nl="selected"
+				when "sk"
+					selected_sk="selected"
+				when "hu"
+					selected_hu="selected"
+				end 
+				%>
+				<select onchange="window.location = this.options[this.selectedIndex].value;">
+					<option value="<%= url_for(params.merge(:locale=>"en")) %>" <%= selected_en %>><%= t("English") %></option>
+					<option value="<%= url_for(params.merge(:locale=>"es")) %>" <%= selected_es %>><%= t("Spanish") %></option>
+					<option value="<%= url_for(params.merge(:locale=>"gl")) %>" <%= selected_gl %>><%= t("Galician") %></option>
+					<option value="<%= url_for(params.merge(:locale=>"pt")) %>" <%= selected_pt %>><%= t("Portuguese") %></option>
+					<option value="<%= url_for(params.merge(:locale=>"fr")) %>" <%= selected_fr %>><%= t("French") %></option>
+					<option value="<%= url_for(params.merge(:locale=>"fi")) %>" <%= selected_fi %>><%= t("Finish") %></option>
+					<option value="<%= url_for(params.merge(:locale=>"no")) %>" <%= selected_no %>><%= t("Norwegian") %></option>
+					<option value="<%= url_for(params.merge(:locale=>"lt")) %>" <%= selected_lt %>><%= t("Lithuanian") %></option>
+					<option value="<%= url_for(params.merge(:locale=>"tr")) %>" <%= selected_tr %>><%= t("Turkish") %></option>
+					<option value="<%= url_for(params.merge(:locale=>"nl")) %>" <%= selected_nl %>><%= t("Dutch") %></option>
+					<option value="<%= url_for(params.merge(:locale=>"sk")) %>" <%= selected_sk %>><%= t("Slovak") %></option>
+					<option value="<%= url_for(params.merge(:locale=>"hu")) %>" <%= selected_sk %>><%= t("Hungarian") %></option>																								
+	
+				</select>
+			</div>	
+		</div>
+	<% end %>
+	<div class="clear"></div>
+	<div class= "file_upload">
+		<% if @edition_mode %>
+			<%= f.file_field :avatar, :onchange => "image_profile_preview(this, event);"%>
+		<% end %>
+	</div>
+	
+	<div class="user_count_activity">
+	
+	</div>
+</div>
+
+<div class="user_form_actions form_actions">
+	<%= f.submit t("save"), :class => 'user_save' %>
+</div>

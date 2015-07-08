@@ -1,0 +1,7 @@
+<div class= "paginate_controls">
+	<%= paginate @contents %>
+</div>
+
+<% @contents.each do |content| %>
+	<%= render :partial => "elements/element", :locals => {:element => content, :current_layout => current_layout} %>
+<% end %>

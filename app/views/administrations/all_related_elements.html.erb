@@ -1,0 +1,21 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => @title, :actions => "resources/related_elements_list_actions"} %>
+<% end %>
+
+<% content_for :advanced_search do %>	
+<% end %>
+
+<% content_for :content do %>
+	<div id="content_index">	
+		<div class= "paginate_controls">
+			<%= paginate @elements %>
+		</div>												
+		<% @elements.each do |element| %>
+			<%= render :partial => "elements/element", :locals => {:element => element, :current_layout => "current_layout"} %>
+		<% end %>
+	</div>
+	
+	<script src="/javascript/resource_index.js"></script>
+	<script src="/javascript/events_index.js"></script>
+<% end %>

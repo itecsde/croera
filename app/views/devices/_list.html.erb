@@ -1,0 +1,16 @@
+<div class= "paginate_controls">
+	<%= paginate @devices %>
+</div>
+
+<% if @devices.first_page? %>
+	<% if current_layout == "popup" %>
+	<a class="extract_box popup_new_activity_sequence_box new_extract_box" onclick="">+</a>
+	<% else %>
+	<%= link_to "+", new_device_path, html_options = {:class => "extract_box new_extract_box"} %>
+	<% end %>
+<% end %>
+
+
+<% @devices.each do |device| %>
+	<%= render :partial => "elements/element", :locals => {:element => device, :current_layout => current_layout} %>
+<% end %>

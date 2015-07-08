@@ -1,0 +1,163 @@
+class BookmarksController < ApplicationController
+  
+  def index
+    @bookmarked_events=current_user.bookmarked_events
+    @bookmarked_applications=current_user.bookmarked_applications
+    @bookmarked_people=current_user.bookmarked_people
+    @bookmarked_lectures=current_user.bookmarked_lectures
+    @bookmarked_sites=current_user.bookmarked_sites
+    @bookmarked_documentaries=current_user.bookmarked_documentaries    
+    @bookmarked_courses=current_user.bookmarked_courses    
+    @bookmarked_articles=current_user.bookmarked_articles    
+    @bookmarked_lres=current_user.bookmarked_lres
+    @bookmarked_posts=current_user.bookmarked_posts    
+    @bookmarked_slideshows=current_user.bookmarked_slideshows        
+
+
+    respond_to do |format|
+      format.html # index.html.erb
+    end  
+  end
+  
+  def add_bookmark
+    @user=current_user
+    @element_class=params[:element_class]
+    @element_id=params[:element_id]
+    
+    if @element_class=="event"
+      element=Event.find(@element_id)
+      if @user.bookmarked_events.find_by_id(element.id)==nil
+          @user.bookmarked_events << element 
+      end
+    elsif @element_class=="application"
+      element=Application.find(@element_id)
+      if @user.bookmarked_applications.find_by_id(element.id)==nil
+          @user.bookmarked_applications << element 
+      end
+    elsif @element_class=="person"
+      element=Person.find(@element_id)
+      if @user.bookmarked_people.find_by_id(element.id)==nil
+          @user.bookmarked_people << element 
+      end
+    elsif @element_class=="lecture"
+      element=Lecture.find(@element_id)
+      if @user.bookmarked_lectures.find_by_id(element.id)==nil
+          @user.bookmarked_lectures << element 
+      end
+    elsif @element_class=="site"
+      element=Site.find(@element_id)
+      if @user.bookmarked_sites.find_by_id(element.id)==nil
+          @user.bookmarked_sites << element 
+      end
+    elsif @element_class=="documentary"
+      element=Documentary.find(@element_id)
+      if @user.bookmarked_documentaries.find_by_id(element.id)==nil
+          @user.bookmarked_documentaries << element 
+      end
+    elsif @element_class=="course"
+      element=Course.find(@element_id)
+      if @user.bookmarked_courses.find_by_id(element.id)==nil
+          @user.bookmarked_courses << element 
+      end
+    elsif @element_class=="article"
+      element=Article.find(@element_id)
+      if @user.bookmarked_articles.find_by_id(element.id)==nil
+          @user.bookmarked_articles << element 
+      end
+    elsif @element_class=="lre"
+      element=Lre.find(@element_id)
+      if @user.bookmarked_lres.find_by_id(element.id)==nil
+          @user.bookmarked_lres << element 
+      end
+    elsif @element_class=="post"
+      element=Post.find(@element_id)
+      if @user.bookmarked_posts.find_by_id(element.id)==nil
+          @user.bookmarked_posts << element 
+      end
+    elsif @element_class=="slideshow"
+      element=Slideshow.find(@element_id)
+      if @user.bookmarked_slideshows.find_by_id(element.id)==nil
+          @user.bookmarked_slideshows << element 
+      end
+    end        
+    @result=true
+    
+    render :nothing => true
+    
+    #respond_to do |format|
+    #  format.js
+    #end
+  end  
+  
+  def remove_bookmark
+    @user=current_user
+    @element_class=params[:element_class]
+    @element_id=params[:element_id]
+    
+    if @element_class=="event"
+      element=@user.bookmarked_events.find(@element_id)
+      if element
+        @user.bookmarked_events.delete(element)  
+      end
+    elsif @element_class=="application"
+      element=@user.bookmarked_applications.find(@element_id)
+      if element
+        @user.bookmarked_applications.delete(element)  
+      end
+    elsif @element_class=="person"      
+      element=@user.bookmarked_people.find(@element_id)
+      if element
+        @user.bookmarked_people.delete(element)  
+      end
+    elsif @element_class=="lecture"      
+      element=@user.bookmarked_lectures.find(@element_id)
+      if element
+        @user.bookmarked_lectures.delete(element)  
+      end
+    elsif @element_class=="site"      
+      element=@user.bookmarked_sites.find(@element_id)
+      if element
+        @user.bookmarked_sites.delete(element)  
+      end
+    elsif @element_class=="documentary"      
+      element=@user.bookmarked_documentaries.find(@element_id)
+      if element
+        @user.bookmarked_documentaries.delete(element)  
+      end
+    elsif @element_class=="course"      
+      element=@user.bookmarked_courses.find(@element_id)
+      if element
+        @user.bookmarked_courses.delete(element)  
+      end
+    elsif @element_class=="article"      
+      element=@user.bookmarked_articles.find(@element_id)
+      if element
+        @user.bookmarked_articles.delete(element)  
+      end
+    elsif @element_class=="lre"      
+      element=@user.bookmarked_lres.find(@element_id)
+      if element
+        @user.bookmarked_lres.delete(element)  
+      end
+    elsif @element_class=="post"      
+      element=@user.bookmarked_posts.find(@element_id)
+      if element
+        @user.bookmarked_posts.delete(element)  
+      end
+     elsif @element_class=="slideshow"      
+      element=@user.bookmarked_slideshows.find(@element_id)
+      if element
+        @user.bookmarked_slideshows.delete(element)  
+      end
+    end
+    
+    @result=true
+    
+    render :nothing => true
+    
+    #respond_to do |format|
+    #  format.js
+    #end
+  end  
+  
+end

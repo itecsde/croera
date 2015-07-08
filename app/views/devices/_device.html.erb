@@ -1,0 +1,4 @@
+<%= form_for(@device, :html => { :class => "device_form" }) do |fo| %>
+	<%= render :partial => "devices/form" , :locals => {:device_form => fo} %>
+<% end %>
+<input type="hidden" id="edition_mode" value="off"/>

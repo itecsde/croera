@@ -1,0 +1,14 @@
+<div class= "paginate_controls">
+	<%= paginate @activity_sequences,:remote => true, :param_name => "activity_sequences_page" %>
+</div>
+
+<% if @activity_sequences.first_page? %>
+	<% if current_layout == "popup" %>
+	<a class="extract_box popup_new_activity_sequence_box new_extract_box" onclick="new_sequence();">+</a>
+	<% else %>
+	<%= link_to "+", new_activity_sequence_path, html_options = {:class => "extract_box new_activity_sequence_box new_extract_box"} %>
+	<% end %>
+<% end %>
+<% @activity_sequences.each do |sequence| %>
+	<%= render :partial => "elements/element", :locals => {:element => sequence, :current_layout => current_layout} %>
+<% end %>

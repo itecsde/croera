@@ -1,0 +1,68 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'home', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'home', :actions => nil} %>
+<% end %>
+		
+<% content_for :content do %>
+
+
+	<div class="home_search">
+		<div class="home_search_bar">
+			<%= form_tag search_results_path, :method => 'get' do %>  
+				<%= text_field_tag :search, params[:search],:class => "input_search_bar" %><%= submit_tag "",:type => :image, :src => "/images/search_button.png", :height => "47px" %>  
+			<% end %>
+		</div>
+	</div>
+
+
+	
+	<% if current_user != nil %>
+		<div class="recommended_resources">
+			<% if @recommended_reports.size > 0  %>		
+				<div class="recommended_resources_type">
+					<div class="prompt"><img src="/images/black_report_100.png" width="40px" height="40px"/>&nbsp;&nbsp;<%= t('recommended_reports')%></div>
+					<div class="body">
+						<% @recommended_reports.each do |element| %>
+							<%= render :partial => "elements/miniature_with_source", :locals => {:element => element} %>
+						<% end %>
+						<div class="clear"></div>
+					</div>
+				</div>
+			<% end %>
+			<% if @recommended_posts.size > 0  %>	
+				<div class="recommended_resources_type">
+					<div class="prompt"><img src="/images/black_post_100.png" width="40px" height="40px"/>&nbsp;&nbsp;<%= t('recommended_posts')%></div>
+					<div class="body">
+						<% @recommended_posts.each do |element| %>
+							<%= render :partial => "elements/miniature_with_source", :locals => {:element => element} %>
+						<% end %>
+						<div class="clear"></div>
+					</div>
+				</div>
+			<% end %>
+			<% if @recommended_events.size > 0  %>	
+				<div class="recommended_resources_type">
+					<div class="prompt"><img src="/images/black_event_100.png" width="40px" height="40px"/>&nbsp;&nbsp;<%= t('recommended_events')%></div>
+					<div class="body">
+						<% @recommended_events.each do |element| %>
+							<%= render :partial => "elements/miniature_with_source", :locals => {:element => element} %>
+						<% end %>
+						<div class="clear"></div>
+					</div>
+				</div>
+			<% end %>
+			<% if @recommended_sites.size > 0  %>	
+				<div class="recommended_resources_type">
+					<div class="prompt"><img src="/images/black_site_100.png" width="40px" height="40px"/>&nbsp;&nbsp;<%= t('recommended_sites')%></div>
+					<div class="body">
+						<% @recommended_sites.each do |element| %>
+							<%= render :partial => "elements/miniature_with_source", :locals => {:element => element} %>
+						<% end %>
+						<div class="clear"></div>
+					</div>
+				</div>
+			<% end %>
+		</div>		
+	<% end %>
+	
+<% end %>

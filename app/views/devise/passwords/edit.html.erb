@@ -1,0 +1,24 @@
+<%= render :partial => "header/main_navbar_not_logged", :locals => {:element_active => ""} %>
+<%= render :partial => "header/subheader", :locals => {:section_title => t(:change_your_password),:actions => "devise/passwords/passwords_actions"} %>
+
+<div id="container_access_control">
+	<div class="forgot_password_box">
+		
+		<div class="left_column_access_box">
+			<img class="logo_image_public" src="/images/index.png" alt="Index"></img>
+			<h1 class="logo_title_public">iTEC-SDE</h1>			
+		</div>
+
+		<div class="separate_columns"> </div>
+		
+		<div class="right_column_access_box">
+			<div class="prompt"><%= t(:change_your_password)%></div>		
+			<div id="forgot_password_form_container" class="forgot_password_form_container">
+				<%= render 'edit_form' %>
+			</div>
+		</div>		
+	</div>
+	<div class="error_messages">
+		<%= devise_error_messages! %>
+	</div>
+</div>

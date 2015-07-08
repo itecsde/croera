@@ -1,0 +1,196 @@
+class BiographiesController < ApplicationController
+  
+  def index
+    @resource_type = "Biography"
+    
+    if I18n.locale.to_s == "gl"
+      search_languages=["gl","es"]
+    else 
+      search_languages=[I18n.locale.to_s]
+    end
+    per_page = 32
+
+    
+    if (params[:advanced_search]=="1") 
+      @search=Biography.search do          
+          keywords params[:keywords], :fields => [:tags] 
+          if params[:subject]!=""
+            keywords Subject.find(params[:subject]).name
+          end
+          with(:translations, search_languages)                    
+          paginate :page => params[:page], :per_page => per_page           
+        end
+      @biographies = @search.results 
+      @num_results=@search.total
+    
+    elsif (params[:search] != nil && params[:search].size > 0)
+      search_text = params[:search]
+      if search_text.index("#") != 0
+        @disambiguation = Search.disambiguation(search_text)
+      else        
+        #Esto es para tener el termino traducido al ingles para hacer las busquedas con el tag en ingles
+        if I18n.locale.to_s != "en" && search_text.index("@") != nil         
+          clean_search_text = search_text[0,search_text.index("@")]
+          search_text_en_translation = Wikipediator.wikipedia_get_article_title_tranlation(Util.to_tag(clean_search_text),I18n.locale.to_s,"en")
+        #Esto es para traducir el termino al idioma de la vista para ver la info de desambiguacion del termino en ese idioma          
+        elsif I18n.locale.to_s != "en" && search_text.index("@") == nil
+          search_text_locale_translation = Wikipediator.wikipedia_get_article_title_tranlation(Util.to_tag(search_text),"en",I18n.locale.to_s)
+        end
+        search = Search.new
+        if I18n.locale.to_s != "en" && search_text_locale_translation != nil
+          @disambigued_term_info = search.disambigued_term_info(Util.to_hashtag_with_language(search_text_locale_translation))
+        else
+          @disambigued_term_info = search.disambigued_term_info(search_text)  
+        end
+      end 
+             
+      @search = Search.search_elements_by_type('Biography', search_text,search_text_en_translation, params[:article_id],per_page,params[:page])
+      @biographies = @search[:results]          
+      @num_results = @search[:total]
+                                 
+    else
+      @search = Biography.search do |query|
+=begin        
+          if current_user != nil && current_user.circumstances != []
+            search_terms = current_user.circumstances.first.tag_list + ", " + current_user.circumstances.first.subject.name
+            query.keywords search_terms, :fields => [:tags, :name] {minimum_match 1}
+          end
+=end          
+          query.with(:translations, search_languages)  
+          query.paginate :page => params[:page],:per_page => per_page 
+      end
+      @biographies = @search.results 
+      @num_results=@search.total
+    end  
+        
+    #@search = Biography.search do
+    #  fulltext params[:search]
+    #  order_by :updated_at, :desc
+    #  paginate :page => params[:page], :per_page => 30
+    #end
+     
+    @previous_search_params=params      
+    @subjects=Subject.all     
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @biographies }
+    end
+  end
+  
+  
+  def show    
+    @biography = Biography.find(params[:id])
+   
+    if current_user!=nil
+      current_user.add_preferences_to_user_history(@biography.taggable_tag_annotations)
+    end
+       
+    @subjects=Subject.all
+    @related_elements=RelatedElement.new(@biography)   
+    @edition_mode=false
+    @resource_type="Biography"
+            
+    if notice == 'Biography was successfully created.' || notice == 'Biography was successfully updated.'
+      @previous_action = 'saved'
+    else
+      @previous_action = 'list'
+    end    
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @biography }
+    end
+  end
+  
+  
+  def new
+    if current_user != nil
+      @biography = Biography.new
+      @subjects=Subject.all
+      @edition_mode=true
+  
+      respond_to do |format|
+        format.html # new.html.erb
+        format.json { render json: @biography }
+      end
+    else
+      redirect_to biographies_path
+    end
+  end
+  
+  def edit
+    @biography = Biography.find(params[:id])
+    if current_user !=nil && ((@biography.owner == current_user) or (@biography.owner_type=="Group" && @biography.owner.users.exists?(current_user)))
+      @subjects=Subject.all
+      @edition_mode=true
+    else
+      redirect_to biography_path(@biography)
+    end
+  end
+  
+  
+  def create
+    @biography = Biography.new(params[:biography])
+    if (params[:biography][:owner_type]==nil)
+      @biography.owner_type="User"
+      @biography.owner=current_user
+    end
+    @biography.creator = current_user
+    @biography.save
+
+    respond_to do |format|
+      if @biography.save
+        format.html { redirect_to @biography, notice: 'Biography was successfully created.' }
+        format.json { render json: @biography, status: :created, location: @biography }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @biography.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+  
+  
+  def update
+    @biography = Biography.find(params[:id])
+    if (params[:biography][:owner_type]==nil)
+      @biography.owner_type="User"
+      @biography.owner=current_user
+    end
+    @biography.subjects.destroy_all
+    
+    respond_to do |format|
+      if @biography.update_attributes(params[:biography])
+        format.html { redirect_to @biography, notice: 'Biography was successfully updated.' }
+        format.json { head :ok }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @biography.errors, status: :unprocessable_entity }
+      end
+    end    
+  end
+  
+  
+  def destroy
+    @biography = Biography.find(params[:id])
+    @biography.destroy
+
+    respond_to do |format|
+      format.html { redirect_to biographies_url }
+      format.json { head :ok }
+    end
+  end
+  
+  
+  def popup_show_biography
+    @biography = Biography.find(params[:element_id])
+    @subjects=Subject.all
+    @edition_mode=false
+    @resource_type = "Biography"   
+    @popup = true 
+
+    respond_to do |format|
+      format.js
+    end
+  end
+  
+  
+end

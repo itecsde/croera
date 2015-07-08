@@ -1,0 +1,8 @@
+<div class="selectable_box">
+	<div class="selectable_controls">
+		<button class="select_requirement_type" onclick="requirement_type_select('<%= requirement_type %>_requirement');" ><%= t("select") %></button>
+	</div>
+	<div class="requirement_type_icon"><i class="<%= icon %>"></i></div>
+	<div class="selectable_name"><%= t(requirement_type +"_requirement_name") %></div>
+	<div class="selectable_description"><%= t(requirement_type +"_requirement_description") %></div>
+</div>

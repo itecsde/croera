@@ -1,0 +1,7 @@
+<div class="contextual_setting_container">
+	<%= form_for :contextual_setting  do |fo| %>
+	<div class="contextual_setting_form">
+		<%= render :partial => "contextual_settings/form" , :locals => {:f => fo} %>
+	</div>
+	<% end %>
+</div>

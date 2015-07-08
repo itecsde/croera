@@ -1,0 +1,9 @@
+<% if @element_class != nil && @element_class == "group_user_selection" %>
+	<% @elements.each do |element| %>
+		<%= render :partial => "elements/element", :locals => {:element => element, :current_layout => "popup"} %>
+	<% end %>
+<% else %>
+	<% @elements.each do |element| %>
+		<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => "popup"} %>
+	<% end %>
+<% end %>

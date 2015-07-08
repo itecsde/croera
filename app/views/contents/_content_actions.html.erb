@@ -1,0 +1,20 @@
+<% if @previous_action == "list" %>
+	<%=link_to  "javascript: history.back();", :class => "back_icon has_tooltip" do %>
+		 <%= image_tag("/images/icons/atras_30.png") %>
+		<span class="tooltip"><%= t("Back_to_list")%></span>
+	<% end %>
+<% else %>
+	<%=link_to  contents_path, :class => "back_icon has_tooltip" do %>
+		 <%= image_tag("/images/icons/atras_30.png") %>
+		<span class="tooltip"><%= t("Back_to_list")%></span>
+	<% end %>
+<% end %>
+
+<%=link_to edit_content_path(@content), :class => "has_tooltip" do %>
+	 <%= image_tag("/images/icons/edit-white.png") %>
+	<span class="tooltip"><%= t("Edit")%></span>
+<% end %>
+<%=link_to  @content, confirm: t('Are_you_sure'), method: :delete, :class => "has_tooltip" do %>
+	 <%= image_tag("/images/icons/delete.png") %>
+	<span class="tooltip"><%= t("Delete")%></span>
+<% end %>

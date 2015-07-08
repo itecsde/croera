@@ -1,0 +1,278 @@
+<% 
+	optionalities= Hash.new()
+	optionalities[""] = t("Select_one")
+	optionalities["0"] = t("required")
+	optionalities["1"] = t("recommended")
+	optionalities["2"] = t("nice_to_have")
+	
+	optionalities_reverse= Hash.new()
+	optionalities_reverse[t("Select_one")] = ""
+	optionalities_reverse[t("required")] = "0" 
+	optionalities_reverse[t("recommended")] = "1" 
+	optionalities_reverse[t("nice_to_have")] = "2"
+	@activity = Activity.find(activity_id)
+%>
+
+<%= form_for(@activity,:html => { :class => "activity_form" }) do |f| %>
+
+<% if @activity.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@activity.errors.count, "error") %> prohibited this activity from being saved:</h2>
+	
+	  <ul>
+	  <% @activity.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+<div class="activity_name editable active">
+	<%= f.text_field :name, :placeholder => t("title") %>
+	<i class="icon-pencil icon-grey"></i>
+</div>
+  
+<div class="activity_description editable active">
+	<textarea id="activity_description" name="activity[description]" placeholder="<%= t("Description") %>"><%= @activity.description %></textarea>
+	<i class="icon-pencil icon-grey"></i>
+</div>
+
+<div class="clear"></div>
+<hr />
+
+<% @activity.boxes.sort_by{|e| e[:position]}.each do |box| %>
+	<div class="box_container <%= box.box_type %>">
+		<%= hidden_field_tag :box_id, box.id %>
+		<%= hidden_field_tag :box_type, box.box_type %>
+		<% box.components.sort_by{|e| e[:position]}.each do |component| %>
+			<div class="component_container">
+				<%= hidden_field_tag :component_id, component.id %>
+				<%= hidden_field_tag :component_type, component.component_type %>
+				<%= render :partial => "components/"+component.component_type, :locals => {:component => component}  %>
+			</div>
+		<%end%>
+	
+	</div>
+	<% if box.box_type == "right_half_box" %>
+		<div class="clear"></div>
+	<%end%>
+<%end%>
+
+<hr />
+<div class="requirements_panel">
+	<div class="requirements_header">
+		<div class="requirements_header_cell">
+			<p><%= t("You_need") %></p>
+		</div>
+	</div>
+	<div class="requirements_body">
+		<% @activity.abstract_requirements.each do |requirement| %>
+			<%= render :partial => "activities/requirement", :locals => {:requirement => requirement} %>
+		<% end %>
+		
+		<% @activity.concrete_requirements.each do |requirement| %>
+			<%= render :partial => "activities/requirement", :locals => {:requirement => requirement} %>
+		<% end %>
+		
+		<% @activity.contributor_requirements.each do |requirement| %>
+			<%= render :partial => "activities/requirement", :locals => {:requirement => requirement} %>
+		<% end %>
+		
+		<% @activity.person_concrete_requirements.each do |requirement| %>
+			<%= render :partial => "activities/requirement", :locals => {:requirement => requirement} %>
+		<% end %>
+		
+		<% @activity.event_requirements.each do |requirement| %>
+			<%= render :partial => "activities/requirement", :locals => {:requirement => requirement} %>
+		<% end %>
+		
+		<% @activity.event_concrete_requirements.each do |requirement| %>
+			<%= render :partial => "activities/requirement", :locals => {:requirement => requirement} %>
+		<% end %>
+		
+	</div>
+	<div class="has_edition_controls active">
+		<div class="add_requirement_button edition_control popup_open_button" href="#requirement_type_selector_box">
+			<span style="font-size:33px; color: #828387;">+</span>
+		</div>
+	</div>
+</div>
+		
+<div id="delete_attributes"></div>
+
+
+<div style="display: none">
+	<div id="tool_selector_box" class="tool_selector_box" style="padding: 26px">
+		<div id="selector_header">
+			<div class="selector_actions hidden">
+				<%=link_to image_tag("/images/icons/back_30.png"),"", :onclick => "back_to_list_selectable('#tool_selector_box'); return false;" %>
+			</div>
+			<div class="selector_box_title">
+				<h1 id="list_title"><%=t :Tools %></h1>
+				<h1 id="individual_title" class="hidden"><%=t :Tool %></h1>
+			</div>
+			<div class="clear"></div>
+			<hr/>
+		</div>
+		<div class="selector">
+			<div class="content_selectable">
+				<% @devices.each do |device| %>
+					<div class="selectable_box">
+						<div class="selectable_controls">
+							<button class="select_tool" name="<%=device.id%>">Select</button>
+							<button class="tool_details_button" onclick="tool_details('<%=device.ld_id%>',this)"><%=t :Details %></button>
+						</div>	
+						<div class="selectable_name"><%=device.name%></div>
+						<div class="selectable_description"><%=raw device.description %></div>
+						<input class="selectable_type" type="hidden" value="<%=device.class%>">
+						<input type="hidden" class="selectable_device_itec_id" value="<%= device.itec_id %>" />
+					</div>	
+				<% end %>
+				<% @applications.each do |application| %>
+					<div class="selectable_box">
+						<div class="selectable_controls">
+							<button class="select_tool" name="<%=application.id%>">Select</button>
+							<button class="tool_details_button" onclick="tool_details('<%=application.ld_id%>',this)"><%=t :Details %></button>
+						</div>	
+						<div class="selectable_name"><%=application.name%></div>
+						<div class="selectable_description"><%=raw application.description%></div>
+						<input class="selectable_type" type="hidden" value="<%=application.class%>">
+						<input type="hidden" class="selectable_application_itec_id" value="<%= application.itec_id %>" />
+					</div>	
+				<% end %>
+			</div>
+		</div>
+		<div class="details hidden"><iframe class="details_iframe" seamless></iframe></div>		
+	</div>
+</div>
+
+<div style="display: none">
+	<div id="contributor_selector_box" style="padding: 26px">
+		<div id="selector_header">
+			<div class="selector_actions hidden">
+				<%=link_to image_tag("/images/icons/back_30.png"),"", :onclick => "back_to_list_selectable('#contributor_selector_box'); return false;" %>
+			</div>
+			<div class="selector_box_title">
+				<h1 id="list_title"><%=t :People %></h1>
+				<h1 id="individual_title" class="hidden"><%=t :Person %></h1>
+			</div>
+			<div class="clear"></div>
+			<hr/>
+		</div>
+		<div class="selector">
+			<div class="content_selectable">
+				<% @people.each do |person| %>
+					<div class="selectable_box">
+						<div class="selectable_controls">
+							<button class="select_person" name="<%=person.id%>">Select</button>
+							<button class="person_details_button" name="<%=person.id%>"><%=t :Details %></button>
+						</div>	
+						<div class="selectable_name"><%=person.name%></div>
+						<div class="selectable_description"><%=person.description%></div>
+					</div>	
+				<% end %>				
+			</div>
+		</div>
+		<div class="details hidden"></div>
+	</div>
+</div>
+
+<div style="display: none">
+	<div id="event_selector_box" style="padding: 26px">
+		<div id="selector_header">
+			<div class="selector_actions hidden">
+				<%=link_to image_tag("/images/icons/back_30.png"),"", :onclick => "back_to_list_selectable('#event_selector_box'); return false;" %>
+			</div>
+			<div class="selector_box_title">
+				<h1 id="list_title"><%=t :Events %></h1>
+				<h1 id="individual_title" class="hidden"><%=t :Event %></h1>
+			</div>
+			<div class="clear"></div>
+			<hr/>
+		</div>
+		<div class="selector">
+			<div class="content_selectable">
+				<% @events.each do |event| %>
+					<div class="selectable_box">
+						<div class="selectable_controls">
+							<button class="select_event" name="<%=event.id%>">Select</button>
+							<button class="event_details_button" name="<%=event.id%>"><%=t :Details %></button>
+						</div>	
+						<div class="selectable_name"><%=event.name%></div>
+						<div class="selectable_description"><%=event.description%></div>
+					</div>	
+				<% end %>
+			</div>
+		</div>
+		<div class="details hidden"></div>
+	</div>
+</div>
+
+<div style="display: none">
+	<div id="requirement_type_selector_box" style="padding: 26px">
+		<div id="selector_header">
+			<div class="selector_box_title">
+				<h1 id="list_title"><%=t :Requirement_Types %></h1>
+			</div>
+			<div class="clear"></div>
+			<hr/>
+		</div>
+		<div class="selector">
+			<div class="content_selectable">
+				<div class="selectable_box">
+					<div class="selectable_controls">
+						<button class="select_requirement_type" name="tool_abstract_requirement">Select</button>
+					</div>
+					<div class="requirement_type_icon"><i class="icon-AbstractRequirement"></i></div>
+					<div class="selectable_name"><%= t("tool_abstract_requirement_name") %></div>
+					<div class="selectable_description"><%= t("tool_abstract_requirement_description") %></div>
+				</div>
+				
+				<div class="selectable_box">
+					<div class="selectable_controls">
+						<button class="select_requirement_type" name="tool_concrete_requirement">Select</button>
+					</div>
+					<div class="requirement_type_icon"><i class="icon-AbstractRequirement"></i></div>	
+					<div class="selectable_name"><%= t("tool_concrete_requirement_name") %></div>
+					<div class="selectable_description"><%= t("tool_concrete_requirement_description") %></div>
+				</div>
+				
+				<div class="selectable_box">
+					<div class="selectable_controls">
+						<button class="select_requirement_type" name="person_abstract_requirement">Select</button>
+					</div>
+					<div class="requirement_type_icon"><i class="icon-ContributorRequirement"></i></div>	
+					<div class="selectable_name"><%= t("person_abstract_requirement_name") %></div>
+					<div class="selectable_description"><%= t("person_abstract_requirement_description") %></div>
+				</div>
+				
+				<div class="selectable_box">
+					<div class="selectable_controls">
+						<button class="select_requirement_type" name="person_concrete_requirement">Select</button>
+					</div>	
+					<div class="requirement_type_icon"><i class="icon-ContributorRequirement"></i></div>
+					<div class="selectable_name"><%= t("person_concrete_requirement_name") %></div>
+					<div class="selectable_description"><%= t("person_concrete_requirement_description") %></div>
+				</div>
+				<div class="selectable_box">
+					<div class="selectable_controls">
+						<button class="select_requirement_type" name="event_abstract_requirement">Select</button>
+					</div>	
+					<div class="requirement_type_icon"><i class="icon-EventRequirement"></i></div>
+					<div class="selectable_name"><%= t("event_abstract_requirement_name") %></div>
+					<div class="selectable_description"><%= t("event_abstract_requirement_description") %></div>
+				</div>
+				<div class="selectable_box">
+					<div class="selectable_controls">
+						<button class="select_requirement_type" name="event_concrete_requirement">Select</button>
+					</div>	
+					<div class="requirement_type_icon"><i class="icon-EventRequirement"></i></div>
+					<div class="selectable_name"><%= t("event_concrete_requirement_name") %></div>
+					<div class="selectable_description"><%= t("event_concrete_requirement_description") %></div>
+				</div>
+			</div>
+		</div>	
+	</div>
+</div>
+
+<% end %>

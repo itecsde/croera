@@ -1,0 +1,219 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+
+class ScraperArticles
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+  
+  ###############################################################
+  #######  SCRAPE_SCIENCEDAILY
+  ###############################################################
+
+  def scrape_sciencedaily(*reintentos)
+    begin
+      url = "http://www.sciencedaily.com/"
+      source_name = __method__.to_s    
+      #Add new source, or select it if exists
+      source = Source.create_or_select_source(source_name, "Article", url)
+      
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+      i=0
+      
+      Nokogiri::HTML(open(url, "User-Agent" => "Ruby/#{RUBY_VERSION}"))
+      page = Nokogiri::HTML(open(url, "User-Agent" => "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:26.0) Gecko/20100101 Firefox/26.0"))
+      reintentos = 2
+
+      page.css("div.shortcuts div a").each_with_index do |category,index|
+        if index != 0
+          scrape_category_sciencedaily category['href'].gsub("/news/","").gsub("/","")
+        end
+      end
+      source.correct_scrape
+    rescue  Exception => e
+      puts "Exception in scrape_sciencedaily"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_sciencedaily(1,reintentos)
+      end
+      source.incorrect_scrape
+    end
+  end
+
+  def scrape_category_sciencedaily(category, *siguiente)
+    begin
+      if siguiente[1]==1
+      reintentos = siguiente[2]
+      else
+      reintentos = 2
+      end
+
+      category_xml = "http://www.sciencedaily.com/xml/featured.php?top=&quirky=&section=" + category
+
+      xml_page = Nokogiri::XML(open(category_xml))
+      max_results = xml_page.xpath("//xml/maxresults").text
+      puts max_results
+      i=0
+      num_start = 0
+      num_end = 1000
+
+      if siguiente[1]!=1
+        category_xml = "http://www.sciencedaily.com/xml/featured.php?top=&quirky=&section=" + category + "&topic=&start=" + num_start.to_s + "&end=" + num_end.to_s
+        xml_page = Nokogiri::XML(open(category_xml))
+        reintentos = 2
+        articles = xml_page.xpath("//xml/item/short")
+        articles.each do |article|
+          scrape_article_sciencedaily "http://www.sciencedaily.com" + article.text.split("href=")[1].split("class")[0].gsub('"','').strip
+          puts i+=1
+        end
+        num_start = num_end
+        num_end = num_end + 1000
+        siguiente = "http://www.sciencedaily.com/xml/featured.php?top=&quirky=&section=" + category + "&topic=&start=" + num_start.to_s + "&end=" + num_end.to_s
+      else
+      siguiente = siguiente[0]
+      end
+
+      while siguiente != nil
+        puts puts "XML_SIGUIENTE --> " + siguiente
+        xml_page2 = Nokogiri::XML(open(siguiente))
+        reintentos = 2
+
+        articles = xml_page2.xpath("//xml/item/short")
+        articles.each do |article|
+         scrape_article_sciencedaily "http://www.sciencedaily.com" + article.text.split("href=")[1].split("class")[0].gsub('"','').strip
+          puts i+=1
+        end
+
+        if num_end < max_results.to_i
+          num_start = num_end
+          num_end = num_end + 1000
+          siguiente = "http://www.sciencedaily.com/xml/featured.php?top=&quirky=&section=" + category + "&topic=&start=" + num_start.to_s + "&end=" + num_end.to_s
+        else
+          siguiente = nil
+        end
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_category_sciencedaily"
+      puts "Reintentamos dos veces, sino saltamos de category"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_category_sciencedaily(category,siguiente,1,reintentos)
+      end
+    end
+  end
+
+ 
+ def scrape_article_sciencedaily(article_url, *reintentos)
+    begin
+      scraped_article = Article.new
+      human_tags = Array.new
+      idiomas_disponibles = ["en"]
+      scraped_from = "http://www.sciencedaily.com/"
+      name = ""
+      description = ""
+      puts article_url
+
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+
+      article_page = Nokogiri::HTML(open(article_url))
+      reintentos = 2
+
+      begin
+        name = article_page.css("div#content h1#headline.story")[0].text.strip
+        puts "Name: " + name
+      rescue
+        puts "Failed Name sciencedaily"
+      end
+      
+      summary = ""
+      text = ""
+      begin
+        summary = article_page.css("div#content div div div#summary")[0].text.strip
+        text = strip_tags article_page.css("div#content div#story div#text")[0].text.strip
+        description = summary + "\n" + text
+        #puts "Description: "
+        #puts description
+      rescue
+        puts "Failed description sciencedaily"
+      end
+
+      begin
+        article_page.css("div#related div#related_topics ul.black li a.blue").each do |related_topic|
+          human_tags << related_topic.text.strip
+        end
+        article_page.css("div#related div#related_articles ul.black li a.blue").each do |related_article|
+          human_tags << related_article.text.strip
+        end
+        #puts "human_tags: "
+        #puts human_tags
+      rescue Exception => e
+        puts "Failed Tags sciencedaily"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+
+      begin
+        photo_url = article_page.css("div#story_photo div#photo_container div.triggers img.image")[0]['src']
+        #puts "photo_url: " + photo_url
+      rescue Exception => e
+        puts "Failed Photo sciencedaily"
+        #puts e.message
+        #puts e.backtrace.inspect
+        photo_url = nil
+      end
+
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_article.element_image=URI.parse(photo_url)
+        rescue
+          puts "sciencedaily: IMAGEN NO GUARDADA"
+          scraped_article.element_image.clear
+        end
+      end
+
+      I18n.locale = "en"
+      scraped_article.name = name
+      scraped_article.description = description
+      scraped_article.url = article_url
+      scraped_article.link = article_url
+      scraped_article.scraped_from = scraped_from
+      prosa = name + ". " + description
+      scraped_article.persist(idiomas_disponibles,prosa,human_tags)
+
+    rescue Exception => e
+      puts "Exception in scrape_article_sciencedaily"
+      puts "Reintentamos dos veces, sino saltamos al siguiente articulo"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_article_sciencedaily(article_url,1,reintentos)
+      end
+    end
+  end  
+ 
+
+end

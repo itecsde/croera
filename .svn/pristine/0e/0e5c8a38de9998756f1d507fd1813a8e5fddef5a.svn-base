@@ -1,0 +1,21 @@
+<%= render :partial => "header", :locals => {:section_title => (t :Person), :actions => "person_actions"} %>
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'person', :actions => "people/person_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+
+	<% if current_user != nil%>
+		<%= render :partial => "generic_partials/header_show_resource", :locals => {:element => @person} %>
+		<%= render :partial => "search_results/related_elements_same_type",:locals => {:related_title =>'related_reports'} %>			
+	<% end %>
+	<div id="content_container" class="person_container">
+		<%= render "person" %>
+	</div> <!-- CONTENT -->
+	
+	<span style="display:none" id="is_edition" data-value="false"></span>	
+	
+	
+	<script src="/javascript/people_form.js"></script>
+<% end %>

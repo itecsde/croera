@@ -1,0 +1,17 @@
+<%
+	if box == nil
+		box= Box.new
+	end
+%>
+
+<div class="experience_box_container <%= document_type %> full_box has_edition_controls">
+	<div class= "draggable_button edition_control active"></div>
+	<div class= "remove_button edition_control active" onclick="remove_experience_contribution(this);"><i class="icon-remove-sign icon-grey"></i></div>
+	<%= hidden_field_tag :box_id, box.id %>
+	<%= hidden_field_tag :box_type, "full_box" %>
+	<%= render :partial => "experience_documents/" + document_type, :locals => {:box => box} %>
+	<div class="social_bar">
+		<span class="social_icon icon_comments"></span>
+		<span class="social_icon icon_share"></span>
+	</div>
+</div>

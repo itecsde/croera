@@ -1,0 +1,24 @@
+<%= render :partial => "header/main_navbar_not_logged", :locals => {:element_active => "login"} %>
+<%= render :partial => "header/subheader", :locals => {:section_title => "login",:actions => "devise/sessions/sessions_actions"} %>
+
+
+<div class="container_access_control">
+	<div class="login_box">
+				
+		<div class="left_column_access_box">
+			<img class="logo_image_public" src="/images/index.png" alt="Index"></img>
+			<h1 class="logo_title_public">iTEC-SDE</h1>			
+		</div>
+		
+		<div class="separate_columns"> </div>
+		
+		<div class="right_column_access_box">
+			<div class="prompt"><%= t("log_in")%></div>
+		
+			<div id="login_form_container" class="login_form_container">
+				<%= render 'form' %>
+			</div>
+		</div>
+		
+	</div>
+</div>

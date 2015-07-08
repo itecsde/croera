@@ -1,0 +1,163 @@
+<% if @book.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@book.errors.count, "error") %> prohibited this book from being saved:</h2>
+	
+	  <ul>
+	  <% @book.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+
+
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="book_name field_body">
+		<% if @edition_mode==true %>
+			<textarea id="book_name" name="book[name]" placeholder="<%= t("title") %>"><%= @book.name %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<span><%= @book.name %></span>
+		<% end %>
+	</div>
+	
+		
+	<div class="book_description description field_body">
+		<% if @edition_mode==true %>
+			<textarea id="book_description" name="book[description]" placeholder="<%= t("description") %>"><%= @book.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<div>
+				<% if @book.description != nil %>			
+					<%= raw @book.description.truncate(1000, :separator => " ", :omission => "...") %>
+				<% end %>					
+			</div>
+		<% end %>
+	</div>
+	
+	
+	<div class="book_tags element_field_box">
+		<div class="field_prompt"><%= t("keywords") %></div>
+		<div class="field_body">			
+			<% if @edition_mode==true %>    
+		    	<textarea id="book_tags" class="tags" name="book[tag_list]"><% if @book!=nil %><%= @book.tag_list %><% end %></textarea>
+		    	<i class="icon-pencil icon-grey"></i>
+		    <% else %>
+		    	<span class="tags"><% if @book!=nil %><%= @book.tag_list_with_links.html_safe %><% end %></span>	
+		    <% end %>														
+		</div>
+	</div>		
+	
+	
+	<% if @edition_mode == true or (@book.author != nil && @book.author != "") %>
+		<div class="book_author element_field_box">
+			<div class="field_prompt"><%= t("author") %></div>
+			<div class="field_body">
+				<% if @edition_mode==true %>    
+			    	<%= book_form.text_field :author %>
+			    	<i class="icon-pencil icon-grey"></i>			    	
+			    <% else %>
+			    	<span><%= @book.author%></span>
+			    <% end %>
+		   </div>		
+		</div>
+	<% end %>
+		
+	<div class="book_url element_field_box">
+		<div class="field_prompt"><%= t("url") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>    
+		    	<%= book_form.text_field :url %>
+		    	<i class="icon-pencil icon-grey"></i>			    	
+		    <% else %>
+		    	<a href="<%= @book.url %>" target="_blank"><%= @book.url %></a>
+		    <% end %>
+	   </div>		
+	</div>
+
+
+	<% if @edition_mode == true or @book.book_subject_annotations.size > 0 %>		
+		<div class="book_subjects element_field_box">
+			<div class="field_prompt"><%= t("subjects") %></div>
+			<div class="field_body">
+				<% @book.book_subject_annotations.each do |annotation| %>
+					<div class="subject_item">
+						<% if @edition_mode==true %>
+							<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name", annotation.subject.id), :prompt => "", :class => "subject" %>
+							<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+						<% else %>
+							<span><%= annotation.subject.name %></span>	
+						<% end %>
+					</div>
+				<% end %>			
+			</div>
+			<% if @edition_mode==true %>
+				<div class="add_item_to_itemize" onclick="add_subject(this);">
+					<span>+</span>
+				</div>
+			<% end %>		
+		</div>
+	<% end %>		
+	
+	
+	
+	<% if @edition_mode!=true && @book.scraped_from!=nil && @book.scraped_from!="" %>  
+		<div class="book_scraped_from element_field_box">
+			<div class="field_prompt"><%= t("source") %></div>
+			<div class="field_body">
+				<a href="<%= @book.scraped_from %>" target="_blank"><%= @book.scraped_from %></a>
+			</div>
+		</div>
+	<% end %>
+	
+	
+</div>
+
+
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<% if @edition_mode == false && @popup == nil %>	
+		<div class="watermark_container_show">
+			<div class="watermark_show <%=@resource_type.downcase%>_watermark"></div>
+		</div>
+	<% end %>
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>		
+			<% if @book.element_image.url() != "none" %>
+				<%= image_tag @book.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_book.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= book_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		<% else %>
+			<% if @book.element_image.url() != "none" %>
+				<%= image_tag @book.element_image.url(:medium), width:'100%', :class => "image_preview_show" %>
+			<% else %>
+				<%= image_tag "/images/no_photo.png", width:'100%', :class => "image_preview_show" %>
+			<% end %>
+		<% end %>
+	</div>
+
+</div>
+
+
+
+
+
+<% if @edition_mode==true %>
+	<div id="snippets_library" style="display: none">
+		<div class="subject_item">				
+			<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name"), :prompt => "", :class => "subject" %>
+			<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+		</div>
+	</div>
+<% end %>
+
+

@@ -1,0 +1,102 @@
+# encoding: utf-8
+require 'net/http'
+require 'net/https'
+require 'uri'
+
+class ScraperWidgets
+  include ActionView::Helpers::SanitizeHelper
+
+  #########################################################
+  ## scrape_widgets
+  ##################################################
+  def scrape_widgets
+    begin
+      source_name = __method__.to_s    
+      #Add new source, or select it if exists
+      source = Source.create_or_select_source(source_name, "Widget", "http://wookie.eun.org/Store/")
+      i=0
+      filename = "./harvest/widgets.json"
+      parsed_result = JSON.parse(IO.read(filename))  
+      widgets = parsed_result['SearchResults']   
+      widgets.each do |widget|
+        manual_tags = Array.new
+        scraped_widget = Widget.new
+        idiomas_disponibles = []
+        name = ""
+        description = ""   
+        begin
+          name = widget['name']
+          puts "Name: " + name
+        rescue
+          puts "Failed name scrape_widgets"
+        end
+
+        begin
+          description = strip_tags widget['description']
+          puts "Description: " + description
+        rescue
+          puts "Failed description scrape_widgets"
+        end
+
+        begin
+          url = "http://wookie.eun.org/wookie/wservices/wookie.apache.org/widgets/WidgetStore/widget_view.html?widgetId=" + widget['id'].to_s
+          puts "URL: " + url
+        rescue
+          puts "Failed url widget_widgets"
+        end
+
+        begin          
+          widget['functionalities'].each do |parsed_functionality|
+            manual_tags << parsed_functionality['name']
+          end
+          widget['tags'].each do |tag|
+            manual_tags << tag['tagtext']
+          end      
+        rescue
+          puts "Failed Tags scrape_widgets"
+        end
+                       
+        begin
+          URI.parse(widget['icon'].to_s)
+          puts "icono_url: " + widget['icon'].to_s
+          if widget['icon'].to_s != ""
+            scraped_widget.element_image = URI.parse(widget['icon'].to_s)
+          else
+            scraped_widget.element_image = URI.parse("http://wookie.eun.org/wookie/wservices/wookie.apache.org/widgets/WidgetStore/img/default_widget_icon.png")
+          end
+        rescue
+          puts "Fail icon scrape_widgets"
+          scraped_widget.element_image = URI.parse("http://wookie.eun.org/wookie/wservices/wookie.apache.org/widgets/WidgetStore/img/default_widget_icon.png")
+        end
+        #application.itec_id = widget['id']
+        prosa = ""
+        if name != nil
+          prosa = prosa + name
+        end
+        if description != nil
+          prosa = prosa + ". " + description
+        end
+        
+        begin
+          I18n.locale = Translator.detect_language(prosa)
+          idiomas_disponibles << I18n.locale.to_s
+        rescue
+          puts "Fail language widget"
+        end
+        
+        scraped_widget.name = name
+        scraped_widget.description = description
+        scraped_widget.url = url
+        scraped_widget.scraped_from = "http://wookie.eun.org/Store/"
+        scraped_widget.persist(idiomas_disponibles,prosa,manual_tags)  
+      end
+      source.correct_scrape
+    rescue Exception => e
+      puts "Exception in scrape_widgets"
+      puts e.message
+      puts e.backtrace.inspect
+      source.incorrect_scrape
+    end
+  end
+
+end

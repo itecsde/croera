@@ -1,0 +1,214 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'administration', :current_layout => "search"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'administration', :actions => "list_actions"} %>
+<% end %>
+
+
+<% content_for :content do %>
+	<div class="sources_container">				
+			<% if @sources_reports.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>		
+				<div class="prompt"><img src="/images/black_site_100.png" width="50px" height="30px"/>
+					<%= t("reports") %><%= link_to t("Tag All Now"), administrations_path(:element_type => "Report", :task => "tag"),:class => "tag_now" %>
+					<%= link_to t("Scrape All Now"), administrations_path(:element_type => "Report", :task => "scrape"),:class => "scrape_now" %>
+					<%= form_tag administrations_path, :method => 'get' do %>  
+					<%= t("Add rss Source") %>:
+					<%= text_field_tag :rss_report_feed, params[:rss_report_feed],:class => "add_rss_feed" %><%= submit_tag "",:type => :image, :src => "/images/black_add_bookmark_30.png" %>  
+				<% end %>
+				</div>			
+				
+				<div class="body">
+					<% @sources_reports.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			<div class="clear"></div>									
+			<% if @sources_sites.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>		
+				<div class="prompt"><img src="/images/black_site_100.png" width="50px" height="30px"/><%= t("sites") %><%= link_to t("Tag All Now"), administrations_path(:element_type => "Site", :task => "tag"),:class => "tag_now" %>
+				<%= link_to t("Scrape All Now"), administrations_path(:element_type => "Site", :task => "scrape"),:class => "scrape_now" %>	
+				</div>
+				<div class="body">
+					<% @sources_sites.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			<div class="clear"></div>
+			
+			<% if @sources_events.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_event_100.png" width="50px" height="30px"/><%= t("events") %><%= link_to t("Tag All Now"), administrations_path(:element_type => "Event", :task => "tag"),:class => "tag_now" %>
+				<%= link_to t("Scrape All Now"), administrations_path(:element_type => "Event", :task => "scrape"),:class => "scrape_now" %>	
+				</div>
+				<div class="body">
+					<% @sources_events.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			<div class="clear"></div>
+	
+			<% if @sources_lectures.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_lecture_100.png" width="50px" height="30px"/><%= t("lectures") %><%= link_to t("Tag All Now"), administrations_path(:element_type => "Lecture", :task => "tag"),:class => "tag_now" %>
+				<%= link_to t("Scrape All Now"), administrations_path(:element_type => "Lecture", :task => "scrape"),:class => "scrape_now" %>
+				</div>
+				<div class="body">
+					<% @sources_lectures.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			<div class="clear"></div>
+	
+			<% if @sources_documentaries.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_documentary_100.png" width="50px" height="30px"/><%= t("documentaries") %><%= link_to t("Tag All Now"), administrations_path(:element_type => "Documentary", :task => "tag"),:class => "tag_now" %>
+				<%= link_to t("Scrape All Now"), administrations_path(:element_type => "Documentary", :task => "scrape"),:class => "scrape_now" %>	
+				</div>
+				<div class="body">
+					<% @sources_documentaries.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			
+			<% if @sources_courses.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>						
+			<div class="prompt"><img src="/images/black_course_100.png" width="50px" height="30px"/><%= t("courses") %><%= link_to t("Tag All Now"), administrations_path(:element_type => "Course", :task => "tag"),:class => "tag_now" %>
+			<%= link_to t("Scrape All Now"), administrations_path(:element_type => "Course", :task => "scrape"),:class => "scrape_now" %>
+			</div>
+				<div class="body">
+					<% @sources_courses.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			
+			<% if @sources_articles.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_article_100.png" width="50px" height="30px"/><%= t("articles") %><%= link_to t("Tag All Now"), administrations_path(:element_type => "Article", :task => "tag"),:class => "tag_now" %>
+				<%= link_to t("Scrape All Now"), administrations_path(:element_type => "Article", :task => "scrape"),:class => "scrape_now" %>	
+				</div>
+				<div class="body">
+					<% @sources_articles.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			
+			<% if @sources_lres.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_lre_100.png" width="50px" height="30px"/><%= t("lres") %><%= link_to t("Tag All Now"), administrations_path(:element_type => "Lre", :task => "tag"),:class => "tag_now" %>
+				<%= link_to t("Scrape All Now"), administrations_path(:element_type => "Lre", :task => "scrape"),:class => "scrape_now" %>
+				</div>
+				<div class="body">
+					<% @sources_lres.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			
+			<% if @sources_applications.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_application_100.png" width="50px" height="30px"/><%= t("applications") %><%= link_to t("Tag All Now"), administrations_path(:element_type => "Application", :task => "tag"),:class => "tag_now" %>
+				<%= link_to t("Scrape All Now"), administrations_path(:element_type => "Application", :task => "scrape"),:class => "scrape_now" %>	
+				</div>
+				<div class="body">
+					<% @sources_applications.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>			
+
+			<% if @sources_posts.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_post_100.png" width="50px" height="30px"/><%= t("posts") %><%= link_to t("Tag All Now"), administrations_path(:element_type => "Post", :task => "tag"),:class => "tag_now" %>
+				<%= link_to t("Scrape All Now"), administrations_path(:element_type => "Post", :task => "scrape"),:class => "scrape_now" %>	
+				<%= form_tag administrations_path, :method => 'get' do %>  
+					<%= t("Add rss Source") %>:
+					<%= text_field_tag :rss_blog_feed, params[:rss_blog_feed],:class => "add_rss_feed" %><%= submit_tag "",:type => :image, :src => "/images/black_add_bookmark_30.png" %>  
+				<% end %>	
+				</div>
+				<div class="body">
+					<% @sources_posts.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			<% if @sources_slideshows.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_slideshow_100.png" width="50px" height="30px"/><%= t("slideshows") %><%= link_to t("Tag All Now"), administrations_path(:element_type => "Slideshow", :task => "tag"),:class => "tag_now" %>
+				<%= link_to t("Scrape All Now"), administrations_path(:element_type => "Slideshow", :task => "scrape"),:class => "scrape_now" %>	
+				</div>
+				<div class="body">
+					<% @sources_slideshows.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>			
+			
+			<% if @sources_biographies.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_biography_100.png" width="50px" height="30px"/><%= t("biographies") %><%= link_to t("Tag All Now"), administrations_path(:element_type => "Biography", :task => "tag"),:class => "tag_now" %>
+				<%= link_to t("Scrape All Now"), administrations_path(:element_type => "Biography", :task => "scrape"),:class => "scrape_now" %>	
+				</div>
+				<div class="body">
+					<% @sources_biographies.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>						
+			
+			
+		</div>	
+		
+<% end %>
+

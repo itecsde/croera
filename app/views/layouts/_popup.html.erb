@@ -1,0 +1,19 @@
+<div id="<%=popup_id%>" class="area_popup visible_mode <%=popup_class%>">
+	
+	<%= yield %>
+	
+	<div class="close">
+		<span class="area_popup_close" onclick="close_area_popup('#<%=popup_id%>')"></span>
+	</div>	
+	<% if popup_class == "selection simple" %>
+	<input type="hidden" class="callback"  value="<%= callback %>"/>
+	<div class="selected_elements" style="display: none;"></div>
+	<% end %>
+	<% if popup_class == "selection multiple" %>
+	<input type="hidden" class="callback"  value="<%= callback %>"/>
+	<div class="selected_elements" style="display: none;"></div>
+	<input type="hidden" class="deselect_callback"  value="<%= deselect_callback %>"/>
+	<div class="deselected_element" style="display: none;"></div>
+	<% end %>
+</div>
+<div class="area_popup_overlay" onclick="close_area_popup('#<%=popup_id%>')"></div>

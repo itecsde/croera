@@ -1,0 +1,21 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'site', :actions => "sites/site_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+
+	<% if current_user != nil%>
+		<%= render :partial => "generic_partials/header_show_resource", :locals => {:element => @site} %>	
+	<% end %>
+
+	<div id="content_container" class="site_container">
+		<%= render "site" %>
+		<%= render :partial => "generic_partials/related_elements_same_type",:locals => {:related_title =>'related_sites'} %>				
+	</div> <!-- CONTENT -->
+	<%= render :partial => "generic_partials/related_elements", :locals => {:element_type =>'Site'} %>
+	<span style="display:none" id="is_edition" data-value="false"></span>	
+	
+	
+	<script src="/javascript/sites_form.js"></script>
+<% end %>

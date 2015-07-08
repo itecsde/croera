@@ -1,0 +1,3 @@
+<div class="biography_form_actions form_actions">
+	<%= biography_form.submit t("save"), :class => 'biography_save' %>
+</div>	

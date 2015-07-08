@@ -1,0 +1,13 @@
+<%= render :partial => "header/main_navbar_not_logged", :locals => {:element_active => "sign_up"} %>
+<%= render :partial => "header/subheader", :locals => {:section_title => "sign_up",:actions => "devise/registrations/registrations_actions"} %>
+
+<div class="content_container">
+	<div class="pagewrap">
+		<div id="content_user" class="profile_container">	
+		<!--<div id="content_container" class="sign_up_container"> -->
+			<%= render 'form' %>
+		<!-- </div> -->	
+		</div>
+		<br>
+	</div>
+</div>

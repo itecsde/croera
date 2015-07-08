@@ -1,0 +1,42 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'reports', :actions => "resources/list_actions"} %>
+<% end %>
+
+<% content_for :advanced_search do %>	
+	<%= render :partial =>"advanced_search" %>
+<% end %>
+
+<% content_for :content do %>
+	<div class="content_disambiguation">
+		<%= render :partial => "generic_partials/resource_disambiguation" %>
+	</div>
+	<div id="content_index">	
+	<% section = {params[:section] => "active"}%>
+	<ul class="nav_report_section">
+		<li class="<%= section["all"] %>">
+			<%= link_to t('all'), reports_path(:section => "all") %>
+		</li>
+		<li class="<%= section["health"] %>">
+			<%= link_to t('health'), reports_path(:section => "health") %>
+		</li>
+		<li class="<%= section["art"] %>">
+			<%= link_to t('art'), reports_path(:section => "art") %>
+		</li>
+		<li class="<%= section["politics"] %>">
+			<%= link_to t('politics'), reports_path(:section => "politics") %>
+		</li>
+		<li class="<%= section["sport"] %>">
+			<%= link_to t('sport'), reports_path(:section => "sport") %>
+		</li>					
+	</ul>
+	<div class="clear"></div>	
+
+	
+		
+		<%= render :partial => "list", :locals => { :current_layout => "application" }%>
+	</div> <!-- CONTENT -->
+	
+	<script src="/javascript/resource_index.js"></script>
+	<script src="/javascript/reports_index.js"></script>
+<% end %>

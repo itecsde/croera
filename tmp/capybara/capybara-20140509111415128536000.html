@@ -1,0 +1,438 @@
+<!DOCTYPE html><html lang="en"><head>
+	<meta charset="utf-8">
+	<title>ITEC-SDE</title>
+	<script type="text/javascript" async="" src="http://www.google-analytics.com/ga.js"></script><script src="/assets/jquery.js?body=1" type="text/javascript"></script>
+<script src="/assets/jquery_nested_form.js?body=1" type="text/javascript"></script>
+<script src="/assets/activities.js?body=1" type="text/javascript"></script>
+<script src="/assets/activity_sequences.js?body=1" type="text/javascript"></script>
+<script src="/assets/applications.js?body=1" type="text/javascript"></script>
+<script src="/assets/contents.js?body=1" type="text/javascript"></script>
+<script src="/assets/contextual_settings.js?body=1" type="text/javascript"></script>
+<script src="/assets/experiences.js?body=1" type="text/javascript"></script>
+<script src="/assets/guide.js?body=1" type="text/javascript"></script>
+<script src="/assets/home.js?body=1" type="text/javascript"></script>
+<script src="/assets/jquery.infinitescroll.min.js?body=1" type="text/javascript"></script>
+<script src="/assets/public.js?body=1" type="text/javascript"></script>
+<script src="/assets/requirements.js?body=1" type="text/javascript"></script>
+<script src="/assets/technological_settings.js?body=1" type="text/javascript"></script>
+<script src="/assets/users.js?body=1" type="text/javascript"></script>
+<script src="/assets/jquery_ujs.js?body=1" type="text/javascript"></script>
+<script src="/assets/application.js?body=1" type="text/javascript"></script>
+
+	<meta content="authenticity_token" name="csrf-param">
+<meta content="YCeqKGUR1gNxUlGpLStqg60XodZzLHB7dHlwwIcb3c0=" name="csrf-token">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Actividades e Recursos Educativos Abertos">
+	<meta name="author" content="GIST">
+	<link rel="icon" href="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/icons/favicon.ico">
+	
+	<!-- Estilos -->
+	<link href="/assets/devise.css?body=1" media="screen" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/css/home.css">
+	<link rel="stylesheet" href="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/css/header.css">
+	<link rel="stylesheet" href="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/css/skin3.css">
+		<link rel="stylesheet" href="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/css/style1.css">
+   	<script src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/javascript/bootstrap_carousel.js"></script>
+
+	 
+	<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+  
+</head>
+<body style="zoom: 1; ">	
+	
+	<header class="z-max" role="top_navigation">
+
+	<div class="dropdown hamburger" onmouseout="$('.full_hamburger').css('width', '0px')">
+		<div class="dropdown_button" onclick="toggle_full_hamburger(this)">
+			<div class="icon_hamburger"></div>
+		</div>
+		<div class="full_hamburger" onmouseover="$('.full_hamburger').css('width', '350px')">
+			<ul>
+				<a href="/es/scenarios">
+				<li>
+					<img src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/white_scenario_30.png">
+					<span>Escenarios</span>
+				</li>
+</a>				<a href="/es/activities">
+				<li>
+					<img src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/white_activity_30.png">
+					<span>Actividades de aprendizaje</span>
+				</li>
+</a>				<a href="/es/experiences">
+				<li>
+					<img src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/white_story_30.png">
+					<span>Historias de aprendizaje</span>
+				</li>
+</a>
+			</ul>
+		</div>
+	</div>
+
+	<div class="logo">
+		<a href="/es"> <div class="icon_logo"></div> </a>
+	</div>
+
+	<div class="dropdown menu_item" onmouseleave="hide_dropdown_list(this)">
+		<div class="dropdown_button" onclick="toggle_dropbox_list_visibility(this);">
+			<div class="down">
+				<img src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/arrow_down.png">
+			</div>
+			<div class="section_title">
+				DESCUBRIR
+			</div>
+		</div>
+		<ul class="dropdown_list discover_resources">
+						<a href="/es/applications">
+				<li>Aplicaciones</li>
+			</a>
+			<a href="/es/events">
+				<li>Eventos</li>
+			</a>
+			<a href="/es/biographies">
+				<li>Biografías</li>				
+			</a>
+			<a href="/es/lectures">
+				<li>Ponencias</li>
+			</a>
+			<a href="/es/sites">
+				<li>Sitios</li>
+			</a>
+			<a href="/es/documentaries">
+				<li>Documentales</li>
+			</a>
+			<a href="/es/courses">
+				<li>Cursos</li>
+			</a>
+			<a href="/es/articles">
+				<li>Articles</li>			
+			</a><a href="/es/posts">
+				<li>Posts</li>				
+			</a>
+			<a href="/es/slideshows">
+				<li>Slideshows</li>				
+			</a>
+			<a href="/es/reports">
+				<li><span class="translation_missing" title="translation missing: es.reports">Reports</span></li>				
+			</a>
+			<a href="/es/artworks">
+				<li>Obras de arte</li>				
+			</a>
+			<a href="/es/lres">
+				<li>OERs</li>				
+			</a>	
+			<a href="/es/klascements">
+				<li><span class="translation_missing" title="translation missing: es.klascement">Klascement</span></li>				
+			</a>
+			<a href="/es/widgets">
+				<li><span class="translation_missing" title="translation missing: es.widgets">Widgets</span></li>				
+			</a>
+		</ul>
+	</div>
+
+	<a href="/es/users/sign_up">
+		<div class="sign_up">
+			<div class="section_title">
+				Registrarse
+			</div>
+		</div>
+</a>
+		<a href="/es/users/sign_in">
+			<div class="login">
+				<div class="section_title">
+					Login
+				</div>
+			</div>
+</a>
+			<div class="dropdown menu_item dropdown_languages" onmouseleave="hide_dropdown_list(this)">
+				<div class="dropdown_button" onclick="toggle_dropbox_list_visibility(this);">
+					<div class="down">
+						<img src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/arrow_down.png">
+					</div>
+					<div class="section_title">
+						Lenguaje
+					</div>
+				</div>
+				<ul class="dropdown_list">
+					<a href="/?locale=en">
+					<li>
+						<img alt="En" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/languages/en.gif">&nbsp;&nbsp;&nbsp;<span class="translation_missing" title="translation missing: es.English">English</span>
+					</li>
+</a>					<a href="/?locale=es">
+					<li>
+						<img alt="Es" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/languages/es.gif">&nbsp;&nbsp;&nbsp;<span class="translation_missing" title="translation missing: es.Spanish">Spanish</span>
+					</li>
+</a>					<a href="/?locale=gl">
+					<li>
+						<img alt="Gl" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/languages/gl.gif">&nbsp;&nbsp;&nbsp;<span class="translation_missing" title="translation missing: es.Galician">Galician</span>
+					</li>
+</a>					<a href="/?locale=pt">
+					<li>
+						<img alt="Pt" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/languages/pt.gif">&nbsp;&nbsp;&nbsp;<span class="translation_missing" title="translation missing: es.Portuguese">Portuguese</span>
+					</li>
+</a>					<a href="/?locale=fr">
+					<li>
+						<img alt="Fr" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/languages/fr.gif">&nbsp;&nbsp;&nbsp;<span class="translation_missing" title="translation missing: es.French">French</span>
+					</li>
+</a>					<a href="/?locale=fi">
+					<li>
+						<img alt="Fi" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/languages/fi.gif">&nbsp;&nbsp;&nbsp;<span class="translation_missing" title="translation missing: es.Finnish">Finnish</span>
+					</li>
+</a>					<a href="/?locale=no">
+					<li>
+						<img alt="No" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/languages/no.gif">&nbsp;&nbsp;&nbsp;<span class="translation_missing" title="translation missing: es.Norwegian">Norwegian</span>
+					</li>
+</a>					<a href="/?locale=lt">
+					<li>
+						<img alt="Lt" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/languages/lt.gif">&nbsp;&nbsp;&nbsp;<span class="translation_missing" title="translation missing: es.Lithuanian">Lithuanian</span>
+					</li>
+</a>					<a href="/?locale=tr">
+					<li>
+						<img alt="Tr" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/languages/tr.gif">&nbsp;&nbsp;&nbsp;<span class="translation_missing" title="translation missing: es.Turkish">Turkish</span>
+					</li>
+</a>					<a href="/?locale=nl">
+					<li>
+						<img alt="Nl" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/languages/nl.gif">&nbsp;&nbsp;&nbsp;<span class="translation_missing" title="translation missing: es.Dutch">Dutch</span>
+					</li>
+</a>					<a href="/?locale=sk">
+					<li>
+						<img alt="Sk" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/languages/sk.gif">&nbsp;&nbsp;&nbsp;<span class="translation_missing" title="translation missing: es.Slovak">Slovak</span>
+					</li>
+</a>					<a href="/?locale=hu">
+					<li>
+						<img alt="Hu" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/languages/hu.gif">&nbsp;&nbsp;&nbsp;<span class="translation_missing" title="translation missing: es.Hungarian">Hungarian</span>
+					</li>
+</a>				</ul>
+			</div>
+</header>
+
+
+
+	
+<div class="secondary_navigation">
+	<div class="actions_menu_items">
+		<ul class="action_list">
+		</ul>	
+	</div>
+	<div class="location_menu_item">
+		Inicio
+	</div>	
+</div>
+
+
+<div class"clear"=""></div>
+
+<div class="content_container">
+	
+	<div class="home_search">
+		<div class="home_search_bar_public">
+			<form accept-charset="UTF-8" action="/es/search_results" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="✓"></div>  
+				<input class="input_search_bar" id="search" name="search" type="text"><input name="commit" src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/search_button.png" type="image" value="">  
+</form>		</div>
+	</div>
+
+	<div class="container_home_logged">
+		<div class="first_row">
+			<div class="first_text_box">
+				<h3>Scenario Development Environment</h3>
+				<p>El Scenario Development Environment (SDE) proporciona la posibilidad de buscar recursos más allá de contenidos, como aplicaciones, eventos que tengan valor educativo, y expertos que puedan contribuir en las actividades de aprendizaje. Estos recursos vienen de la busqueda automática en páginas web. Además, puedes usar el SDE para configurar una historia de aprendizaje con los recursos más apropiados, confiando en las recomendaciones que te proporciona el SDE y que tienen en cuenta las preferencias marcadas en tu cuenta de usuario.</p>
+			</div>	
+			<div class="second_text_box">
+				<h3>Inicia sesión para descubrir y crear recursos educativos</h3>
+				<p>Puedes descubrir recursos y usarlos para crear escenarios, actividades de aprendizaje o hstorias de aprendzaje. Registrate para probar el SDE.</p>
+			</div>	
+			<div class="third_text_box">
+				<h3>iTEC </h3>
+				<p>Innovative Technologies for Engaging Classrooms (iTEC) es actualmente la mayor iniciativa para el diseño de la enseñanza y el aprendizaje en las clases del futuro.</p>
+				<p><a href="http://itec.eun.org/web/guest" target="_blank">http://itec.eun.org/</a></p>		
+			</div>	
+		</div>	
+		<div class="second_row">
+			<div class="first_column">
+				<div class="discover_row active" onclick="toggle_home_discover_create(this);">
+					<h3>Descubrir</h3>
+					<img src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/discover_400x200.png">
+				</div>	
+				<div class="relevant_resources_row">
+					<div class="relevant_resource_box">
+						
+						<div class="mini_extract mini_extract_discover" style="background-image: url('/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/system/applications/element_images/000/000/019/original/evernote.png?1392911760')" onclick="window.location.href ='/es/applications';return false;">
+						
+							<div class="mini_extract_header">
+								<p>Aplicaciones relevantes</p>
+							</div>	
+							<div class="mini_extract_footer">
+									<p>Evernote</p>
+								<p></p>
+							</div>	
+						</div>
+							<div class="mini_extract mini_extract_create" style="background-image: url('/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/watermarks/b_watermark_scenario.png')" onclick="alert('Login for this feature');">
+							<div class="mini_extract_header">
+								<p>Escenario</p>
+							</div>	
+							<div class="mini_extract_footer">
+								<p>&nbsp;</p>
+								<p>Crear un escenario</p>								
+							</div>	
+						</div>
+							
+					</div>	
+					
+					<div class="relevant_resource_box">
+						
+						<div class="mini_extract mini_extract_discover" style="background-image: url('/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/system/events/element_images/000/000/119/original/auditorio_zaragoza_exterior_t5000109.jpg_5796651.jpg?1393241350')" onclick="window.location.href ='/es/events';return false;">
+							<div class="mini_extract_header">
+								<p>Eventos relevantes</p>
+							</div>	
+							<div class="mini_extract_footer">
+									<p>Ciclo Flamenco Zaragoza</p>
+								<p></p>
+							</div>	
+						</div>
+						
+							<div class="mini_extract mini_extract_create" style="background-image: url('/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/watermarks/b_watermark_activity.png')" onclick="alert('Login for this feature');">
+							<div class="mini_extract_header">
+								<p>Actividad de aprendizaje</p>
+							</div>	
+							<div class="mini_extract_footer">
+								<p>&nbsp;</p>
+								<p>Crear una actividad de aprendizaje</p>								
+							</div>	
+						</div>
+							
+					</div>	
+				</div>	
+			</div>
+			
+			<!-- Segunda columna -->
+			<div class="second_column">
+				<div class="create_row" onclick="toggle_home_discover_create(this);">
+					<h3>Crear</h3>
+					<img src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/create_400x200.png">
+				</div>	
+				<div class="relevant_resources_row">
+					<div class="relevant_resource_box">
+						
+						<div class="mini_extract mini_extract_discover" style="background-image: url('/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/system/biographies/element_images/000/000/002/original/Aaliyah-9542434-1-402.jpg?1395158525')" onclick="window.location.href ='/es/biographies';return false;">
+							<div class="mini_extract_header">
+								<p>Biografías relevantes</p>
+							</div>	
+							<div class="mini_extract_footer">
+									<p>Aaliyah</p>
+								<p></p>
+							</div>	
+						</div>
+						
+							<div class="mini_extract mini_extract_create" style="background-image: url('/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/watermarks/b_watermark_story.png')" onclick="alert('Login for this feature');">
+							<div class="mini_extract_header">
+								<p>Historia de aprendizaje</p>
+							</div>	
+							<div class="mini_extract_footer">
+								<p>&nbsp;</p>
+								<p>Crear una historia de aprendizaje</p>								
+							</div>	
+						</div>
+							
+					</div>
+						
+					<div class="relevant_resource_box">
+						
+						<div class="mini_extract mini_extract_discover" style="background-image: url('/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/system/lectures/element_images/000/000/005/original/rh2qrfa6fd57ru2tiqssx32jrpenpj2z.jpg?1396512005')" onclick="window.location.href ='/es/lectures';return false;">
+							<div class="mini_extract_header">
+								<p>Ponencias relevantes</p>
+							</div>	
+							<div class="mini_extract_footer">
+									<p>Media Mixing for e-Learning...</p>
+								<p></p>
+							</div>	
+						</div>
+						
+						
+						
+					</div>	
+				</div>	
+			</div>
+			
+			
+			<div class="third_column">
+				<div id="myCarousel" class="carousel slide">
+					<ol class="carousel-indicators">
+					    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+					    <li data-target="#myCarousel" data-slide-to="1"></li>
+					    <li data-target="#myCarousel" data-slide-to="2"></li>
+					    <li data-target="#myCarousel" data-slide-to="3"></li>
+					    <li data-target="#myCarousel" data-slide-to="4"></li>							    
+					</ol>
+					<!-- Carousel items -->
+					<div class="carousel-inner">
+					   <div class="active item">
+					   		<img src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/carousel/carousel_1.jpg">
+					   		<div class="carousel-caption">
+                     			<h4>Workshop in Oulu</h4>
+                      			<p>Teachers and students testing the ITEC-SDE in a workshop in Oulu, Finland.</p>
+                    		</div>
+					   </div>
+					   <div class="item">
+					   		<img src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/carousel/carousel_2.jpg">
+					   		<div class="carousel-caption">
+                     			<h4>Workshop in Oulu</h4>
+                      			<p>Teachers and students testing the ITEC-SDE in a workshop in Oulu, Finland.</p>
+                    		</div>
+					   </div>
+					   <div class="item">
+					   		<img src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/carousel/carousel_3.jpg">
+					   		<div class="carousel-caption">
+                     			<h4>Workshop in Oulu</h4>
+                      			<p>Teachers and students testing the ITEC-SDE in a workshop in Oulu, Finland.</p>
+                    		</div>
+					   </div>
+					   <div class="item">
+					   		<img src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/carousel/carousel_4.jpg">
+					   		<div class="carousel-caption">
+                     			<h4>Workshop in Lisbon</h4>
+                      			<p>Teachers testing the ITEC-SDE in a workshop in Lisbon, Portugal.</p>
+                    		</div>
+					   </div>
+					   <div class="item">
+					   		<img src="/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/public/images/carousel/carousel_5.jpg">
+					   		<div class="carousel-caption">
+                     			<h4>Workshop in Lisbon</h4>
+                      			<p>Teachers testing the ITEC-SDE in a workshop in Lisbon, Portugal.</p>
+                    		</div>
+					   </div>
+					</div>
+					<!-- Carousel nav -->
+					<a class="carousel-control left" href="#myCarousel" data-slide="prev">‹</a>
+					<a class="carousel-control right" href="#myCarousel" data-slide="next">›</a>
+				</div>				
+				
+				
+			</div>	
+		</div>	
+	</div>
+</div>
+	
+	<div class="footer">
+		<div class="copyright">
+			Copyright www.itec-sde.eu 2014
+		</div>
+		
+	</div>
+	
+		<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-48591469-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</body></html>

@@ -1,0 +1,41 @@
+
+
+<% if @disambiguation != nil && @disambiguation != [] && @disambiguation.size > 0 && @disambigued_term_info == nil%>
+	<div class="disambiguation_box">
+		<div class="prompt"><%= t('see_results_about') %></div>
+		<div class="body">					
+		<% @disambiguation.each do |dis| %>
+			<div class="disambiguation_word">
+				<span class="title"><%= link_to dis[0], params.merge(:search => Util.to_hashtag(dis[0]), :article_id => dis[2]) %></span>:&nbsp;
+				<span class="description"><% if dis[1] != nil && dis[1]!="" %><%= raw dis[1].truncate(150-dis[0].size, :separator => " ", :omission => "...") %><% end %></span>
+			</div>						
+		<% end %>
+		<div class="clear"></div>
+		</div>
+	</div>
+<% elsif @disambiguation != nil && @disambiguation != [] && @disambiguation.size == 1 && @disambigued_term_info != nil && @disambigued_term_info != {} %>
+	<div class="disambiguation_box">
+		<div class="prompt"><%= @disambiguation[0][0] %></div>
+		<div class="body">
+			<% if @disambigued_term_info[:image]!= nil %>
+			<div class="wikipedia_info_with_image">
+			<% else %>
+			<div class="wikipedia_info">
+			<% end %>
+				<div class="wikipedia_description"><%= @disambiguation[0][1] %></div>
+				<div class="wikipedia_properties">
+				<% @disambigued_term_info[:info].each do |info| %>
+					<p><span class="property_prompt"><%= info[:title] %>:&nbsp;</span><span class="property_body"><%= info[:content] %></span></p>
+				<% end %>
+				</div>
+			</div>
+			<% if @disambigued_term_info[:image]!= nil %>
+				<div class="wikipedia_image">				
+					<img src="<%= @disambigued_term_info[:image] %>"></img>				
+				</div>
+			<% end %>
+		</div>
+		<div class="clear"></div>
+
+	</div>
+<% end %>

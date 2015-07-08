@@ -1,0 +1,3 @@
+scraper_lres = ScraperLres.new
+scraper_lres.scrape_oercommons
+scraper_lres.scrape_didactalia

@@ -1,0 +1,3 @@
+<% @devices.each do |device| %>
+	<%= render :partial => "elements/element", :locals => {:element => device, :current_layout => current_layout} %>
+<% end %>

@@ -1,0 +1,18 @@
+
+<% if current_user != nil && @experiences.first_page? %>
+	<% if current_layout == "popup" %>
+	<a class="extract_box popup_new_experience_box new_extract_box" onclick="">+</a>
+	<% elsif current_user != nil %>
+	<%= link_to "+", new_experience_path, html_options = {:class => "new_extract_box_fixed"} %>
+	<% end %>
+<% end %>
+
+<% @experiences.each do |experience| %>
+	<%= render :partial => "elements/element_fixed", :locals => {:element => experience, :current_layout => current_layout} %>
+<% end %>
+
+<div class="clear"></div>
+
+<div class= "paginate_controls active">
+	<%= paginate @experiences %>
+</div>

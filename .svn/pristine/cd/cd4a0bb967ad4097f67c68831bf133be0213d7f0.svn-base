@@ -1,0 +1,120 @@
+# encoding: utf-8
+class Scraper  
+  def make_readable(url)
+    source = open(url).read
+    puts Readability::Document.new(source).content
+  end
+
+
+
+  def geolocate_address_cloudmade(address)
+    arr_coordinates=[]
+    puts "Proceeding to Geolocate"
+    begin
+        cm = CloudMade::Client.from_parameters('a19d1d45661e468697514deaf502669f')
+                        
+        coordinates = cm.geocoding.find(URI::encode(address.gsub(/[^a-z,A-Z,0-9,\s]+/,"")))
+        if coordinates.results != nil
+          latitude=coordinates.results[0].centroid.lat
+          longitude=coordinates.results[0].centroid.lon
+          arr_coordinates<< latitude
+          arr_coordinates<< longitude          
+        end 
+        
+        puts "GEOLOCATED ******************************************"
+    rescue Exception => e
+      puts "RESCUEEE geolacated adresss !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+      puts e.backtrace.inspect
+      puts e.message
+    end
+    return arr_coordinates
+  end
+  
+
+    
+  def geolocate_address_with_google(address)
+    arr_coordinates=[]
+    begin
+        #cm = CloudMade::Client.from_parameters('a19d1d45661e468697514deaf502669f')                        
+        #coordinates = cm.geocoding.find(URI::encode(address.gsub(/[^a-z,A-Z,0-9,\s]+/,"")))
+        
+       coordinates = Geocoder.coordinates(address)
+        
+       # if coordinates.results != nil
+          #latitude=coordinates.results[0].centroid.lat
+          #longitude=coordinates.results[0].centroid.lon
+          #arr_coordinates<< latitude
+          #arr_coordinates<< longitude          
+        #end
+        
+        puts "GEOLOCATED ******************************************"
+    rescue Exception => e
+      puts "RESCUEEE geolacated adresss !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+      puts e.backtrace.inspect
+      puts e.message         
+    end
+    #return arr_coordinates
+    return coordinates
+  end
+        
+  
+  
+  def geolocate_address(address,options={})       
+      arr_coordinates=[]
+      list_services=[:google,:cloudmade,:esri,:bing,:mapquest,:yandex,:nominatim]
+      #Si no envia el servicio de geocoder que quiere le ponemos google por defecto   
+      if options[:geocoder_service] 
+          geocoder_service=options[:geocoder_service]
+      else
+          geocoder_service=:google;
+      end    
+      puts "Proceeding to Geolocate with "+ geocoder_service.to_s             
+                    
+      if address !=nil && address != ""
+          clean_address=address.gsub(/[^a-z,A-Z,0-9,á-ú,Á,É,Í,Ó,Ú,ñ,ç,\s]+/,"")
+          puts clean_address
+          #Si es cloudmade y tinene algun caracter raro pasamos al siguiente servicio porque cloudmade lo va a hacer mal        
+          if geocoder_service==:cloudmade
+              expr_regular=/[á-úÁÉÍÓÚñç]/
+              m = expr_regular.match(clean_address) 
+              if m
+                geocoder_service=list_services[list_services.index(geocoder_service)+1]
+                puts "Extrange chareacter for cloudmade proceeding to Geolocate with "+ geocoder_service.to_s
+              end  
+          end
+                  
+          begin             
+              if list_services.include?(geocoder_service)                
+                 coordinates=Geocoder.coordinates(clean_address, :lookup => geocoder_service)                   
+              else
+                puts "NO EXISTE EL SERVICIO DE GEOLOCALIZAZION "+ geocoder_service.to_s
+                arr_coordinates=[]   
+              end            
+              if coordinates!=nil 
+                arr_coordinates=coordinates
+              end
+              puts "GEOLOCATED !!!!"
+              puts arr_coordinates
+              arr_coordinates << geocoder_service.to_s
+              return arr_coordinates  
+                 
+          rescue Exception => e  
+              #puts e.backtrace.inspect
+              puts e.message
+              puts "Failed location service trying with other"
+              # Si no llego al utlimo probamos con el siguiente servicio para que geolocalice ya que el actual no funciono
+              if list_services.index(geocoder_service) < (list_services.size-1)               
+                 geolocate_address(address,:geocoder_service => list_services[list_services.index(geocoder_service)+1])
+              else
+                return arr_coordinates
+              end
+                                 
+          end
+      else #del if de address
+         return arr_coordinates
+      end
+      
+    end     
+  
+ end
+

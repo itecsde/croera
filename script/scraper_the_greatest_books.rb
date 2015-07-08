@@ -1,0 +1,2 @@
+scraper_books = ScraperBooks.new
+scraper_books.scrape_thegreatestbooks

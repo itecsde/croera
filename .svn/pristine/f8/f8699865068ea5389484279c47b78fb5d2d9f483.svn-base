@@ -1,0 +1,1 @@
+<%= render :partial => "bookmarks/popup_show", :layout => "layouts/popup", :locals => {:popup_id => "popup_show", :popup_class => "details", :callback => "", :details_header_title => "show"} %>

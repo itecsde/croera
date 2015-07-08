@@ -1,0 +1,7 @@
+<%= render :partial => "header", :locals => {:section_title => (t ("Pictures")), :actions => "resources/list_actions"} %>
+
+<div id="content_index">	
+	<%= render :partial => "list", :locals => { :current_layout => "application" }%>
+</div> <!-- CONTENT -->
+
+<script src="/javascript/resource_index.js"></script>

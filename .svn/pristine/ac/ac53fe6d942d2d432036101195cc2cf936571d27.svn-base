@@ -1,0 +1,3 @@
+<% @people.each do |person| %>
+	<%= render :partial => "elements/element", :locals => {:element => person, :current_layout => current_layout} %>
+<% end %>

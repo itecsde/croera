@@ -1,0 +1,4 @@
+<input type="hidden" id="edition_mode" value="off"/>
+<%= form_for(@guide, :html => { :class => "guide_form" }) do |f_guide| %>
+	<%= render :partial => "form" , :locals => {:guide_form => f_guide} %>
+<% end %>

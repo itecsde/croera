@@ -1,0 +1,177 @@
+class RelatedElement      
+    
+    def initialize (element)
+      @element=element        
+       
+    end
+    
+    def get_related_elements(element_type, page = 1)
+      if I18n.locale.to_s == "gl"
+        search_languages=["gl","es"]
+      else 
+        search_languages=[I18n.locale.to_s]
+      end
+
+      search_terms = TaggableTagAnnotation.where(:taggable_id => @element.id, :type_tag => ["automatic","automatic_from_human"],:taggable_type => @element.class).order("weight DESC").first(30).map { |t| '"' + Util.to_hashtag(t.tag.name) + '"' if t.tag.name != nil}.join(" ")                   
+      puts search_terms      
+    
+      if search_terms == ""
+        @result = Search.get_empty_sunspot_search(element_type)[:results]        
+      else                                    
+        @search = element_type.constantize.search do |query|                                    
+            query.fulltext search_terms, :fields => [:w100_wikitopics, :w95_wikitopics, :w90_wikitopics, :w85_wikitopics, :w80_wikitopics, :w75_wikitopics, :w70_wikitopics, :w65_wikitopics, :w60_wikitopics, :w55_wikitopics, :w50_wikitopics] do
+              boost_fields :w100_wikitopics => 10.0
+              boost_fields :w95_wikitopics => 9.5
+              boost_fields :w90_wikitopics => 9
+              boost_fields :w85_wikitopics => 8.5
+              boost_fields :w80_wikitopics => 8.0
+              boost_fields :w75_wikitopics => 7.5
+              boost_fields :w70_wikitopics => 7.0
+              boost_fields :w65_wikitopics => 6.5
+              boost_fields :w60_wikitopics => 6.0
+              boost_fields :w55_wikitopics => 5.5
+              boost_fields :w50_wikitopics => 5.0
+              minimum_match 1
+            end              
+            if @element.class == element_type.constantize
+                query.without(:id, @element.id)
+            end
+            query.with(:translations, search_languages) 
+            query.paginate :page => page, :per_page => 4
+        end
+        @result = @search.results   
+      end
+      
+=begin                        
+           search_text = ""
+           if @element.name != nil
+             search_text += @element.name + " "                        
+           end 
+           if @element.description != nil
+             search_text += @element.description + " "  
+           end                                           
+           @search = element_type.constantize.search do |query|
+              query.fulltext search_text       
+              if @element.class == element_type.constantize
+                  query.without(:id, @element.id)
+              end
+              query.with(:translations, search_languages) 
+              query.paginate :per_page => 4              
+           end  
+=end
+=begin                                  
+         @search = Sunspot.more_like_this(@element, element_type.constantize) do |query|                                                                  
+           if @element.class == element_type.constantize
+               query.without(:id, @element.id)
+           end
+           query.with(:translations, search_languages) 
+           query.paginate :per_page => 4   
+         end          
+       end
+=end                  
+      return @result
+   end
+    
+    
+    
+    
+   def get_best_related_elements
+      if I18n.locale.to_s == "gl"
+         search_languages=["gl","es"]
+      else
+         search_languages=[I18n.locale.to_s]
+      end
+
+      search_terms = TaggableTagAnnotation.where(:taggable_id => @element.id, :type_tag => ["automatic","automatic_from_human"],:taggable_type => @element.class).order("weight DESC").first(30).map { |t| '"' + Util.to_hashtag(t.tag.name) + '"' if t.tag.name != nil}.join(" ")
+      puts search_terms
+
+      if search_terms == ""
+         @result = Search.get_empty_sunspot_search('Person')[:results]
+      else
+         resources_array=[Application,Event,Biography,Lecture,Site,Documentary,Course,Article,Post,Slideshow,Report,Lre,Klascement,Widget,Artwork,Book]
+         resources_array.delete(@element.class)         
+         @search = Sunspot.search resources_array do |query|
+            query.fulltext search_terms, :fields => [:w100_wikitopics, :w95_wikitopics, :w90_wikitopics, :w85_wikitopics, :w80_wikitopics, :w75_wikitopics, :w70_wikitopics, :w65_wikitopics, :w60_wikitopics, :w55_wikitopics, :w50_wikitopics] do
+              boost_fields :w100_wikitopics => 10.0
+              boost_fields :w95_wikitopics => 9.5
+              boost_fields :w90_wikitopics => 9
+              boost_fields :w85_wikitopics => 8.5
+              boost_fields :w80_wikitopics => 8.0
+              boost_fields :w75_wikitopics => 7.5
+              boost_fields :w70_wikitopics => 7.0
+              boost_fields :w65_wikitopics => 6.5
+              boost_fields :w60_wikitopics => 6.0
+              boost_fields :w55_wikitopics => 5.5
+              boost_fields :w50_wikitopics => 5.0
+              minimum_match 1
+            end
+            
+            query.without(:id, @element.id)
+            query.with(:translations, search_languages)
+            query.paginate :per_page => 8
+        end
+         @result = @search.results
+      end
+      return @result
+   end
+    
+    
+    
+    
+    
+   def get_all_related_elements(element_type,page)              
+      if I18n.locale.to_s == "gl"
+        search_languages=["gl","es"]
+      else 
+        search_languages=[I18n.locale.to_s]
+      end
+
+      search_terms = TaggableTagAnnotation.where(:taggable_id => @element.id, :type_tag => ["automatic","automatic_from_human"],:taggable_type => @element.class).order("weight DESC").first(30).map { |t| '"' + Util.to_hashtag(t.tag.name) + '"' if t.tag.name != nil}.join(" ")                   
+      puts search_terms      
+    
+      if search_terms == ""
+        @result = Search.get_empty_sunspot_search(element_type)[:results]        
+      else                                    
+        @search = element_type.constantize.search do |query|                                    
+            query.fulltext search_terms, :fields => [:w100_wikitopics, :w95_wikitopics, :w90_wikitopics, :w85_wikitopics, :w80_wikitopics, :w75_wikitopics, :w70_wikitopics, :w65_wikitopics, :w60_wikitopics, :w55_wikitopics, :w50_wikitopics] do
+              boost_fields :w100_wikitopics => 10.0
+              boost_fields :w95_wikitopics => 9.5
+              boost_fields :w90_wikitopics => 9
+              boost_fields :w85_wikitopics => 8.5
+              boost_fields :w80_wikitopics => 8.0
+              boost_fields :w75_wikitopics => 7.5
+              boost_fields :w70_wikitopics => 7.0
+              boost_fields :w65_wikitopics => 6.5
+              boost_fields :w60_wikitopics => 6.0
+              boost_fields :w55_wikitopics => 5.5
+              boost_fields :w50_wikitopics => 5.0
+              minimum_match 1
+            end              
+            if @element.class == element_type.constantize
+                query.without(:id, @element.id)
+            end
+            query.with(:translations, search_languages) 
+            query.paginate :page => page, :per_page => 32
+        end
+        @result = @search.results   
+      end
+      return @result 
+       
+     
+=begin                 
+      @search = element_type.constantize.search do |query|                       
+          search_terms = @element.categories.map { |t| '"' + t.name + '"' if t.name != nil }.join(", ")+","+@element.tags.map { |t| '"' + t.name + '"' if t.name != nil}.join(", ")
+          query.keywords search_terms, :fields => [:categories, :tags, :name] {minimum_match 1}
+          if @element.class == element_type.constantize
+              query.without(:id, @element.id)
+          end
+          #query.with(:translations, [I18n.locale.to_s])  
+          query.paginate :page => page, :per_page => 32
+       end
+       @result=@search.results       
+       return @result
+=end
+    end
+
+      
+end

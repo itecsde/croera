@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title><%= @page_title or 'SDE' %></title>
+		<%= javascript_include_tag "application"%>
+
+		<%= csrf_meta_tags %>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="The Scenario Development Environment (SDE) provides the capability of looking for resources beyond content, such as applications, events that may have an educational value, and experts that may contribute to Learning Activities. Those resources come from the automatic crawling of web sites. Besides, you can use the SDE to configure a Learning Story with the most appropriate resources, relying on recommendations that the SDE provides taking your profile into account.">
+		<meta name="author" content="University of Vigo. GIST">
+		<link rel="icon" href="/images/icons/favicon.ico" />
+		<%= stylesheet_link_tag "application" %>
+		
+		
+		
+			<link rel="stylesheet" href="/css/jquery-ui-1.10.3.custom.min.css" />
+		<link rel="stylesheet" href="/css/bootstrap.css" />
+		<link rel="stylesheet" href="/css/bootstrap-responsive.css" />
+		<link rel="stylesheet" href="/css/flags.css" />
+		<link rel="stylesheet" href="/css/grid.css" />
+		<link rel="stylesheet" href="/css/colorbox.css" />
+		<link rel="stylesheet" href="/css/style1.css" />
+		<link rel="stylesheet" href="/css/skin3.css" />
+		<link rel="stylesheet" href="/css/skin3_responsive.css" />
+		<link rel="stylesheet" href="/css/home.css" />
+		<link rel="stylesheet" href="/css/header.css" />
+		<link rel="stylesheet" href="/css/bookmarks_and_created_by_me.css" />
+		<link rel="stylesheet" href="/css/resources.css" />
+	
+		<link rel="stylesheet" href="/css/chosen.min.css" />
+	
+		<script src="/javascript/jquery.colorbox-min.js"></script>
+		<script src="/javascript/jquery.autosize.js"></script>
+		<script src="/javascript/jquery.masonry.min.js"></script>
+		<script src="/javascript/jquery.ui.widget.js"></script>
+		<script src="/javascript/jquery.ui.core.min.js"></script>
+		<script src="/javascript/jquery.ui.mouse.min.js"></script>
+		<script src="/javascript/jquery.ui.position.js"></script>
+		<script src="/javascript/jquery.ui.menu.js"></script>
+		<script src="/javascript/jquery.ui.datepicker.js"></script>
+		<script src="/javascript/jquery.ui.autocomplete.js"></script>
+		<script src="/javascript/jquery.ui.effect.min.js"></script>
+		<script src="/javascript/jquery.ui.effect-slide.min.js"></script>
+		<script src="/javascript/jquery.ui.slider.min.js"></script>
+		<script src="/javascript/chosen.jquery.min.js"></script>
+		<script src="/javascript/bootstrap_carousel.js"></script>
+	
+		<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+		<script src="/javascript/map_control.js"></script>
+		
+		
+	</head>
+	<body>
+		<div id="header_overlay" onclick="close_comments()"></div>
+		
+		<%= yield :head %>
+					
+		<div class="clear"></div>
+		<div class="content_container">					
+			<%= yield :advanced_search %>
+			<%= yield(:content) or yield  %>
+		</div>
+
+		<div id="extract_box_overlay" onclick="close_comments();"></div>
+		<div id="popup_overlay" onclick="close_comments();"></div>
+		<div class="clear"></div>
+	
+		<%= render :partial => "footer/footer" %>
+				
+		<input type="hidden" id="locale" value="<%= I18n.locale %>" />
+		
+		
+		
+		<script type="text/javascript">
+			  var _gaq = _gaq || [];
+			  _gaq.push(['_setAccount', 'UA-48591469-1']);
+			  _gaq.push(['_trackPageview']);
+			
+			  (function() {
+			    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			  })();			
+		</script>		
+	</body>
+</html>

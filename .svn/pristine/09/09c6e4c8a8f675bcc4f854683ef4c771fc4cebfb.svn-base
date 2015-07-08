@@ -1,0 +1,335 @@
+# Sample localization file for English. Add more files in this directory for other locales.
+# See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+it:
+  activities: "Actividades"
+  resources: "Recursos"
+  users: "Usuarios"
+  shareboards: "Taboleiros"
+  classrooms: "Aulas"
+  keywords: "Palabras clave"
+  groups: "Grupos"
+  sequences: "Secuencias"
+  guide: "Guía"
+  guides: "Guías"
+  experiences: "Experiencias"
+  learning_stories: "Learning Stories"
+  learning_story: "Learning Story"
+  activity: "Actividade"
+  sequence: "Secuencia"
+  teacherMotivation: "O mestre debe..."
+  learnerMotivation: "Os teus alumnos poden aprender..."
+  technicalMotivation: "Ideas para utilizar tecnoloxía..."
+  guidelines: "Instruccións"
+  preparation: "Preparación"
+  introduction: "Introdución"
+  development: "Desenvolvemento"
+  assessment: "Avaliación"
+  interaction: "Interacción"
+  time_to_complete: "Tempo de realización"
+  select_by_tag: "Filtra por palabra clave..."
+  select_by_interaction: "Filtra por interacción..."
+  home: "Benvido a itec-sde"
+  Add: "Engadir"
+  Add_guide: "Engadir guia"
+  Add_sequence: "Engadir secuencia"
+  Add_technological_setting: "Engadir configuración tecnolóxica"
+  Add_contextual_setting: "Engadir configuración contextual"
+  User: "Usuario"
+  technological_settings: "Tecnoloxías da Aula"
+  technological_setting: "Tecnoloxías da Aula"
+  devices: "Dispositivos"
+  applications: "Aplicacións"
+  lectures: "Lectures"
+  sites: "Sitios de interese"
+  new_sequence: "Nova Secuencia"
+  contextual_settings: "Información sobre a clase"
+  contextual_setting: "Información sobre a clase"
+  Name: "Nome"
+  Description: "Descrición"
+  title: "Título"
+  Add_New_Activity: "Engade actividade"
+  Editing_activity_sequence: "Edición de secuencia"
+  Editing_guide: "Edición de guía"
+  Add_activity: "Engadir actividade"
+  Editing_contextual_setting: "Edición de Configuración Contextual"
+  Editing_technological_setting: "Edición de Configuración Tecnolóxica"
+  new_guide: "Nova Guía"
+  save: "Gardar"
+  no_selected: "Non seleccionada"
+  text_no_selected_technological_setting: "Non tes seleccionada ningunha Configuración Tecnolóxica"
+  text_no_selected_contextual_setting: "Non tes seleccionada ningunha Configuración Contextual"
+  text_no_selected_sequence: "Non tes seleccionada ningunha Secuencia"
+  select: "Seleccionar"
+  activity_sequence: "Secuencia de actividades"
+  activity_sequences: "Secuencias de actividades"
+  edit: "Editar"
+  Audience: "Audiencia"
+  Date_range: "Rango de datas"
+  Subjects: "Materias"
+  Localisation: "Localización"
+  Details: "Detalles"
+  new_activity: "Nova Actividade"
+  Editing_activity: "Edición de Actividade"
+  Are_you_sure: "Estás seguro?"
+  Write_here: "Escribe aquí..."
+  Log_in: "Inicia sesión"
+  Sign_up: "Únete a itec-sde"
+  Unassigned: "Non asignado"
+  You_need: "Precisas..."
+  Your_selection: "A túa selección..."
+  It_is: "É"
+  Requirement_optionality: "opcionalidade do requisito"
+  specific_tool: "ferramenta específica"
+  Not_specified: "Non especificado"
+  required: "requirido"
+  recommended: "recomendado"
+  nice_to_have: "desexable"
+  The_optionality_level_is: "O nivel de opcionalidade é"
+  Select_one: "Selecciona un..."
+  The_functionality_required_is: "A funcionalidade requirida é"
+  The_person_selected_is: "A persoa seleccionada é"
+  The_person_category_required_is: "A categoría da persoa requirida é"
+  The_person_role_required_is: "O role da persoa requirida é"
+  The_event_type_required_is: "O tipo de evento requirido é"
+  The_event_place_required_is: "O lugar do evento requirido é"
+  a: "un/unha"
+  as: "como"
+  in: "en"
+  Tool: "Ferramenta"
+  tool: "ferramenta"
+  tool_abstract_requirement_name: "... unha ferramenta con certa funcionalidade"
+  tool_abstract_requirement_description: "Para describir unha ferramenta requirida a través da súa funcionalidade."
+  tool_concrete_requirement_name: "... unha ferramenta específica"
+  tool_concrete_requirement_description: "Para especificar unha ferramenta requirida."
+  person_abstract_requirement_name: "... unha persoa con certas características"
+  person_abstract_requirement_description: "Para describir unha persoa requirida a través do seu tipo e rol."
+  person_concrete_requirement_name: "... unha persoa específica"
+  person_concrete_requirement_description: "Para especificar unha persoa requirida."
+  event_abstract_requirement_name: "... un evento con certas características"
+  event_abstract_requirement_description: "Para describir un evento requirido a través do seu tipo e lugar."
+  event_concrete_requirement_name: "... un evento específico"
+  event_concrete_requirement_description: "Para especificar un evento requirido."
+  The_tool_selected_is: "A ferramenta seleccionada é"
+  functionality: "funcionalidade"
+  Subject: "Materia"
+  Intended_audience: "Audiencia"
+  Age_range: "Rango de idades"
+  Education_level: "Nivel educativo"
+  Address: "Enderezo"
+  Street: "Rúa"
+  Postal_code: "Código postal"
+  Locality: "Localidade"
+  Remove: "Eliminar"
+  Requirements: "Requisitos"
+  Collapse: "Colapsar"
+  Select: "Seleccionar"
+  Country: "País"
+  Date_range: "Rango de datas"
+  Start_date: "Data de inicio"
+  End_date: "Data de fin"
+  People: "Persoas"
+  View_details: "Ver detalles"
+  Remove: "Eliminar"
+  Requirements: "Requisitos"
+  Collapse: "Colapsar"
+  Select: "Seleccionar"
+  no_recommends: "Non hai recomendacións para este requisito"
+  Its_recommended: "É recomendado..."
+  You_can_use: "Podes usar..."
+  first_name: "Nome"
+  last_name: "Apelidos"
+  Password: "Contrasinal"
+  Email: "Correo electrónico"
+  Remember_me: "Recordarme"
+  Sign_in: "Entrar"
+  Sign_up: "Rexistrarse"
+  Forgot_your_password: "Esqueceches o contrasinal?"
+  Did_not_receive_confirmation_instructions: "Non recibiu instrucións de confirmación?"
+  Did_not_receive_unlock_instructions: "Non recibiu instrucións de desbloqueo?"
+  Password_confirmation: "Confirmación de contrasinal"
+  Pick_it: "Cólleo"
+  My_activities: "As miñas actividades"
+  activity_sequences: "Secuencias"
+  My_activity_sequences: "As miñas secuencias"
+  Requirement_Types: "Tipos de requisitos"
+  Is_needed_to: "Precísase para..."
+  profile: "Perfil"
+  Editing_profile: "Edición de perfil"
+  Select: "Selecciona..."
+  Device: "Dispositivo"
+  Application: "Aplicación"
+  Aporta_o_teu_GRAN: "Aporta o teu GRAN!"
+  intro_AREA: "ITEC-SDE: Actividades e Recursos Educativos Abertos para a innovación pedagóxica e tecnolóxica."
+  Go_to_home: "Ir a Inicio"
+  Back_to_list: "Regresar ó listado"
+  Last_trails_in_AREA: "Último rastro en itec-sde..."
+  Nothing_found: "Uups, non houbo resultados!"
+  We_appreciate_your_feedback: "Agradecemos os seus comentarios!"
+  Positive_comment: "Comentario positivo"
+  Your_comment: "O teu comentario..."
+  contents: "Contidos"
+  people: "Persoas"
+  events: "Eventos"
+  Boards: "Taboleiros"
+  boards: "Taboleiros"
+  board: "Taboleiro"
+  My_boards: "Os meus taboleiros"
+  new_board: "Novo taboleiro"
+  Edit: "Editar"
+  Editing_board: "Edición de taboleiro"
+  Delete: "Borrar"
+  Save: "Gardar"
+  Resources: "Recursos"
+  Applications : "Aplicacións"
+  Enter_search_term: "Introduce o termo de busca..."
+  Forgot_your_password: "¿Esqueceches o contrasinal?"
+  Send_me_resglet_password_instructions: "Mandame instrucións para restablecer contrasinal"
+  Hello: "Ola"
+  Someone_has_requested_a_link_to_change_your_password: "Alguén pediu unha ligazón para cambiar o seu contrasinal. Pode facelo a través do seguinte ligazón."
+  Change_my_password: "Cambiar o meu contrasinal"
+  If_you_didn_request_this_please_ignore_this_email: "Se vostede non pediu isto, por favor, ignore este email."
+  Your_password_wont_change: "O seu contrasinal non cambiará ata que acceda a ligazón anterior e cree un novo."
+  Change_your_password: "Cambie o seu contrasinal"
+  New_password: "Novo contrasinal"
+  Confirm_new_password: "Confirme novo contrasinal"
+  Change_my_password: "Cambia o meu contrasinal"
+  Are_you_sure: "¿Estás seguro?"
+  Last_activities: "Últimas actividades..."
+  Last_sequences: "Últimas secuencias..."
+  Last_guides: "Últimas guías..."
+  Contents: "Contidos"
+  new_content: "Novo contido"
+  external_content: "Contido"
+  editing_content: "Edición de contido"
+  Devices: "Dispositivos"
+  device: "Dispositivo"
+  Editing_device: "Edición de dispositivo"
+  new_device: "Novo dispositivo"
+  application: "Aplicación"
+  Editing_application: "Edición de aplicación"
+  Person: "Persoa"
+  Editing_person: "Edición de persoa"
+  new_person: "Nova persoa"
+  Events: "Eventos"
+  Event: "Evento"
+  Editing_event: "Edición de evento"
+  New_event: "Novo evento"
+  new_application: "Nova aplicación"
+  experience: "Experiencia"
+  Editing_experience: "Edición de experiencia"
+  New_experience: "Nova experiencia"
+  Search: "Procurar"
+  All_types: "Todos"
+  specific_person: "unha persoa específica"
+  specific_content: "un contido específico"
+  content_concrete_requirement_name: "... un contido específico"
+  content_concrete_requirement_description: "Para especificar un contido requirido"
+  The_content_selected_is: "O contido seleccionado é "
+  The_event_selected_is: "O evento seleccionado é "
+  Contents: "Contidos"
+  content: "Contido"
+  Tools: "Ferramentas"
+  Select_picture: "Selecciona imaxe"
+  No_comments: "Non hai comentarios"
+  Comment_it: "Comenta"
+  My_guides: "As miñas guías"
+  My_experiences: "As miñas experiencias"
+  My_applications: "As miñas aplicacións"
+  My_contents: "Os meus contidos"
+  My_devices: "Os meus dispositivos"
+  My_events: "Os meus eventos"
+  My_people: "As miñas persoas"
+  My_resources: "Os meus recursos"
+  My_sequences: "As miñas secuencias"
+  My_tools: "As miñas ferramentas"
+  Copy: "Copiar"
+  
+  errors: &errors
+    format: ! '%{attribute} %{message}'
+    messages:
+      accepted: debe ser aceptado
+      blank: non pode estar en blanco
+      confirmation: non coincide coa confirmación
+      empty: non pode estar valeiro
+      equal_to: debe ser igual a %{count}
+      even: debe ser impar
+      exclusion: xa existe
+      greater_than: debe ser maior que %{count}
+      greater_than_or_equal_to: debe ser maior ou igual que %{count}
+      inclusion: non está incluido na lista
+      invalid: non é válido
+      less_than: debe ser menor que %{count}
+      less_than_or_equal_to: debe ser menor ou igual que %{count}
+      not_a_number: non é un número
+      odd: debe ser par
+      taken: non está dispoñible
+      too_long: é demasiado longo (non máis de %{count} carácteres)
+      too_short: é demasiado curto (non menos de %{count} carácteres)
+      wrong_length: non ten a lonxitude correcta (debe ser de %{count} carácteres)
+    template:
+      body: ! 'Atopáronse os seguintes problemas:'
+      header:
+        one: 1 erro evitou que se poidese gardar o %{model}
+        other: ! '%{count} erros evitaron que se poidese gardar o %{model}'
+  number:
+    currency:
+      format:
+        delimiter: .
+        format: ! '%n %u'
+        precision: 2
+        separator: ! ','
+        significant: false
+        strip_insignificant_zeros: false
+        unit: €
+    format:
+      delimiter: .
+      precision: 2
+      separator: ! ','
+      significant: false
+      strip_insignificant_zeros: false
+    human:
+      decimal_units:
+        format: ! '%n %u'
+        units:
+          unit: ''
+      format:
+        delimiter: ''
+        precision: 1
+        significant: true
+        strip_insignificant_zeros: true
+      storage_units:
+        format: ! '%n %u'
+        units:
+          byte:
+            one: Byte
+            other: Bytes
+          gb: GB
+          kb: KB
+          mb: MB
+          tb: TB
+    percentage:
+      format:
+        delimiter: ''
+    precision:
+      format:
+        delimiter: ''
+  support:
+    array:
+      last_word_connector: ! ' e '
+      two_words_connector: ! ' e '
+      words_connector: ! ', '
+  time:
+    am: ''
+    formats:
+      default: ! '%A, %e de %B de %Y ás %H:%M'
+      long: ! '%A %e de %B de %Y ás %H:%M'
+      short: ! '%e/%m, %H:%M'
+    pm: ''
+  # remove these aliases after 'activemodel' and 'activerecord' namespaces are removed from Rails repository
+  activemodel:
+    errors:
+      <<: *errors
+  activerecord:
+    errors:
+      <<: *errors

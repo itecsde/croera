@@ -1,0 +1,22 @@
+
+<div class="search_elements_type_box list_<%= params[:date_range] %>">
+	<div class="prompt">
+		<img src="/images/black_event_100.png" width="50px" height="30px"/>&nbsp;&nbsp;<%= t(date_range) %>
+	</div>
+	<div class="body">	
+		<% if @num_results == 0 %>
+			<div class="no_results"><%= t('no_results')%></div>			
+		<% end %>
+		
+		<% @reports.each do |report| %>
+			<%= render :partial => "elements/element_fixed", :locals => {:element => report, :current_layout => current_layout} %>
+		<% end %>
+		
+		<div class="clear"></div>
+		
+		<div class= "paginate_controls active">
+			<%= paginate @reports %>
+		</div>
+	</div>
+</div>
+

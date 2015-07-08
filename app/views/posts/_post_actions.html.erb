@@ -1,0 +1,29 @@
+<li>
+<% if @previous_action == "list" %>
+	<%=link_to  "javascript: history.back();", :class => "back_icon has_tooltip" do %>
+		 <img src="/images/white_arrow_left.png" title="<%= t('back_to_home') %>"></img>
+	<% end %>
+<% else %>
+	<%=link_to  posts_path, :class => "back_icon has_tooltip" do %>
+		 <img src="/images/white_arrow_left.png" title="<%= t('back_to_home') %>"></img>
+	<% end %>
+<% end %>
+</li>
+<% if current_user != nil && ((@post.owner == current_user) or (@post.owner_type=="Group" && @post.owner.users.exists?(current_user)))%>
+	<li>
+	<%=link_to edit_post_path(@post), :class => "has_tooltip" do %>
+		 <img src="/images/white_edit.png" title="<%= t('edit') %>"></img>
+	</li>
+	<% end %>
+	<li>
+	<%=link_to  @post, confirm: t('are_you_sure'), method: :delete, :class => "has_tooltip" do %>
+		<img src="/images/white_delete.png" title="<%= t('delete') %>"></img>
+	<% end %>	
+	</li>
+<% end %>
+
+<li>
+	<%= form_tag search_results_path, :method => 'get' do %>  
+    	<%= text_field_tag :search, params[:search], :class => "subnavbar_search" %>&nbsp;&nbsp;<%= submit_tag t('search'),:class => "search_button_subnavbar" %>  
+	<% end %>
+</li>

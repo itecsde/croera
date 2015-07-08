@@ -1,0 +1,133 @@
+class Site < ActiveRecord::Base
+  include Taggable
+  include Ownable
+  include Wikipediable
+  include Globalizable
+  include Aggregable  
+  include Categorizable
+  include Scrapeable
+    
+  translates :name
+  translates :description
+  translates :link
+  
+  searchable do
+    integer :id
+    text :name
+    latlon(:location) { Sunspot::Util::Coordinates.new(latitude, longitude) }
+    text :tags do |p|
+      p.tags.map(&:name)
+    end
+    text :categories do |p|
+      p.categories.map(&:name)
+    end
+    string :translations, :multiple => true do
+      translations.map{|translation| translation.locale}
+    end  
+    I18n.available_locales.each do |locale|
+      text "description_" + locale.to_s do
+        read_attribute(:description, :locale => locale.to_s)
+      end
+    end    
+    integer :owner_id
+    time :updated_at
+  end
+  
+  # A site may have many comments
+  has_many :comments, :as => :commentable, :dependent => :destroy
+   
+  # A site is bookmarkable
+  has_many :bookmark_user_element_annotations, :as => :element, :dependent => :destroy
+  has_many :bookmarked_by, :through => :bookmark_user_element_annotations, :source =>:user
+
+  # And a site may include a representative picture
+  attr_accessible :element_image, :name, :description, :url, :link, :address, :latitude, :longitude, :owner_type, :owner_id, :scraped_from, :creator_id, :tag_list
+  has_attached_file :element_image, :styles => { :original => "300x300>", :medium => "200x200>", :thumb => "30x30>" }, :default_url => "none"
+  
+  def persist(idiomas_disponibles, prosa, array_tags)
+    recent_hash = Digest::MD5.hexdigest(prosa)
+    check_result = check_resource_storage_state(self.url,recent_hash)
+    if check_result == "insert"
+      puts "SE INSERTA EL SITE"
+    self.info_to_wikify = prosa
+    self.hash_resource = recent_hash
+    self.create_semantic_annotations(array_tags)
+    automatic_tags_ids = self.create_automatic_semantic_annotations(prosa)
+    #self.categorize(automatic_tags_ids)
+    self.save
+    self.reload
+    Sunspot.index self
+    Sunspot.commit    
+    elsif check_result == "update"
+      puts "UPDATE => SE ACTUALIZA EL SITE"
+      scraped_site = Site.where(:url => self.url)[0]
+      idiomas_disponibles.each do |idioma|
+        I18n.locale = idioma
+        scraped_site.name = self.name
+        scraped_site.description = self.description
+        scraped_site.link = self.link
+      end
+    scraped_site.create_semantic_annotations(array_tags)
+    automatic_tags_ids = scraped_site.create_automatic_semantic_annotations(prosa)
+    #scraped_site.categorize(automatic_tags_ids)
+    scraped_site.info_to_wikify = prosa
+    scraped_site.hash_resource = recent_hash
+    scraped_site.save
+    scraped_site.reload
+    Sunspot.index scraped_site
+    Sunspot.commit    
+    elsif check_result == "do_nothing"
+      puts "DO_NOTHING => NI SE INSERTA NI SE ACTUALIZA EL SITE, COMPROBAMOS TRADUCCIONES"
+      if Site.where(:url => self.url).size != 0
+        site = Site.find_by_url(self.url)
+        locales_string = Array.new
+        site.translated_locales.each do |locale|
+          locales_string << locale.to_s
+        end
+        idiomas_disponibles_string = Array.new
+        idiomas_disponibles.each do |idioma_disponible|
+          idiomas_disponibles_string << idioma_disponible.to_s
+        end
+        if (idiomas_sin_traducciones = idiomas_disponibles_string - locales_string) != []
+          puts "ACTUALIZAMOS TRADUCCIONES"
+          idiomas_sin_traducciones.each do |idioma|
+            I18n.locale = idioma
+            puts I18n.locale
+            puts self.description
+            site.name = self.name
+            site.description = self.description
+            site.link = self.link
+            site.save
+          end
+        else
+          puts "LAS TRADUCCIONES ESTAN COMPLETAS. NO HACEMOS NADA"
+        end
+      end
+    end
+  end
+  
+  def check_resource_storage_state(url,recent_hash)
+    result = "do_nothing"
+    site = Site.where(:url => url)
+    if site.size > 0
+      #puts "hash BD: " + site[0].hash_resource
+      #puts "hash actual: " + recent_hash
+      if site[0].hash_resource != recent_hash
+        result = "update"
+      end
+    else
+      result = "insert"
+    end
+    return result
+  end #check_resource_storage_state
+  
+  def tag_list
+    self.tags.map { |t| t.name }.join(", ")
+  end
+
+  def tag_list=(new_value)
+    tag_names = new_value.split(/,\s+/)
+    self.tags = tag_names.map { |name| Tag.where('name = ?', name).first or Tag.create(:name => name.strip) }
+  end
+  
+end

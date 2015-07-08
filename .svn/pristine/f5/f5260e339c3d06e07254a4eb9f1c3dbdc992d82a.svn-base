@@ -1,0 +1,204 @@
+<% if @application.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@application.errors.count, "error") %> prohibited this application from being saved:</h2>
+	
+	  <ul>
+	  <% @application.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="application_name field_body">
+		<% if @edition_mode==true %>
+			<textarea id="application_name" name="application[name]" placeholder="<%= t("title") %>"><%= @application.name %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<span><%= @application.name %></span>
+		<% end %>
+	</div>
+	
+		
+	<div class="application_description description field_body">
+		<% if @edition_mode==true %>
+			<textarea id="application_description" name="application[description]" placeholder="<%= t("description") %>"><%= @application.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<div>
+				<% if @application.description != nil %>			
+					<%= raw @application.description.truncate(1000, :separator => " ", :omission => "...") %>
+				<% end %>				
+			</div>
+		<% end %>
+	</div>
+	
+	
+	<div class="application_tags element_field_box">
+		<div class="field_prompt"><%= t("keywords") %></div>
+		<div class="field_body">			
+			<% if @edition_mode==true %>    
+		    	<textarea id="application_tags" class="tags" name="application[tag_list]"><% if @application!=nil %><%= @application.tag_list %><% end %></textarea>
+		    	<i class="icon-pencil icon-grey"></i>
+		    <% else %>
+		    	<span class="tags"><% if @application!=nil %><%= @application.tag_list_with_links.html_safe %><% end %></span>	
+		    <% end %>														
+		</div>
+	</div>		
+	
+	
+	<div class="application_url element_field_box">
+		<div class="field_prompt"><%= t("url") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>    
+		    	<%= application_form.text_field :url %>
+		    	<i class="icon-pencil icon-grey"></i>			    	
+		    <% else %>
+		    	<a href="<%= @application.url %>" target="_blank"><%= @application.url %></a>
+		    <% end %>
+	   </div>		
+	</div>
+
+
+	<div class="application_operating_systems element_field_box">
+		<div class="field_prompt"><%= t("operating_systems") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>
+				<% @application.application_operating_system_annotations.each do |annotation| %>
+					<div class="operating_system_item">
+						<%= select_tag "operating_system", options_from_collection_for_select(@operating_systems, "id", "name", annotation.operating_system.id), :prompt => "", :class => "operating_system" %>
+						<span class="delete_operating_system"  onClick="delete_operating_system(this);">X</span>					
+					</div>
+				<% end %>
+			<% else %>
+				<div><span>
+					<% @application.application_operating_system_annotations.each do |annotation| %>
+						<%= annotation.operating_system.name %>&nbsp;
+					<% end %>
+				</div></span>
+			<% end %>			
+		</div>
+		<% if @edition_mode==true %>
+			<div class="add_item_to_itemize" onclick="add_operating_system(this);">
+				<span>+</span>
+			</div>
+		<% end %>		
+	</div>
+
+
+
+	<div class="application_functionalities element_field_box">
+		<div class="field_prompt"><%= t("functionalities") %></div>
+		<div class="field_body">			
+			<% @application.application_functionality_annotations.each do |annotation| %>						
+				<div class="selector_with_slider">
+					<div class="selector_field">
+						<% if @edition_mode==true %>
+							<%= select_tag "functionality", options_from_collection_for_select(@functionalities, "id", "name", annotation.functionality.id), :prompt => "", :class => "functionality" %>						
+						<% else %>
+							<span><%= annotation.functionality.name %></span>
+						<% end %>
+					</div>
+					<div class="slider_with_input">
+						<div class="input_field">					
+							<% if @edition_mode==true %>
+								<input type="text" class="level" value="<%= annotation.level%>" />
+							<% else %>
+								<span><%= t("level") %>:&nbsp;<%= annotation.level%></span>								
+							<% end %>
+						</div>
+						<% if @edition_mode==true %>
+							<div class="slider"></div>
+						<% end %>
+					</div>
+					<% if @edition_mode==true %>
+						<div class="delete_selector_with_slider"  onClick="delete_selector_with_slider(this);">x</div>
+					<% end %>		
+					<div class="clear"></div>															
+				</div>				
+			<% end %>						
+		</div>
+		<% if @edition_mode==true %>			
+			<div class="add_item_to_itemize">
+				<span onclick="add_selector_with_slider(this);">+</span>
+			</div>			
+		<% end %>
+	</div>
+
+
+
+	<% if @edition_mode!=true && @application.scraped_from!=nil && @application.scraped_from!="" %>  
+		<div class="application_scraped_from element_field_box">
+			<div class="field_prompt"><%= t("source") %></div>
+			<div class="field_body">
+				<a href="<%= @application.scraped_from %>" target="_blank"><%= @application.scraped_from %></a>
+			</div>
+		</div>
+	<% end %>
+
+</div>
+
+
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>		
+			<% if @application.element_image.url() != "none" %>
+				<%= image_tag @application.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_application.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= application_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		<% else %>
+			<% if @application.element_image.url() != "none" %>
+				<%= image_tag @application.element_image.url(:medium), width:'100%', :class => "image_preview_show" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_application.png", width:'100%', :class => "image_preview_show" %>
+			<% end %>
+		<% end %>
+	</div>
+</div>
+
+
+
+
+
+
+<% if @edition_mode==true %>
+	<div id="snippets_library" style="display: none">				
+		<div class="selector_with_slider">
+			<div class="selector_field">				
+				<%= select_tag "functionality", options_from_collection_for_select(@functionalities, "id", "name"),  :prompt => "", :class => "edition_control functionality" %>
+			</div>
+			<div class="slider_with_input">
+				<div class="input_field">					
+					<input type="text" class="level" style="border: 0; color: #f6931f; font-weight: bold;" />
+				</div>
+				<div class="slider"></div>													
+			</div>			
+			<div class="delete_selector_with_slider"  onClick="delete_selector_with_slider(this);">x</div>		
+			<div class="clear"></div>
+		</div>
+		
+		
+		<div class="operating_system_item">			
+			<%= select_tag "operating_system", options_from_collection_for_select(@operating_systems, "id", "name"), :prompt => "", :class => "operating_system" %>
+			<span class="delete_operating_system"  onClick="delete_operating_system(this);">X</span>			
+		</div>		
+	</div>
+<% end %>
+						
+
+
+
+
+
+

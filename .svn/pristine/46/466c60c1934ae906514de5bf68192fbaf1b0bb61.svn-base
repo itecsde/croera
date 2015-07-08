@@ -1,0 +1,12 @@
+<div class="secondary_navigation">
+	<div class="actions_menu_items">
+		<ul class="action_list">
+			<% if actions != nil %>
+				<%= render actions %>
+			<% end %>		
+		</ul>	
+	</div>
+	<div class="location_menu_item">
+		<%= t(section_title) %>
+	</div>	
+</div>

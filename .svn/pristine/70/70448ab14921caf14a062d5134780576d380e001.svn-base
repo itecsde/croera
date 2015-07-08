@@ -1,0 +1,64 @@
+<% if @group.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@group.errors.count, "error") %> prohibited this group from being saved:</h2>
+	
+	  <ul>
+	  <% @group.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+<div class="group_name editable active">
+	<%= group_form.text_field :name, :class => "element_title", :placeholder => t("title") %>
+	<i class="icon-pencil icon-grey"></i>
+</div>
+<div class="clear"></div>
+
+
+<div class="element_image_box picture_container">	
+	<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>
+	<% if @group.element_image.url() != "none" %>
+		<%= image_tag @group.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+	<% else %>
+		<%= image_tag "/images/group/medium/group.png", width:'100%', :class => "image_preview" %>
+	<% end %>
+	<div class= "file_upload">
+		<%= group_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+	</div>
+</div>
+
+<div class="group_description editable active description form_group_description">
+	<textarea id="group_description" name="group[description]" placeholder="<%= t("description") %>"><%= @group.description %></textarea>
+	<i class="icon-pencil icon-grey"></i>
+</div>
+
+<div class="clear"></div>
+<hr/>
+
+
+
+
+
+		
+<div class="subtitle_form">
+	<%= t("users_group") %>	
+</div>
+<div class="users">
+	<% if @edition_mode==true %>
+		<div class="add_user_box extract_box new_extract_box" onclick="open_area_popup('#group_user_selection','/selectors/paginate_elements/?element_class=group_user_selection');">
+			<span style="font-size:33px; color: #828387;">+</span>
+		</div>
+	<% end %>				
+	<% @group.users.each do |selected_user| %>
+		<%= render :partial => "groups/user_extract_box" , :locals => {:element => selected_user, :edition_mode =>@edition_mode} %> 
+	<% end %>
+
+</div>
+
+
+
+	
+	
+

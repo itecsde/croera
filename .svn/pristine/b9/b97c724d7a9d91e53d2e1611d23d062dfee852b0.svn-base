@@ -1,0 +1,846 @@
+class SelectorsController < ApplicationController
+  def paginate_elements
+    element_class = params[:element_class]
+    if I18n.locale.to_s == "gl"
+      search_languages = ["gl","es"]    
+    else 
+      search_languages = [I18n.locale.to_s]
+    end    
+    
+    case element_class 
+      when 'activities'
+        if params[:user_id]
+          @search = Activity.search do
+            fulltext params[:search]
+            with :status, 'class'
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+        else
+           @search = Activity.search do
+            fulltext params[:search]
+            with :status, 'class'
+              order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+           end
+         end
+        @elements = @search.results
+      when 'tool_requirement_selection'
+        if params[:user_id]
+          @search = Sunspot.search [Device,Application] do
+              fulltext params[:search]
+              with :owner_id, params[:user_id]
+              order_by :updated_at, :desc
+              paginate :page => params[:page], :per_page => 25
+           end
+        else
+           @search = Sunspot.search [Device,Application] do
+                fulltext params[:search]
+              order_by :updated_at, :desc
+              paginate :page => params[:page], :per_page => 25
+           end
+        end
+        @elements = @search.results
+      when 'person_requirement_selection'
+        if params[:user_id]
+          @search = Person.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+        else
+           @search = Person.search do
+            fulltext params[:search]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+         end
+        @elements = @search.results
+      when 'event_requirement_selection'
+        if params[:user_id]
+          @search = Event.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+        else
+           @search = Event.search do
+            fulltext params[:search]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+         end
+        @elements = @search.results
+       when 'content_requirement_selection'
+         if params[:user_id]
+          @search = Content.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+        else
+           @search = Content.search do
+            fulltext params[:search]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+         end
+          @elements = @search.results
+      when 'technological_settings'
+        @technological_settings = TechnologicalSetting.all(:conditions => { :status => 'class' })
+        @elements= Kaminari.paginate_array(@technological_settings).page(params[:page])
+      when 'contextual_settings'
+        @contextual_settings = ContextualSetting.all(:conditions => { :status => 'class' })
+        @elements= Kaminari.paginate_array(@contextual_settings).page(params[:page])
+      when 'sequences'
+        if params[:user_id]
+          @search = ActivitySequence.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            with :status, 'class'
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+        else
+           @search = ActivitySequence.search do
+            fulltext params[:search]
+            with :status, 'class'
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+         end
+          @elements = @search.results
+      when 'tool_assignment_selection'
+        if params[:user_id]
+          @search = Sunspot.search [Device,Application] do
+              fulltext params[:search]
+              with :owner_id, params[:user_id]
+              order_by :updated_at, :desc
+              paginate :page => params[:page], :per_page => 25
+           end
+           @elements = @search.results  
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_applications
+            if @aux.size > 0
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+            else
+              @elements=Search.get_empty_sunspot_search("Application")[:results]           
+            end                  
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Application',params[:search],"","",25,params[:page])
+           else 
+               @search = Search.listing_elements_by_type('Application', search_languages, current_user, 25 ,params[:page])                              
+           end
+           @elements = @search[:results]                    
+        end
+        
+      when 'person_assignment_selection'
+        if params[:user_id]
+          @search = Person.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_people
+            if @aux.size > 0
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+            else
+              @elements=Search.get_empty_sunspot_search("Person")[:results]
+            end         
+        else
+           @search = Person.search do |query|
+              if params[:search]!=nil && params[:search]!=""
+                  query.fulltext params[:search]
+                  if current_user.circumstances != [] && current_user.circumstances.first.latitude!=nil  
+                    query.order_by_geodist(:location, current_user.circumstances.first.latitude, current_user.circumstances.first.longitude)
+                  end
+              else      
+                if current_user.circumstances != []
+                  search_terms = current_user.circumstances.first.tag_list_quoted + ", " + current_user.circumstances.first.subject.name
+                  query.keywords search_terms, :fields => [:tags, :subjects] {minimum_match 1}
+                end
+                if current_user.circumstances.first.latitude!=nil  
+                  query.order_by_geodist(:location, current_user.circumstances.first.latitude, current_user.circumstances.first.longitude)
+                end
+              end
+              query.paginate :page => params[:page],:per_page => 30 
+          end     
+          @elements = @search.results
+         end
+         
+      when 'biography_assignment_selection'
+        if params[:user_id]
+          @search = Biography.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_biographies
+            if @aux.size > 0
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+            else
+              @elements=Search.get_empty_sunspot_search("Biography")[:results]
+            end         
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Biography',params[:search],"","",25,params[:page])
+           else
+              @search = Search.listing_elements_by_type('Biography', search_languages, current_user, 25 ,params[:page])
+           end            
+           @elements = @search[:results]      
+        end
+        
+      when 'event_assignment_selection'
+        if params[:user_id]
+          @search = Event.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results          
+          puts @elements
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_events
+            if @aux.size > 0 
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+            else
+              @elements=Search.get_empty_sunspot_search("Event")[:results]
+            end             
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Event',params[:search],"","",25,params[:page])
+           else
+              @search = Search.listing_elements_by_type('Event', search_languages, current_user, 25 ,params[:page])
+           end
+           @elements = @search[:results]      
+         end
+      
+       when 'lecture_assignment_selection'
+        if params[:user_id]
+          @search = Lecture.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results          
+          puts @elements
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_lectures
+            if @aux.size > 0
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+            else
+              @elements=Search.get_empty_sunspot_search("Lecture")[:results]
+            end             
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Lecture',params[:search],"","",25,params[:page])
+           else
+              @search = Search.listing_elements_by_type('Lecture', search_languages, current_user, 25 ,params[:page])
+           end
+           @elements = @search[:results]      
+        end
+         
+      when 'site_assignment_selection'
+        if params[:user_id]
+          @search = Site.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results          
+          puts @elements
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_sites
+            if @aux.size > 0 
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+            else
+              @elements=Search.get_empty_sunspot_search("Site")[:results]
+            end             
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Site',params[:search],"","",25,params[:page])
+           else
+              @search = Search.listing_elements_by_type('Site', search_languages, current_user, 25 ,params[:page])
+           end
+           @elements = @search[:results]
+=begin           
+          @search = Site.search do |query|
+            if params[:search]!=nil && params[:search]!=""
+              query.fulltext params[:search]
+              if current_user.circumstances != [] && current_user.circumstances.first.latitude!=nil
+                query.order_by_geodist(:location, current_user.circumstances.first.latitude, current_user.circumstances.first.longitude)
+              end                            
+            else
+              if current_user.circumstances != []              
+                #search_terms = current_user.circumstances.first.tag_list_quoted + ", " + current_user.circumstances.first.subject.name             
+                #query.keywords search_terms, :fields => [:tags, :name] {minimum_match 1}
+                if current_user.circumstances.first.latitude!=nil
+                  #query.with(:location).in_radius(current_user.circumstances.first.latitude, current_user.circumstances.first.longitude, 500)       
+                  query.order_by_geodist(:location, current_user.circumstances.first.latitude, current_user.circumstances.first.longitude)
+                end              
+              end
+            end
+            query.paginate :page => params[:page],:per_page => 30 
+          end
+           @elements = @search.results
+=end
+           
+        end
+      
+      
+      when 'documentary_assignment_selection'
+        if params[:user_id]
+          @search = Documentary.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results          
+          puts @elements
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_documentaries
+            if @aux.size > 0
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+            else
+              @elements=Search.get_empty_sunspot_search("Documentary")[:results]
+            end             
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Documentary',params[:search],"","",25,params[:page])
+           else
+              @search = Search.listing_elements_by_type('Documentary', search_languages, current_user, 25 ,params[:page])
+           end
+           @elements = @search[:results]      
+        end 
+         
+         
+      when 'course_assignment_selection'
+        if params[:user_id]
+          @search = Course.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results          
+          puts @elements
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_courses
+            if @aux.size > 0
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+            else
+              @elements=Search.get_empty_sunspot_search("Course")[:results]
+            end             
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Course',params[:search],"","",25,params[:page])
+           else
+              @search = Search.listing_elements_by_type('Course', search_languages, current_user, 25 ,params[:page])
+           end
+           @elements = @search[:results]
+        end
+      
+         
+      when 'article_assignment_selection'
+        if params[:user_id]
+          @search = Article.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results          
+          puts @elements
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_articles
+            if @aux.size > 0
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+            else
+              @elements=Search.get_empty_sunspot_search("Article")[:results]             
+            end             
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Article',params[:search],"","",25,params[:page])
+           else
+              @search = Search.listing_elements_by_type('Article', search_languages, current_user, 25 ,params[:page])
+           end
+           @elements = @search[:results]
+        end
+
+
+      when 'lre_assignment_selection'
+        if params[:user_id]
+          @search = Lre.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results          
+          puts @elements
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_lres
+            if @aux.size > 0
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+            else
+              @elements=Search.get_empty_sunspot_search("Lre")[:results]             
+            end             
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Lre',params[:search],"","",25,params[:page])
+           else
+              @search = Search.listing_elements_by_type('Lre', search_languages, current_user, 25 ,params[:page])
+           end
+           @elements = @search[:results]
+        end                   
+      
+      
+      when 'post_assignment_selection'
+        if params[:user_id]
+          @search = Post.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results          
+          puts @elements
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_posts
+            if @aux.size > 0
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+            else
+              @elements=Search.get_empty_sunspot_search("Post")[:results]             
+            end             
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Post',params[:search],"","",25,params[:page])
+           else
+              @search = Search.listing_elements_by_type('Post', search_languages, current_user, 25 ,params[:page])
+           end
+           @elements = @search[:results]
+        end      
+         
+      when 'slideshow_assignment_selection'
+        if params[:user_id]
+          @search = Slideshow.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results          
+          puts @elements
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_slideshows
+            if @aux.size > 0
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+            else
+              @elements=Search.get_empty_sunspot_search("Slideshow")[:results]             
+            end             
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Slideshow',params[:search],"","",25,params[:page])
+           else
+              @search = Search.listing_elements_by_type('Slideshow', search_languages, current_user, 25 ,params[:page])
+           end
+           @elements = @search[:results]
+        end               
+
+      when 'report_assignment_selection'
+        if params[:user_id]
+          @search = Report.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results          
+          puts @elements
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_reports
+            if @aux.size > 0
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+            else
+              @elements=Search.get_empty_sunspot_search("Report")[:results]             
+            end             
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Report',params[:search],"","",25,params[:page])
+           else
+              @search = Search.listing_elements_by_type('Report', search_languages, current_user, 25 ,params[:page])
+           end
+           @elements = @search[:results]
+        end
+
+      when 'artwork_assignment_selection'
+        if params[:user_id]
+          @search = Artwork.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results          
+          puts @elements
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_artworks
+            if @aux.size > 0
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+            else
+              @elements=Search.get_empty_sunspot_search("Artwork")[:results]             
+            end             
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Artwork',params[:search],"","",25,params[:page])
+           else
+              @search = Search.listing_elements_by_type('Artwork', search_languages, current_user, 25 ,params[:page])
+           end
+           @elements = @search[:results]
+        end
+        
+      when 'widget_assignment_selection'
+        if params[:user_id]
+          @search = Widget.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+          @elements = @search.results          
+          puts @elements
+        elsif params[:display_bookmarks]
+            @aux= current_user.bookmarked_widgets
+            if @aux.size > 0
+              #@elements=Sunspot::Search::PaginatedCollection.new(@aux,1,@aux.size,@aux.size)
+              @elements=Kaminari.paginate_array(@aux).page(params[:page])
+            else
+              @elements=Search.get_empty_sunspot_search("Widget")[:results]             
+            end             
+        else
+           if params[:search] != nil && params[:search] != ""
+              @search = Search.search_elements_by_type('Widget',params[:search],"","",25,params[:page])
+           else
+              if I18n.locale.to_s != "en"
+                  search_languages = [I18n.locale.to_s, "en"]
+              end
+              @search = Search.listing_elements_by_type('Widget', search_languages, current_user, 25 ,params[:page])
+           end
+           @elements = @search[:results]
+        end                                            
+        
+      when 'alternatives'
+         if params[:contribution_type]=="event"
+              tags=Event.find(params[:contribution_id]).tag_list              
+              @search = Event.search do |query|
+                search_terms = tags
+                query.keywords search_terms, :fields => [:tags, :subjects] {minimum_match 1}
+                query.paginate :page => params[:page], :per_page => 25
+                if current_user.circumstances.first.latitude!=nil  
+                    query.order_by_geodist(:location, current_user.circumstances.first.latitude, current_user.circumstances.first.longitude)
+                end
+              end
+         
+         elsif params[:contribution_type]=="biography"
+              tags=Biography.find(params[:contribution_id]).tag_list              
+              @search = Biography.search do |query|
+                search_terms = tags
+                query.keywords search_terms, :fields => [:tags, :subjects] {minimum_match 1}
+                query.paginate :page => params[:page], :per_page => 25                
+              end       
+         
+         elsif params[:contribution_type]=="person"
+              tags=Person.find(params[:contribution_id]).tag_list              
+              @search = Person.search do |query|
+                search_terms = tags
+                query.keywords search_terms, :fields => [:tags, :subjects] {minimum_match 1}
+                query.paginate :page => params[:page], :per_page => 25
+                if current_user.circumstances.first.latitude!=nil  
+                    query.order_by_geodist(:location, current_user.circumstances.first.latitude, current_user.circumstances.first.longitude)
+                end
+              end        
+         elsif params[:contribution_type]=="application"
+              tags=Application.find(params[:contribution_id]).tag_list
+              functionalities=Application.find(params[:contribution_id]).functionalities      
+              @search = Application.search do
+                if current_user.circumstances != []
+                  with :operating_systems, [current_user.circumstances.first.operating_system_id, 6]
+                  if current_user.circumstances.first.has_internet == false
+                      without :operating_systems, 6
+                  end
+                  keywords tags, :fields => [:tags] {minimum_match 1}
+                  paginate :page => params[:page], :per_page => 25
+                  #with :functionalities, params[:functionality]
+                end
+              end
+         elsif params[:contribution_type]=="lecture"
+              tags=Lecture.find(params[:contribution_id]).tag_list
+              @search = Lecture.search do
+                  if current_user.circumstances != []                    
+                    keywords tags, :fields => [:tags] {minimum_match 1}    
+                    #fulltext current_user.circumstances.first.locale.name, :fields => [:languages]                
+                  end              
+                  paginate :page => params[:page],:per_page => 30
+              end
+         elsif params[:contribution_type]=="site"
+              tags=Site.find(params[:contribution_id]).tag_list              
+              @search = Site.search do |query|
+                search_terms = tags
+                query.keywords search_terms, :fields => [:tags, :name] {minimum_match 1}
+                query.paginate :page => params[:page], :per_page => 25
+                if current_user.circumstances.first.latitude!=nil  
+                    query.order_by_geodist(:location, current_user.circumstances.first.latitude, current_user.circumstances.first.longitude)
+                end
+              end
+         elsif params[:contribution_type]=="documentary"
+              tags=Documentary.find(params[:contribution_id]).tag_list
+              @search = Documentary.search do
+                  if current_user.circumstances != []                    
+                    keywords tags, :fields => [:tags] {minimum_match 1}    
+                    #fulltext current_user.circumstances.first.locale.name, :fields => [:languages]                
+                  end              
+                  paginate :page => params[:page],:per_page => 30
+              end
+         elsif params[:contribution_type]=="course"
+              tags=Course.find(params[:contribution_id]).tag_list
+              @search = Course.search do
+                  if current_user.circumstances != []                    
+                    keywords tags, :fields => [:tags] {minimum_match 1}    
+                    #fulltext current_user.circumstances.first.locale.name, :fields => [:languages]                
+                  end              
+                  paginate :page => params[:page],:per_page => 30
+              end
+         elsif params[:contribution_type]=="article"
+              tags=Article.find(params[:contribution_id]).tag_list
+              @search = Article.search do
+                  if current_user.circumstances != []                    
+                    keywords tags, :fields => [:tags] {minimum_match 1}    
+                    #fulltext current_user.circumstances.first.locale.name, :fields => [:languages]                
+                  end              
+                  paginate :page => params[:page],:per_page => 30
+              end
+         elsif params[:contribution_type]=="lre"
+              tags=Lre.find(params[:contribution_id]).tag_list
+              @search = Lre.search do
+                  if current_user.circumstances != []                    
+                    keywords tags, :fields => [:tags] {minimum_match 1}    
+                    #fulltext current_user.circumstances.first.locale.name, :fields => [:languages]                
+                  end              
+                  paginate :page => params[:page],:per_page => 30
+              end
+         elsif params[:contribution_type]=="post"
+              tags=Post.find(params[:contribution_id]).tag_list
+              @search = Post.search do
+                  if current_user.circumstances != []                    
+                    keywords tags, :fields => [:tags] {minimum_match 1}    
+                    #fulltext current_user.circumstances.first.locale.name, :fields => [:languages]                
+                  end              
+                  paginate :page => params[:page],:per_page => 30
+              end       
+         elsif params[:contribution_type]=="slideshow"
+              tags=Slideshow.find(params[:contribution_id]).tag_list
+              @search = Slideshow.search do
+                  if current_user.circumstances != []                    
+                    keywords tags, :fields => [:tags] {minimum_match 1}    
+                    #fulltext current_user.circumstances.first.locale.name, :fields => [:languages]                
+                  end              
+                  paginate :page => params[:page],:per_page => 30
+              end
+         elsif params[:contribution_type]=="report"
+              tags = Report.find(params[:contribution_id]).tag_list
+              @search = Report.search do
+                  if current_user.circumstances != []                    
+                    keywords tags, :fields => [:tags] {minimum_match 1}    
+                    #fulltext current_user.circumstances.first.locale.name, :fields => [:languages]                
+                  end              
+                  paginate :page => params[:page],:per_page => 30
+              end
+         elsif params[:contribution_type]=="artwork"
+              tags = Artwork.find(params[:contribution_id]).tag_list
+              @search = Artwork.search do
+                  if current_user.circumstances != []                    
+                    keywords tags, :fields => [:tags] {minimum_match 1}    
+                    #fulltext current_user.circumstances.first.locale.name, :fields => [:languages]                
+                  end              
+                  paginate :page => params[:page],:per_page => 30
+              end
+         elsif params[:contribution_type]=="widget"
+              tags = Widget.find(params[:contribution_id]).tag_list
+              @search = Widget.search do
+                  if current_user.circumstances != []                    
+                    keywords tags, :fields => [:tags] {minimum_match 1}    
+                    #fulltext current_user.circumstances.first.locale.name, :fields => [:languages]                
+                  end              
+                  paginate :page => params[:page],:per_page => 30
+              end                                                                                                                                      
+
+         elsif params[:contribution_type]=="activity"
+            @search = Activity.search do
+                fulltext "a"
+                order_by :updated_at, :desc
+                paginate :page => params[:page], :per_page => 25
+              end
+         end         
+         @elements = @search.results   
+      
+      when 'activity_assignment_selection'
+        if params[:user_id]
+          @search = Activity.search do
+            fulltext params[:search]
+            with :status, 'class'
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+        else
+           @search = Activity.search do
+            fulltext params[:search]
+            with :status, 'class'
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+           end
+         end
+        @elements = @search.results
+      
+       
+      when 'technological_setting_device_selection'
+        if params[:user_id]
+          @search = Device.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+        else
+           @search = Device.search do
+            fulltext params[:search]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+         end
+        @elements = @search.results
+      when 'technological_setting_application_selection'
+        if params[:user_id]
+          @search = Application.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+        else
+          @search = Application.search do
+            fulltext params[:search]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+        end
+        @elements = @search.results
+      when 'guides'
+        if params[:user_id]
+          @search = Guide.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+        else
+           @search = Guide.search do
+            fulltext params[:search]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+         end
+        @elements = @search.results
+      when 'experiences'
+        if params[:user_id]
+          @search = Experience.search do
+            fulltext params[:search]
+            with :owner_id, params[:user_id]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+        else
+           @search = Experience.search do
+            fulltext params[:search]
+            order_by :updated_at, :desc
+            paginate :page => params[:page], :per_page => 25
+          end
+         end
+        @elements = @search.results
+      when 'resources'
+        if params[:user_id]
+          @search = Sunspot.search [Device,Application,Content,Person,Event] do
+              fulltext params[:search]
+              with :owner_id, params[:user_id]
+              order_by :updated_at, :desc
+              paginate :page => params[:page], :per_page => 25
+           end
+        else
+           @search = Sunspot.search [Device,Application,Content,Person,Event] do
+                fulltext params[:search]
+              order_by :updated_at, :desc
+              paginate :page => params[:page], :per_page => 25
+           end
+        end
+        @elements = @search.results
+        
+      when 'group_user_selection'
+         @search = User.search do
+            fulltext params[:search]
+            paginate :page => params[:page], :per_page => 25          
+          end
+        @elements = @search.results
+        @element_class= "group_user_selection"        
+        
+      when 'group_selection'
+         @search = Group.search do
+            fulltext params[:search]
+            paginate :page => params[:page], :per_page => 25          
+          end
+        @elements = @search.results        
+    end 
+    
+    if params[:refresh_popup]
+      @refresh_popup= params[:refresh_popup]
+    else
+      @refresh_popup= 'false'
+    end
+    #@refresh_popup='true'
+    if element_class=="alternatives"
+      element_class="element_assignment_selection"
+    end
+    @callback_parameter= element_class
+     respond_to do |format|
+      format.js
+    end
+  end
+end

@@ -1,0 +1,16 @@
+<%= render :partial => "header", :locals => {:section_title => (t :Editing_profile), :actions => "form_actions"} %>
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'users', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => (t ('users')), :actions => "users/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@user, :html => { :class => "user_form" ,:multipart => true }) do |f_user| %>
+		<div id="content_user" class="profile_container">
+			<%= render :partial => "form" , :locals => {:f => f_user} %>
+			<input type="hidden" id="edition_mode" value="on"/>
+		</div>
+		<%= render :partial => "circumstances/edit" %>
+	<% end %>
+	<script src="/javascript/user_profile.js"></script>
+<% end %>

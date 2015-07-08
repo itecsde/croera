@@ -1,0 +1,1 @@
+puts ReutersNewItem.all.size

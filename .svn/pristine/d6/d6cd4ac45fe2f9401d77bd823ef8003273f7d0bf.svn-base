@@ -1,0 +1,18 @@
+
+<% if current_user != nil && @scenarios.first_page? %>
+	<% if current_layout == "popup" %>
+		<a class="extract_box popup_new_scenario_box new_extract_box" onclick="">+</a>
+	<% else %>
+		<%= link_to "+", new_scenario_path, html_options = {:class => "new_extract_box_fixed"} %>
+	<% end %>	
+<% end %>
+
+<% @scenarios.each do |scenario| %>
+	<%= render :partial => "elements/element_fixed", :locals => {:element => scenario, :current_layout => current_layout} %>
+<% end %>
+
+<div class="clear"></div>
+
+<div class= "paginate_controls active">
+	<%= paginate @scenarios,:remote => true, :param_name => "scenarios_page" %>
+</div>

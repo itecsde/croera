@@ -1,0 +1,51 @@
+class RelatedElement      
+    
+    def initialize (element)
+      @element=element        
+       
+    end
+    
+    def get_related_elements(element_type)
+      if I18n.locale.to_s == "gl"
+        search_languages=["gl","es"]
+      else 
+        search_languages=[I18n.locale.to_s]
+      end
+                  
+      @search = element_type.constantize.search do |query|                       
+          #search_terms = @element.categories.map { |t| '"' + t.name + '"' if t.name != nil }.join(", ")+","+@element.tags.map { |t| '"' + t.name + '"' if t.name != nil}.join(", ")          
+          #query.keywords search_terms, :fields => [:categories, :tags, :name] {minimum_match 1}
+          search_terms = @element.tags.limit(5).map { |t| '"' + t.name + '"' if t.name != nil}.join(", ")
+          query.fulltext search_terms do
+            boost_fields :name => 3.0
+            boost_fields :tags => 3.0
+            boost_fields :description => 1.0
+            #phrase_fields :name => 8.0
+            #phrase_fields :tags => 20.0
+            minimum_match 2
+          end
+          if @element.class == element_type.constantize
+              query.without(:id, @element.id)
+          end
+          query.with(:translations, search_languages) 
+          query.paginate :per_page => 4
+       end
+       @result=@search.results       
+       return @result
+    end
+    
+     def get_all_related_elements(element_type,page)                  
+      @search = element_type.constantize.search do |query|                       
+          search_terms = @element.categories.map { |t| '"' + t.name + '"' if t.name != nil }.join(", ")+","+@element.tags.map { |t| '"' + t.name + '"' if t.name != nil}.join(", ")
+          query.keywords search_terms, :fields => [:categories, :tags, :name] {minimum_match 1}
+          if @element.class == element_type.constantize
+              query.without(:id, @element.id)
+          end
+          #query.with(:translations, [I18n.locale.to_s])  
+          query.paginate :page => page, :per_page => 32
+       end
+       @result=@search.results       
+       return @result
+    end
+  
+end

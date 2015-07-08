@@ -1,0 +1,173 @@
+class DocumentariesController < ApplicationController
+  
+  def index
+    @resource_type = "Documentary"
+    if I18n.locale.to_s == "gl"
+      search_languages=["gl","es"]
+    else 
+      search_languages=[I18n.locale.to_s]
+    end
+    per_page = 32
+
+    if (params[:advanced_search]=="1") 
+      @search=Documentary.search do          
+          keywords params[:keywords], :fields => [:tags] 
+          if params[:subject]!=""
+            keywords Subject.find(params[:subject]).name
+          end
+          with(:translations, search_languages)                    
+          paginate :page => params[:page], :per_page => per_page           
+        end
+      @documentaries = @search.results 
+      @num_results=@search.total
+      
+    elsif (params[:search] != nil && params[:search].size > 0)
+      if params[:article_id] == nil
+        @disambiguation = Search.disambiguation(params[:search])
+      end
+      if params[:search].index("#") == 0 
+        search = Search.new
+        @disambigued_term_info = search.disambigued_term_info(params[:search])
+      end        
+      @search = Search.search_elements_by_type('Documentary', params[:search],params[:article_id],per_page,params[:page])
+      @documentaries = @search[:results]          
+      @num_results = @search[:total]
+         
+    else
+      @search = Documentary.search do |query|
+=begin        
+          if current_user != nil && current_user.circumstances != []
+            search_terms = current_user.circumstances.first.tag_list_quoted + ", " + current_user.circumstances.first.subject.name
+            query.keywords search_terms, :fields => [:tags, :name] {minimum_match 1}
+          end
+=end          
+          query.with(:translations, search_languages)  
+          query.paginate :page => params[:page],:per_page => per_page 
+      end
+      @documentaries = @search.results 
+      @num_results=@search.total
+    end    
+     
+    @previous_search_params=params      
+    @subjects=Subject.all     
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @documentaries }
+    end
+  end
+  
+  
+  def show
+    @documentary = Documentary.find(params[:id])
+    
+    if current_user!=nil
+      current_user.add_preferences_to_user_history(@documentary.taggable_tag_annotations)
+    end
+         
+    @subjects=Subject.all   
+    @related_elements=RelatedElement.new(@documentary)
+    @edition_mode=false
+    @resource_type="Documentary"
+        
+    if notice == 'Documentary was successfully created.' || notice == 'Documentary was successfully updated.'
+      @previous_action = 'saved'
+    else
+      @previous_action = 'list'
+    end    
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @documentary }
+    end
+  end
+  
+  
+  def new
+    if current_user != nil
+      @documentary = Documentary.new
+      @subjects=Subject.all
+      @edition_mode=true
+  
+      respond_to do |format|
+        format.html # new.html.erb
+        format.json { render json: @documentary }
+      end
+    else
+      redirect_to documentaries_path
+    end
+  end
+  
+  def edit
+    @documentary = Documentary.find(params[:id])
+    if current_user !=nil && ((@documentary.owner == current_user) or (@documentary.owner_type=="Group" && @documentary.owner.users.exists?(current_user)))
+      @subjects=Subject.all
+      @edition_mode=true
+    else
+      redirect_to documentary_path(@documentary)
+    end
+  end
+  
+  
+  def create
+    @documentary = Documentary.new(params[:documentary])
+    if (params[:documentary][:owner_type]==nil)
+      @documentary.owner_type="User"
+      @documentary.owner=current_user
+    end
+    @documentary.creator = current_user
+    @documentary.save
+
+    respond_to do |format|
+      if @documentary.save
+        format.html { redirect_to @documentary, notice: 'Documentary was successfully created.' }
+        format.json { render json: @documentary, status: :created, location: @documentary }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @documentary.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+  
+  
+  def update
+    @documentary = Documentary.find(params[:id])
+    if (params[:documentary][:owner_type]==nil)
+      @documentary.owner_type="User"
+      @documentary.owner=current_user
+    end
+    @documentary.subjects.destroy_all
+    
+    respond_to do |format|
+      if @documentary.update_attributes(params[:documentary])
+        format.html { redirect_to @documentary, notice: 'Documentary was successfully updated.' }
+        format.json { head :ok }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @documentary.errors, status: :unprocessable_entity }
+      end
+    end    
+  end
+  
+  
+  def destroy
+    @documentary = Documentary.find(params[:id])
+    @documentary.destroy
+
+    respond_to do |format|
+      format.html { redirect_to documentaries_url }
+      format.json { head :ok }
+    end
+  end
+  
+  
+  def popup_show_documentary
+    @documentary = Documentary.find(params[:element_id])
+    @subjects=Subject.all
+    @edition_mode=false
+
+    respond_to do |format|
+      format.js
+    end
+  end
+  
+  
+end

@@ -1,0 +1,71 @@
+classify = Classify.new
+
+date = ARGV[0]
+puts "Date:"
+puts date
+
+#retag reports three times to minimize wikipediator errors
+
+
+#Delete sections
+Report.all.each do |report|
+   report.section = nil
+   report.save
+end
+
+#retag reports to minimize wikipediator errors
+
+
+#classify sections with different methods
+
+#basic method
+#call method three times to minimize wikipediator errors
+classify.classify_stored_reports("basic")
+classify.classify_stored_reports("basic")
+classify.classify_stored_reports("basic")
+classify.statistics(date,"basic")
+
+#Delete sections
+Report.all.each do |report|
+   report.section = nil
+   report.save
+end
+
+
+#with_weight method
+#call method three times to minimize wikipediator errors
+classify.classify_stored_reports("with_weight")
+classify.classify_stored_reports("with_weight")
+classify.classify_stored_reports("with_weight")
+classify.statistics(date,"with_weight")
+
+#Delete sections
+Report.all.each do |report|
+   report.section = nil
+   report.save
+end
+
+#with_broader_sections method
+#call method three times to minimize wikipediator errors
+classify.classify_stored_reports("with_broader_sections")
+classify.classify_stored_reports("with_broader_sections")
+classify.classify_stored_reports("with_broader_sections")
+classify.statistics(date,"with_broader_sections")
+
+#Delete sections
+Report.all.each do |report|
+   report.section = nil
+   report.save
+end
+
+
+#without_countries method
+#call method three times to minimize wikipediator errors
+classify.classify_stored_reports("without_countries")
+classify.classify_stored_reports("without_countries")
+classify.classify_stored_reports("without_countries")
+classify.statistics(date,"without_countries")
+
+
+
+

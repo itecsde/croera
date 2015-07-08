@@ -1,0 +1,57 @@
+<%= render :partial => "header", :locals => {:section_title => (t :Editing_guide), :actions => "form_actions"} %>
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'guides', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => (t :Editing_guide), :actions => "guides/form_actions"} %>
+<% end -%>
+
+<% content_for :content do %>
+		<div class="guide_container">
+			<input type="hidden" id="edition_mode" value="on"/>
+			<%= form_for(@guide, :html => { :class => "guide_form" }) do |f_guide| %>
+				<%= render :partial => "form" , :locals => {:guide_form => f_guide} %>
+				<%= render :partial => "submit", :locals => {:guide_form => f_guide} %>
+			<% end %>
+			
+			<div id="elements_library">
+				<%= render :partial => "activities/adding_elements" %>
+				<%= render :partial => "technological_settings/adding_elements" %>
+			</div>
+			<div id="popups">
+				<%= render :partial => "technological_settings/adding_popups" %>
+				<%= render :partial => "activities/adding_popups" %>
+				<%= render :partial => "activity_sequences/adding_popups" %>
+				<%= render :partial => "guides/adding_popups" %>
+			</div>
+		</div>
+
+<link rel="stylesheet" href="/css/colorbox.css" />
+<link rel="stylesheet" href="/css/jquery-ui-1.10.3.custom.min.css" />
+<link rel="stylesheet" href="/css/chosen.min.css" />
+
+<script src="/javascript/jquery.colorbox-min.js"></script>
+<script src="/javascript/jquery.ui.widget.js"></script>
+<script src="/javascript/jquery.ui.core.min.js"></script>
+<script src="/javascript/jquery.ui.mouse.min.js"></script>
+<script src="/javascript/jquery.ui.accordion.min.js"></script>
+<script src="/javascript/jquery.ui.draggable.min.js"></script>
+<script src="/javascript/jquery.ui.droppable.min.js"></script>
+<script src="/javascript/jquery.ui.sortable.min.js"></script>
+<script src="/javascript/activity_sequences_form.js"></script>
+<script src="/javascript/activities_form.js"></script>
+<script src="/javascript/chosen.jquery.min.js"></script>
+
+<script src="/javascript/guides_form.js"></script>
+<script src="/javascript/guide_paginations.js"></script>
+<script src="/javascript/technological_setting_form.js"></script>
+
+<script src="/javascript/jquery.ui.position.js"></script>
+<script src="/javascript/jquery.ui.menu.js"></script>
+<script src="/javascript/jquery.ui.datepicker.js"></script>
+<script src="/javascript/jquery.ui.autocomplete.js"></script>
+<script src="/javascript/jquery.ui.effect.min.js"></script>
+<script src="/javascript/jquery.ui.effect-slide.min.js"></script>
+<script src="/javascript/jquery.ui.slider.min.js"></script>
+<script src="/javascript/jquery.masonry.min.js"></script>
+<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script src="/javascript/map_control.js"></script>
+<% end -%>

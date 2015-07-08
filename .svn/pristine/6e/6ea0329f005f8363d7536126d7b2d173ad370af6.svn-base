@@ -1,0 +1,141 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+
+#require "capybara/dsl"
+class ScraperArtworks
+  include ActionView::Helpers::SanitizeHelper
+  #include Capybara::DSL
+  #############################################################
+  ####### scrape_google_art_project
+  ###########################################################
+  def scrape_google_art_project
+    artwork_id = -1
+    idiomas_disponibles = []
+    disabled = false
+    i=0
+    Capybara.register_driver :webkit_ignore_ssl do |app|
+      browser = Capybara::Driver::Webkit::Browser.new(:ignore_ssl_errors => true)
+      Capybara::Driver::Webkit.new(app, :browser => browser)
+    end
+
+    Capybara.javascript_driver = :webkit_ignore_ssl
+
+    session = Capybara::Session.new(:webkit)
+    
+    session.visit "https://www.google.com/culturalinstitute/collection/albertina-vienna"
+    puts "Recorriendo la galeria."
+    while disabled != true
+      session.find('.SPRITE_icon_asset_viewer_nav_right_arrow').click
+      sleep 0.3
+      nokogiri_clicked_page = Nokogiri::HTML(session.body)
+      if nokogiri_clicked_page.css("div.gci-page-arrow")[1]['disabled'] == "disabled"
+        disabled = true
+      end
+    end
+   
+    sleep 1
+          
+    puts "Disfrutando de la coleccion."                              
+
+    nokogiri_html_collection_page = Nokogiri::HTML(session.body)
+
+    nokogiri_html_collection_page.css("div.gci-asset-gallery-item").each do |artwork|
+      manual_tags = Array.new
+      name = ""
+      description = ""
+      prosa = ""
+
+      artwork_id += 1
+      puts artwork_id
+      begin
+        photo_url = artwork.css(".gci-asset-gallery div.collections-image-holder div.holder-background")[0]['style']
+        if photo_url.include? "=s"
+          photo_url = photo_url.split("url(")[1].split("=s")[0]
+        else
+          photo_url = photo_url.split("url(")[1].split(");")[0]
+        end
+        puts "PHOTO URL"
+        puts photo_url
+      rescue
+        puts "Exception photo_url art_project"
+      end
+      
+      session.all('.gci-asset-gallery div.gci-asset-title-date a.gci-asset-title')[artwork_id].click
+      session.click_button 'Details'
+      nokogiri_html_detail_page = Nokogiri::HTML(session.body)
+      
+      begin
+        name = nokogiri_html_detail_page.css("h1.gci-unified-header-title-container span.gci-asset-viewer-title")[0].text.strip
+      rescue
+        puts "Exception name art_project"
+      end
+      begin
+        description = nokogiri_html_detail_page.css("div.gci-asset-viewer-tab-description-content")[0].text.strip
+      rescue
+        puts "Exception description art_project"
+      end
+      
+      begin
+        author = nokogiri_html_detail_page.css("span.gci-asset-viewer-creator")[0].text.strip       
+      rescue
+        puts "Failed Author art_project"
+      end
+
+      begin
+        museum = nokogiri_html_detail_page.css("a.gci-asset-viewer-partner")[0].text.strip       
+      rescue
+        puts "Failed museum art_project"
+      end
+      
+      begin
+        url = session.current_url
+      rescue
+        puts "Exception URL art_project"
+      end
+      
+      puts "name"
+      puts name
+      puts "description"
+      puts description
+      puts "author"
+      puts author
+      puts "museum"
+      puts museum
+      puts "URL"
+      puts url
+      
+      manual_tags << author
+      manual_tags << museum
+          
+      puts "human_tags"
+      puts manual_tags    
+  
+      if name != nil
+        prosa = prosa + name
+      end
+      if description != nil
+        prosa = prosa + ". " + description
+      end   
+
+      scraped_artwork = Artwork.new
+      scraped_artwork.name = name
+      scraped_artwork.description = description
+      if photo_url!=nil
+        begin
+          scraped_artwork.element_image = URI.parse(photo_url)
+        rescue
+          puts "art_projec IMAGEN NO GUARDADA"
+          scraped_artwork.element_image.clear
+        end
+      end      
+      scraped_artwork.url = url
+      scraped_artwork.link = url
+      scraped_artwork.scraped_from = "https://www.google.com/culturalinstitute/project/art-project"
+      scraped_artwork.persist(idiomas_disponibles, prosa, manual_tags)
+    end #do artwork
+   
+  end #method
+
+end #class

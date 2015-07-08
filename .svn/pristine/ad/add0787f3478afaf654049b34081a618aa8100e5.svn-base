@@ -1,0 +1,462 @@
+# See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+
+es:
+  
+  a: "a"
+  activities: "Actividades"
+  activity: "Actividad"
+  activity_sequence: "Secuencia de actividades"
+  activity_sequences: "Secuencias de Actividades"
+  add: "Añadir"
+  add_activity: "Añadir actividad"
+  add_contextual_setting: "Añadir configuración contextual"
+  add_guide: "Añadir guía"
+  add_new_activity: "Añade actividad"
+  add_sequence: "Añadir secuencia"
+  add_technological_setting: "Añadir configuración tecnológica"
+  address: "Dirección"
+  age_range: "Rango de edades"
+  all_types: "Todos"  
+  application: "Aplicación"
+  applications: "Aplicaciones"
+  are_you_sure: "¿Estás seguro?"
+  article: "Article"
+  articles: "Articles"
+  artwork: "Obra de arte"
+  artworks: "Obras de arte"  
+  as: "como"
+  assessment: "Evaluación"
+  audience: "Audiencia"
+  back_to_list: "Volver al listado"
+  back_to_home: "Volver al inicio"
+  biography: "Biografía"
+  biographies: "Biografías"  
+  board: "Tablero"
+  boards: "Tableros"
+  bookmarked_items: "Elementos marcados"
+  bookmarked_applications: "Aplicaciones marcadas"
+  bookmarked_events: "Eventos marcados"
+  bookmarked_experts: "Expertos marcados"
+  bookmarked_lectures: "Ponencias marcadas"
+  bookmarked_sites: "Sitios marcados"
+  bookmarked_documentaries: "Documentales marcados"
+  bookmarked_courses: "Cursos marcados"
+  bookmarked_articles: "Articulos marcados" 
+  bookmarked_lres: "Lres marcados"   
+  change_image: "Cambiar imagen"
+  change_my_password: "Cambia mi contraseña"
+  change_your_password: "Cambia tu contraseña"
+  classrooms: "Aulas"
+  collapse: "Colapsar"
+  comment_it: "Comenta"
+  confirm_new_password: "Confirme nueva contraseña"
+  content: "Contenido"
+  content_concrete_requirement_description: "Para especificar un contenido requerido"
+  content_concrete_requirement_name: "... un contenido específico"
+  contents: "Contenidos"  
+  context: "Contexto"
+  contextual_setting: "Información sobre la clase"
+  contextual_settings: "Información sobre la clases"
+  copy: "Copiar"
+  core_purpose: "Proposito principal"
+  country: "Pais"
+  course: "Curso"
+  courses: "Cursos"
+  create: "Crear"
+  create_scenario: "Crear un escenario"
+  create_learning_activity: "Crear una actividad de aprendizaje"
+  create_learning_story: "Crear una historia de aprendizaje"  
+  created_by_me: "Creados por mi"
+  date_range: "Rango de fechas"  
+  delete: "Borrar"
+  description: "Descripcion"
+  details: "Detalles"
+  development: "Desarrollo"
+  device: "Dispositivo"
+  devices: "Dispositivos"
+  did_not_receive_confirmation_instructions: "¿No has recibido instrucciones de confirmación?"
+  did_not_receive_unlock_instructions: "¿No has recibido instrucciones de desbloqueo?"
+  discover: "Descubrir"
+  discover_and_create_title: "Descubre y crea"
+  discover_and_create_description: "Puedes descubirir recursos y utilizarlos para crear escenarios, actividades o historias de aprendizaje"
+  documentaries: "Documentales"
+  documentary: "Documental"    
+  edit: "Editar"
+  edit_context: "Editar contexto"
+  edit_profile: "Editar cuenta"
+  editing_activity: "Edición de Actividad"
+  editing_activity_sequence: "Edición de Secuencia"
+  editing_application: "Edición de aplicación"
+  editing_board: "Edición de tablero"
+  editing_content: "Edición de contenido"
+  editing_contextual_setting: "Edición de Configuración Contextual"
+  editing_device: "Edición de dispositivo"
+  editing_event: "Edición de evento"
+  editing_experience: "Edición de experiencia"
+  editing_group: "Edición de grupo"  
+  editing_guide: "Edición de guia"
+  editing_learning_activity: "Edición actividad de aprendizaje"
+  editing_learning_story: "Edición historia de aprendizaje"   
+  editing_lecture: "Edicion ponencia"  
+  editing_person: "Edición experto"
+  editing_profile: "Edición profile"
+  editing_scenario: "Edición escenario"
+  editing_site: "Edición sitio"    
+  editing_technological_setting: "Edición de Configuración Tecnológica"
+  education_level: "Nivel educativo"
+  educational_level: "Nivel educativo"  
+  email: "Correo electrónico"
+  end_date: "Fecha de fin"
+  enriched_on: "Enriquecimiento activo"
+  enriched_off: "Enriquecimiento inactivo"
+  environment: "Entorno"
+  enter_search_term: "Introduce término de búsqueda..."
+  event: "Evento"
+  event_abstract_requirement_description: "Para describir un evento requerido a través de su tipo y lugar."
+  event_abstract_requirement_name: "... un evento con ciertas características"
+  event_concrete_requirement_description: "Para especificar un evento requerido."
+  event_concrete_requirement_name: "... un evento específico"
+  events: "Eventos"
+  experience: "Experiencia"
+  experiences: "Experiencias"
+  expertises: "Areas de especialización"
+  expert: "Experto"
+  experts: "Expertos"
+  external_content: "Contenido"
+  fill_inputs_and_search: "Rellena los campos y pulsa el botón de buscar"
+  first_name: "Nombre"
+  forgot_your_password: "¿Olvidaste tu contraseña?"
+  free_text: "Texto Libre"
+  functionalities: "Functionalidades"
+  functionality: "Functionalidad"  
+  go_to_home: "Ir al inicio"
+  group: "Grupo"
+  groups: "Grupos"
+  guide: "Guía"
+  guidelines: "Instrucciones"
+  guides: "Guía"
+  has_interactive_whiteboard: "Dispone de pizarra virtual"
+  has_internet: "Tiene Internet"
+  hello: "Hola"
+  home: "Inicio"
+  if_you_didn_request_this_please_ignore_this_email: "Si usted no ha pedido esto, por favor, ignore este email"
+  ideas_for_using_technology: "Ideas para usar tecnologias..."
+  in: "en"
+  intended_audience: "Audiencia"
+  interaction: "Interacción"
+  introduction: "Introdución"
+  is_needed_to: "Se necesita para..."
+  it_is: "Es"
+  itec_description: "Innovative Technologies for Engaging Classrooms (iTEC) es actualmente la mayor iniciativa para el diseño de la enseñanza y el aprendizaje en las clases del futuro."
+  its_recommended: "Es recomendable..."
+  keywords: "Palabras clave"
+  language: "Lenguaje"
+  last_activities: "Últimas actividades..."
+  last_guides: "Últimas guías..."
+  last_name: "Apellidos"
+  last_sequences: "Últimas secuencias..."
+  learner_motivation: "Tus alumnos pueden aprender..."
+  learning_activities: "Actividades de aprendizaje"
+  learning_activity: "Actividad de aprendizaje"
+  learning_stories: "Historias de aprendizaje"
+  learning_story: "Historia de aprendizaje"
+  lecture: "Ponencia"
+  lectures: "Ponencias"
+  localisation: "Localización"
+  locality: "Localidad"
+  log_in: "Inicia sesión"
+  login: "Login"
+  login_to_discover_create_description: "Puedes descubrir recursos y usarlos para crear escenarios, actividades de aprendizaje o hstorias de aprendzaje. Registrate para probar el SDE."
+  login_to_discover_create_title: "Inicia sesión para descubrir y crear recursos educativos"
+  logout: "Cerrar sesión"
+  mother_tongue: "Lengua materna"
+  my_activities: "Mis actividades"
+  my_activity_sequences: "Mis secuencias"
+  my_applications: "Mis aplicaciones"
+  my_boards: "Mis tableros"
+  my_contents: "Mis contenidos"
+  my_devices: "Mis dispositivos"
+  my_events: "Mis eventos"
+  my_experiences: "Mis experiencias"
+  my_experts: "Mis expertos"  
+  my_groups: "Mis grupos"
+  my_guides: "Mis guias"
+  my_lectures: "Mis ponencias"
+  my_lres: "Mis OERs"    
+  my_people: "Mis personas"
+  my_resources: "Mis recursos"
+  my_sequences: "Mis secuencias"
+  my_sites: "Mis sitios"  
+  my_tools: "Mis herramientas"
+  name: "Nombre"
+  narrative_description: "Descripción narrativa"  
+  narrative_overview: "Resumen narrativo"
+  new_activity: "Nueva Actividad"
+  new_application: "Nueva aplicación"
+  new_board: "Nuevo tablero"
+  new_content: "Nuevo contenido"
+  new_device: "Nuevo dispositivo"
+  new_event: "Nuevo evento"
+  new_experience: "Nueva experiencia"
+  new_group: "Nuevo grupo"
+  new_guide: "Nueva Guia"
+  new_lecture: "Nueva ponencia"
+  new_learning_activity: "Nueva actividad de aprendizaje"
+  new_learning_story: "Nueva historia de aprendizaje"  
+  new_password: "Nueva contraseña"
+  new_person: "Nueva persona"
+  new_scenario: "Nuevo escenario"
+  new_sequence: "Nueva secuencia"
+  new_site: "Nuevo Sitio"  
+  nice_to_have: "deseable"
+  no_address_provided: "Ninguna direccion proporcionada"
+  no_comments: "No hay comentarios"
+  no_educational_level_provided: "Nivel educativo no especificado"  
+  no_internet: "No internet"
+  no_recommends: "No hay recomendaciones para este requisito"
+  no_selected: "No seleccionada"
+  no_subject_provided: "Materia no especificada"
+  not_specified: "No especificado"
+  nothing_found: "Uups, ningún resultado!"
+  operating_system: "Sistema Operativo"
+  operating_systems: "Sistemas Operativos"
+  owned_by: "Propietario"
+  password: "Contraseña"
+  password_confirmation: "Confirmación de contraseña"
+  people: "Personas"
+  people_and_roles: "Personas y roles"
+  person: "Persona"
+  person_abstract_requirement_description: "Para describir una persona requerida a través de su tipo y rol."
+  person_abstract_requirement_name: "... una persona con ciertas características"
+  person_concrete_requirement_description: "Para especificar una persona requerida."
+  person_concrete_requirement_name: "... una persona específica"
+  pick_it: "Cógelo"
+  positive_comment: "Comentario positivo"
+  possible_approaches_to_teaching: "Possible approaches to teaching and assessment"
+  post: "Post"  
+  postal_code: "Codigo postal"
+  posts: "Posts"  
+  preparation: "Preparación"
+  profile: "Perfil"
+  radius: "Radio"
+  recommended: "recomendado"
+  register: "Registrarse"
+  related_applications: "Aplicaciones relacionadas"
+  related_biographies: "Biografías relacionadas"  
+  related_events: "Eventos relacionados"
+  related_people: "Personas relacionadas"
+  related_lectures: "Ponencias relacionadas"
+  related_sites: "Sitios relacionados"
+  related_documentaries: "Documentales relacionados"
+  related_courses: "Cursos relacionados"
+  related_articles: "Articulos relacionados"
+  related_lres: "Lres relacionados"
+  related_posts: "Posts relacionados"    
+  related_slideshows: "Slideshows relacionadas"
+  related_reports: "Noticias relacionadas"
+  related_artworks: "Obras de arte relacionadas"
+  related_widgets: "Widgets relacionados"
+  related_klascements: "Klascements relacionados"    
+  relevant_applications: "Aplicaciones relevantes"
+  relevant_biographies: "Biografías relevantes"  
+  relevant_events: "Eventos relevantes"
+  relevant_experts: "Expertos relevantes"
+  relevant_lectures: "Ponencias relevantes"
+  relevant_people: "Personas relevantes"
+  relevant_sites: "Sitios relevantes"
+  remember_me: "Recuérdame"
+  remove: "Eliminar"
+  required: "requerido"
+  requirement_optionality: "opcionalidad del requisito"
+  requirement_types: "Tipos de requisitos"
+  requirements: "Requisitos"
+  resources: "Recursos"
+  resources_including_technologies: "Recursos (Incluyendo tecnologías)"
+  results: "Resultados"
+  save: "Guardar"
+  scenario: "Escenario"
+  scenario_development_environment: "Scenario Development Environment"
+  scenarios: "Escenarios"
+  school_address: "Dirección de la escuela"
+  sde_description: "El Scenario Development Environment (SDE) proporciona la posibilidad de buscar recursos más allá de contenidos, como aplicaciones, eventos que tengan valor educativo, y expertos que puedan contribuir en las actividades de aprendizaje. Estos recursos vienen de la busqueda automática en páginas web. Además, puedes usar el SDE para configurar una historia de aprendizaje con los recursos más apropiados, confiando en las recomendaciones que te proporciona el SDE y que tienen en cuenta las preferencias marcadas en tu cuenta de usuario."
+  search: "Buscar"
+  search_terms: "Términos de búsqueda"  
+  select: "Seleccionar"
+  select_: "Seleccionar..."
+  select_by_interaction: "Filtra por interacción..."
+  select_by_tag: "Filtra por palabra clave..."
+  select_one: "Selecciona un..."
+  select_picture: "Selecciona imagen"
+  send_me_reset_password_instructions: "Enviarme las instrucciones de restablecimiento de contraseña"
+  sequence: "Secuencia"
+  sequences: "Secuencias"
+  shareboards: "Tableros"
+  show: "Mostrar"
+  sign_in: "Entrar"
+  sign_up: "Registrarse"
+  site: "Sitio"
+  sites: "Sitios"
+  slideshow: "Slideshow"
+  slideshows: "Slideshows"  
+  someone_has_requested_a_link_to_change_your_password: "Alguien ha pedido un enlace para cambiar su contraseña. Puede hacerlo a través del siguiente enlace."
+  source: "Fuente"
+  specific_content: "un contenido específico"
+  specific_person: "una persona específica"
+  specific_tool: "herramienta específica"
+  start_date: "Fecha de inicio"
+  street: "Calle"
+  subject: "Materia"
+  subjects: "Materias"
+  tags_comma_separated: "Palabras clave (Separadas por coma)"
+  teacherMotivation: "El profesor debe..."
+  technicalMotivation: "Ideas para utilizar tecnología..."
+  technological_settings: "Tecnologías del Aula"
+  text_no_selected_contextual_setting: "No tienes seleccionada ninguna Configuración Contextual"
+  text_no_selected_sequence: "No tienes seleccionada ninguna Secuencia"
+  text_no_selected_technological_setting: "No tienes seleccionada ninguna Configuración Tecnológica"
+  the_content_selected_is: "El contenido seleccionado es "
+  the_event_place_required_is: "El evento seleccionado es "
+  the_event_selected_is: "El evento seleccionado es "
+  the_event_type_required_is: "El tipo de evento requerido es"
+  the_functionality_required_is: "La funcionalidad requerida es"
+  the_optionality_level_is: "El nivel de opcionalidad es"
+  the_person_category_required_is: "La categoría de la persona requerida es"
+  the_person_role_required_is: "El rol de la persona requerida es"
+  the_person_selected_is: "La persona seleccionada es"
+  the_students_may_learn: "The students may learn..."
+  the_teacher_may_look_forward_to: "The teacher may look forward to..."
+  the_tool_selected_is: "La herramienta seleccionada es"
+  time_to_complete: "Tiempo de realización"
+  title: "Título"  
+  tool: "Herramienta"
+  tool_abstract_requirement_description: "Para describir una herramienta requerida a través de su funcionalidad."
+  tool_abstract_requirement_name: "... una herramienta con cierta funcionalidad"
+  tool_concrete_requirement_description: "Para especificar una herramienta requerida."
+  tool_concrete_requirement_name: "... una herramienta específica"
+  tools: "Herramientas"
+  total_results: "Total resultados"  
+  trends: "Tendencia/s"
+  unassigned: "Sin asignar"
+  user: "Usuario"
+  users: "Usuarios"
+  users_group: "Usuarios del grupo"
+  view_details: "Ver detalles"
+  we_appreciate_your_feedback: "Agradecemos sus comentarios!"
+  write_here: "Escribe aqui..."
+  you_can_use: "Puedes usar..."
+  you_need: "Necesitas..."
+  your_comment: "Tu comentario..."
+  your_password_wont_change: "Su contraseña no cambiará hasta que acceda al enlace anterior y cree uno nuevo."
+  your_selection: "Tu selección..."
+  
+  errors: &errors
+    format: ! '%{attribute} %{message}'
+    messages:
+      accepted: debe ser aceptado
+      blank: no puede estar en blanco
+      confirmation: no coincide con la confirmación
+      empty: no puede estar vacío
+      equal_to: debe ser igual a %{count}
+      even: debe ser par
+      exclusion: está reservado
+      greater_than: debe ser mayor que %{count}
+      greater_than_or_equal_to: debe ser mayor que o igual a %{count}
+      inclusion: no está incluido en la lista
+      invalid: no es válido
+      less_than: debe ser menor que %{count}
+      less_than_or_equal_to: debe ser menor que o igual a %{count}
+      not_a_number: no es un número
+      not_an_integer: debe ser un entero
+      odd: debe ser impar
+      record_invalid: ! 'La validación falló: %{errors}'
+      taken: ya está en uso
+      too_long: es demasiado largo (%{count} caracteres máximo)
+      too_short: es demasiado corto (%{count} caracteres mínimo)
+      wrong_length: no tiene la longitud correcta (%{count} caracteres exactos)
+    template:
+      body: ! 'Se encontraron problemas con los siguientes campos:'
+      header:
+        one: No se pudo guardar este/a %{model} porque se encontró 1 error
+        other: No se pudo guardar este/a %{model} porque se encontraron %{count} errores
+  helpers:
+    select:
+      prompt: Por favor seleccione
+    submit:
+      create: Crear %{model}
+      submit: Guardar %{model}
+      update: Actualizar %{model}
+  number:
+    currency:
+      format:
+        delimiter: .
+        format: ! '%n %u'
+        precision: 2
+        separator: ! ','
+        significant: false
+        strip_insignificant_zeros: false
+        unit: €
+    format:
+      delimiter: .
+      precision: 3
+      separator: ! ','
+      significant: false
+      strip_insignificant_zeros: false
+    human:
+      decimal_units:
+        format: ! '%n %u'
+        units:
+          billion: mil millones
+          million: millón
+          quadrillion: mil billones
+          thousand: mil
+          trillion: billón
+          unit: ''
+      format:
+        delimiter: ''
+        precision: 1
+        significant: true
+        strip_insignificant_zeros: true
+      storage_units:
+        format: ! '%n %u'
+        units:
+          byte:
+            one: Byte
+            other: Bytes
+          gb: GB
+          kb: KB
+          mb: MB
+          tb: TB
+    percentage:
+      format:
+        delimiter: ''
+    precision:
+      format:
+        delimiter: ''
+  support:
+    array:
+      last_word_connector: ! ', y '
+      two_words_connector: ! ' y '
+      words_connector: ! ', '
+  time:
+    am: am
+    formats:
+      default: ! '%A, %d de %B de %Y %H:%M:%S %z'
+      long: ! '%d de %B de %Y %H:%M'
+      short: ! '%d de %b %H:%M'
+    pm: pm
+  # remove these aliases after 'activemodel' and 'activerecord' namespaces are removed from Rails repository
+  activemodel:
+    errors:
+      <<: *errors
+  activerecord:
+    errors:
+      <<: *errors
+      
+  views:
+    pagination:
+      previous: "&laquo;Ant"
+      next: "Sig&raquo;"
+      first: "&laquo;Primero"      
+      last: "Último&raquo;"      
+      truncate: "..."

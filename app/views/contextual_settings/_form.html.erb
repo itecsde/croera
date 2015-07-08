@@ -1,0 +1,162 @@
+  <% if @contextual_setting.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@contextual_setting.errors.count, "error") %> prohibited this contextual_setting from being saved:</h2>
+
+      <ul>
+      <% @contextual_setting.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+<div class="contextual_setting_id">
+	<%= f.hidden_field :id %>
+</div>
+<div class="contextual_setting_status">
+	<%= f.hidden_field :status, :value => "instance" %>
+</div>
+<div class="contextual_setting_name editable active">
+    <%= f.text_field :name, :class => "contextual_setting_title", :placeholder => t("title") %>
+    <i class="icon-pencil icon-grey"></i>
+</div>
+  
+  <div class="clear"></div>
+  <div class="contextual_setting_description editable active">
+  <textarea id="contextual_setting_description" name="contextual_setting[description]" placeholder="<%= t("Description") %>"><%= @contextual_setting.description %></textarea>
+  <i class="icon-pencil icon-grey"></i>
+  </div>
+  
+  <hr/>
+
+  <div id="contextual_setting_fields">
+<input type= "hidden" id="select_placeholder" value="<%= t("Select") %>"/>
+<input type= "hidden" id="select_no_found_text" value="<%= t("Nothing_found") %>"/>
+<div class="contextual_setting_box_left">
+	<div class="field editable active">
+		<p class= "field_label"><%= t("Subject") %>:</p>
+		<div style="position: relative;float: left">
+			<% if(@contextual_setting.subject != nil ) %>
+			<div class="selector_input">
+				<span><%= @contextual_setting.contextual_setting_subject_annotation.subject.name %></span>
+				<%= select_tag "contextual_setting[contextual_setting_subject_annotation_attributes][subject_id]", options_from_collection_for_select(@subjects, "id", "name", @contextual_setting.contextual_setting_subject_annotation.subject.id), :prompt => "", :class => "edition_control" %>
+			</div>
+			<% else %>
+			<div class="selector_input">
+				<span></span>
+				<%= select_tag "contextual_setting[contextual_setting_subject_annotation_attributes][subject_id]", options_from_collection_for_select(@subjects, "id", "name"),  :prompt => "", :class => "edition_control" %>
+			</div>
+			<% end %>
+		</div>
+	</div>
+	<div class="clear"></div>
+	<hr/>
+	<div class="field editable active">
+	    <p class= "field_label"><%= t("Keywords") %>:</p>
+	    <div style="position: relative;float: left; width: 80%;">
+		    <%= f.text_field :keywords %>
+		    <i class="icon-pencil icon-grey"></i>
+		</div>
+	</div>
+	<div class="clear"></div>
+	<hr/>		
+  	<h4><%= t("Intended_audience") %>:</h4>
+	  <div class="field editable active">
+	    <p class= "field_label"><%= t("Age_range") %>:</p>
+	    <div style="position: relative;float: left">
+	    	<% if @contextual_setting.age_range != nil && @contextual_setting.age_range != "" %>
+	    		<input type="hidden" id="age_range" value="<%= @contextual_setting.age_range %>" />
+	    	<% else %>
+	    		<input type="hidden" id="age_range" value="" />
+	    	<% end %>
+		    <%= f.text_field :age_range %>
+		    <div id="slider-range"></div>
+	    </div>
+	  </div>
+	  <div class="clear"></div>
+	  <div class="field editable active">
+	    <p class= "field_label"><%= t("Education_level") %>:</p>
+	    <div style="position: relative;float: left;">
+		    <% if(@contextual_setting.education_levels != [] ) %>
+			<div class="selector_input">
+				<span>
+					<% education_levels_length= @contextual_setting.education_level_ids.length %>
+					<% @contextual_setting.education_levels.each_with_index do |education_level, index|%>
+						<% if index != education_levels_length -1 %>
+							<%= education_level.name %>,
+						<% else %>
+							<%= education_level.name %>
+						<% end %>
+					<% end %>
+				</span>
+				<%= select_tag "contextual_setting[education_level_ids][]", options_from_collection_for_select(@education_levels, "id", "name", @contextual_setting.education_level_ids), {:multiple => true, :class => "edition_control"} %>
+			</div>
+			<% else %>
+			<div class="selector_input">
+				<span></span>
+				<%= select_tag "contextual_setting[education_level_ids][]", options_from_collection_for_select(@education_levels, "id", "name"), {:multiple => true, :class => "edition_control"} %>
+			</div>
+			<% end %>
+		</div>
+	  </div>
+	 <div class="clear"></div>
+	 <hr/>
+	 
+	 <div class="field editable active">
+	    <p class= "field_label"><%= t("language") %>:</p>
+	    <div style="position: relative;float: left; width: 80%;">
+		    <% if(@contextual_setting.contextual_languages != [] ) %>
+			<div class="selector_input">
+				<span>
+					<% contextual_languages_length= @contextual_setting.contextual_language_ids.length %>
+					<% @contextual_setting.contextual_languages.each_with_index do |contextual_language, index|%>
+						<% if index != contextual_languages_length -1 %>
+							<%= contextual_language.name %>,
+						<% else %>
+							<%= contextual_language.name %>
+						<% end %>
+					<% end %>
+				</span>
+				<%= select_tag "contextual_setting[contextual_language_ids][]", options_from_collection_for_select(@contextual_languages, "id", "name", @contextual_setting.contextual_language_ids), {:multiple => true, :class => "edition_control"} %>
+			</div>
+			<% else %>
+			<div class="selector_input">
+				<span></span>
+				<%= select_tag "contextual_setting[contextual_language_ids][]", options_from_collection_for_select(@contextual_languages, "id", "name"),{:multiple => true, :class => "edition_control"} %>
+			</div>
+			<% end %>
+		</div>
+	  </div>
+	 <div class="clear"></div>
+</div>
+
+<div class="contextual_setting_box_right"> 
+	<div class="field editable active">
+		<p class= "field_label"><%= t("Address") %>:</p>
+		<div style="position: relative;float: left; width: 80%;">
+			<%= f.text_field :address, :onkeypress => "return press_key(event)" %>
+	 	</div>
+	 	<%= f.hidden_field :latitude %>
+	 	<%= f.hidden_field :longitude %>
+	 </div>
+	 <div class="clear"></div>
+	 <div id="map-canvas"></div>
+	<div class="clear"></div>
+	<hr/>
+	 <h4><%= t("Date_range") %>:</h4> 
+	  <div class="field editable active">
+	    <p class= "field_label"><%= t("Start_date") %>:</p>
+	    <div style="position: relative;float: left">
+		    <%= f.text_field :start_date %>
+		    <i class="icon-pencil icon-grey"></i>
+	    </div>
+	  </div>
+	  <div class="field editable active">
+	    <p class= "field_label"><%= t("End_date") %>:</p>
+	    <div style="position: relative;float: left">
+		    <%= f.text_field :end_date %>
+		    <i class="icon-pencil icon-grey"></i>
+	    </div>
+	  </div>
+	<div class="clear"></div>
+	  
+</div>

@@ -1,0 +1,9 @@
+<% if current_layout == "popup" %>
+	<a class="extract_box popup_new_activity_box new_extract_box" onclick="show_templates(this);">+</a>
+<% else %>
+	<a class="extract_box new_extract_box" href="#activity_template_selector">+</a>
+<% end %>
+
+<% @pictures.each do |picture| %>
+	<%= render :partial => "elements/element", :locals => {:element => picture, :current_layout => current_layout} %>
+<% end %>

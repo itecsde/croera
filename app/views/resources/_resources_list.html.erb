@@ -1,0 +1,13 @@
+
+
+
+<div class= "paginate_controls">
+	<%= paginate @resources, :remote => true, :param_name => "tools_page" %>
+</div>
+
+
+
+<% @resources.each do |resource| %>
+	<%= render :partial => "elements/element", :locals => {:element => resource, :current_layout => current_layout} %>
+<% end %>
+

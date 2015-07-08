@@ -1,0 +1,2 @@
+a=ScraperArtworks.new
+a.scrape_google_art_project

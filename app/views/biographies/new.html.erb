@@ -1,0 +1,23 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'new_biography', :actions => "biographies/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@biography, :html => { :class => "biography_form" }) do |f_biography| %>
+		<div id="element_header">
+			<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @biography,:element_type=>"biography"} %> 
+			<hr />
+			<div class="clear"></div>
+		</div>
+		<div id="content_container" class="biography_container">
+			<input type="hidden" id="edition_mode" value="on">
+				<%= render :partial => "form" , :locals => {:biography_form => f_biography} %>
+				<%= render :partial => "submit", :locals => {:biography_form => f_biography} %>
+		</div>	
+		
+		<span style="display:none" id="is_edition" data-value="true"></span>	
+		
+		<script src="/javascript/biographies_form.js"></script>
+	<% end%>
+<% end %>

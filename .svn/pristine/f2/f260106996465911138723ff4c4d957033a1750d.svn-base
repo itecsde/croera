@@ -1,0 +1,46 @@
+<% 
+	optionalities= Hash.new()
+	optionalities[""] = t("Select_one")
+	optionalities["0"] = t("required")
+	optionalities["1"] = t("recommended")
+	optionalities["2"] = t("nice_to_have")
+	
+	optionalities_reverse= Hash.new()
+	optionalities_reverse[t("Select_one")] = ""
+	optionalities_reverse[t("required")] = "0" 
+	optionalities_reverse[t("recommended")] = "1" 
+	optionalities_reverse[t("nice_to_have")] = "2"
+	@activity = Activity.find(activity_id)
+%>
+
+<div class="draggable_box has_edition_controls active has_action_controls">
+	<div class="draggable_zone">
+		<div class="handle edition_control"></div>
+	</div>
+	<div class="BorderBoxTop">
+		<div class="border_top_1">
+			<div class="link_bar">
+				<div class="edition_controls_bar">
+					<div class="trash edition_control has_tooltip" onclick="trash(this)"><i class="icon-remove icon-grey"></i><span class="tooltip"><%= t("Remove") %></span></div>
+				</div>
+				<div class="actions_controls_bar">
+					<div class="maximize action_control has_tooltip" onclick="maximize(this)"><i class="icon-resize-small icon-grey"></i><span class="tooltip"><%= t("Collapse") %></span></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="edit_sequence_box" >
+		<div class="step_body">
+			<div class="clear"></div>
+			<div>
+				<%= fields_for @activity do |activity_fields| %>
+					<%= render :partial => "activities/form" , :locals => {:f => activity_fields, :is_in_guide => true,:is_in_sequence=>true} %>
+				<% end %>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+	<div class="BorderBoxBottom">
+		<div id="arrow_bottom"></div>
+	</div>
+</div>

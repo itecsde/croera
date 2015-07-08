@@ -1,0 +1,85 @@
+# encoding: utf-8
+require 'net/http'
+require 'net/https'
+require 'uri'
+
+#require "capybara/dsl"
+class Clasify
+   include ActionView::Helpers::SanitizeHelper
+   def clasify_it(text)
+      
+      #sport
+      #text = "Few surprises on Brazil's World Cup team Brazil, as the host country, will play the first game in this summer’s World Cup, so it seems only fitting that on Wednesday it was also among the first countries to announce its 23-man roster for the tournament.Not that any of the players Coach Luiz Felipe Scolari selected were a surprise. Among them were Toronto FC keeper Julio Cesar; defenders David Luiz (Chelsea), Thiago Silva (Paris Saint-Germain) and Dani Alves (Barcelona); Chelsea midfielder teammates Oscar, Ramires and Willian; and forwards Fred (Fluminese), Hulk (Zenit St. Petersburg) and Neymar (Barcelona).Among the omissions were three former world players of the year in Kaka, Robinho and Ronaldinho, all of whom are well past their prime, as well as 21-year-old Liverpool midfielder Philippe Coutinho and Manchester United’s Rafael Pereira da Silva, a 23-year-old right back.Now comes the hard part for Scolari: convincing Brazilians that this team is worth the $11-billion investment the country made in the World Cup.Whether..."
+      
+      #science
+      #text = "The voices of women are all too often missing when the scientific community presents itself to the public. Last week at the British Science Association conference, delegates discussed how to change thatA wise poetcalled Rumi once spoke of acommunityof the spirit. “Join it,” he said, “and feel thedelight/of walking in the noisy street/and being the noise.”The scientific community has spirit inabundance – but still, all too often, the sound of women is missingfrom that joyful noise. At theBritishScience Association’s 2014 conferencelast week, I togetherwithSuze Kundu,LaurieWinkless,HeatherWilliamsandJonWood, led a session in which we askeddelegatesto talk about how we, as science communicators, can publicise the work of women already in science, technology, engineering and mathematics – and encourage those girls andwomen who may be thinking of joining them.I have condensed ourmajor conclusions into a five-point guide – a manifesto, if youwill – for science communicators who want to... "
+      
+      #health
+      #text = "Our ability to tinker with nature has outstripped our ability to regulate what we create, says Yves Tiberghien, a political scientist who specializes in global regulatory mechanisms for technology and trade. Consider that almost 70 per cent of the products we buy at the grocery store contain genetically engineered food. Yet we don't know their long-term impact on our health, the environment, or how they may tip the future balance of power in the global economy. Consider that almost 70 per cent of the products we buy at the grocery store contain genetically engineered food. Yet we don’t know their long-term impact on our health, the environment, or how they may tip the future balance of power in the global economy. “Corn and soy are the two main culprits since nearly all processed foods uses ingredients such as corn syrup, corn starch or soy lecithin,” says Tiberghien. GMO corn and soy first entered into the human food supply in 1996. “It’s a very big experiment -- 11 years of... "
+      
+      #art
+      #text = " Was the Mona Lisa the world's first 3D artwork? Experts claim painter Leonardo da Vinci created two versions of the world famous portrait as part of a science project. The Renaissance artist produced two almost identical copies, which when viewed next to one another would create the impression of depth, it has been claimed."
+      
+      #politics/health      
+      #text = " Democrats Confront Vexing Politics Over the Health Care Law. Democrats may ultimately see political benefit from the law. But people helped by it are among the least likely to vote."
+      
+      #politics
+      #text = " The state Senate on Thursday passed a measure that would require cellphones sold in California to be equipped with kill switches that can render them inoperable if stolen.LAPD Chief Charlie Beck and other law enforcement officials backed the legislation as a way to counter a surge in often-violent robberies, in which thieves take smartphones to resell them. We have a crime wave sweeping our state, Sen. Mark Leno (D-San Francisco) told his colleagues before the vote. We are trying to keep our constituents safe on their streets and in their neighborhoods. The bill had previously failed a Senate vote, but Leno agreed to change it to exclude electronic tablets and delay the date by which kill switches would be mandatory in newly made phones, fromJanuary to July 2015.As a result, Apple and Microsoft dropped their opposition, and five Democrats switched their votes to support the measure. It passed 26 to 8 and now goes to the Assembly.Some Republicans voted against the measure because... "
+      
+      #science
+      #text = " Mars Science Lab launch delayed two years
+#WASHINGTON (CNN)-- NASA's launch of the Mars Science Laboratory -- hampered by technical difficulties and cost overruns -- has been delayed until the fall of 2011, NASA officials said at a news conference Thursday in Washington.A photo illustration of a laser-equipped vehicle that is set to be part of the Mars Science Laboratory.The mission had been scheduled for launch in the fall of 2009.The Mars Science Lab is a large, nuclear-powered rover designed to traverse long distances with a suite of onboard scientific instruments aboard.It is, according to NASA's Web site, part of a long-term effort of robotic exploration established to study the early environmental history of Mars and assess whether Mars has ever been -- or still is -- able to sustain life.The delay of the launch, according to NASA, is due to a number of testing and hardware challenges that must (still) be addressed to ensure mission success.The progress in recent weeks has not come fast enough on solving...
+#"
+      #fashion
+      #text = "Born Donna Ivy Faske on October 2, 1948, in Forest Hills, New York. One of the most influential fashion designers in the world, Donna Karan has left a lasting impact on the world of clothing, bringing uptown New York chic into the mainstream. In 2004 she was the recipient of the Lifetime Achievement Award from the Council of Fashion Designers of America.Fashion designer. Born Donna Ivy Faske on October 2, 1948, in Forest Hills, New York. From an early age Donna, who grew up in Hewlett, Long Island, was immersed in the world of fashion. Her mother worked as a model while her stepfather made a living as a suit designer.Karan's family's influence was apparent in her early life. By the age of 14 she had dropped out of school and begun selling clothing at a local boutique. In 1968 Karan was accepted into the highly respected Parsons School of Design in New York City.While in school, Karan landed an prestigious summer job working for designer Anne Klein. Her work there proved so... "
+
+      #education
+      #text = "END 2014 - Education and New Developments 2014 in Madrid, Spain: send your abstract until 21 March 2014CALL FOR ABSTRACTSEND 2014 - International Conference on Education and New Developments 201428 - 30 of June 2014  Madrid, Spainhttp://www.end-educationconference.org /= Important Dates (1st Call Extension) =Abstract submissions: 21 March 2014Authors' notifications: 21 April 2014Registration: until 19 May 2014=Keynote Speaker=Professor Hanna David, PhD Tel Aviv University (Emerita), Israel= Conference Goals =Education, in a global sense, is a right since we are born. Every experience has a formative effect on the constitution of the human being, in the way one thinks, feels and acts. One of the most important contribution resides in what and how we learn through the improvement of educational processes, both in formal and informal settings.Our International Conference seeks to provide some answers and explore the processes, actions, challenges... " 
+      
+      #technology
+      #text = "Sci-fi film Minority Report introduced the idea that large, vertical screens could one day be controlled using just gestures.But while the film was a work of fiction set 40 years in the future, a university in Bristol has taken the technology one step closer to reality. The MisTable features a tabletop, touchscreen display surround by a 'curtain of mist'.This curtain is made of fog screens that work in a similar way to touch displays, letting users move images around and manipulate their orientation within the smoke. Scroll down for video The MisTable, pictured, was developed by researchers at the University of Bristol. It features a tabletop, touchscreen display surround by a 'curtain of mist'. This curtain is made of fog screens that work in a similar way to touch displays, letting users move images around within the smokeThe MisTable features a tabletop, touchscreen display surrounded by a 'curtain of mist'.This curtain is made of fog screens that work in a similar way to touch... "
+      
+      #money
+      #text = "n its heyday, Bitcoin’s value soared passed $1,100 but just five months later, the currency’s price has plummeted.Earlier this week, Chinese banks sent notices to local Bitcoin exchanges stating their accounts would be frozen on April 15 as part of a wider national crackdown.Chinese trading makes up a large volume of Bitcoin transactions, and the news saw its value drop to $350 - a loss of around $100 in a single day.Bitcoin is a piece of data confined to an internet network by an algorithm.Once released it can be traded and used like money online and can be purchased with real cash.Many websites are now taking Bitcoins as a form of currency.As well as digital currency, Bitcoin miners enjoy the competitive nature of unlocking the coins.It has been dismissed by some as a Ponzi Scheme and touted by others as the future of money.It is not centrally controlled and its unique and complex set-up means the market cannot be altered or hacked, according to the developers.There are 21... "
+      
+      #text = " Avoid these mistakes on Social Security and selling investments
+#Dear Liz:My wife and I, 63 and 62, plan to continue working till at least 65. We will begin collecting Social Security benefits in September. Our combined income is $58,000, we own our home outright, and we have no debt, no children, $84,000 in a traditional IRA and $90,000 in a stock portfolio.I just sold a portion of a mutual fund for a $30,000 gain that is in the bank for the time being. How long do we have to reinvest without paying a capital gains tax? Or would it be best to pay the tax now, leave the money in the bank and be done with it?Answer:Unless you sell another investment for a $30,000 loss to offset the gain, you're going to have to pay taxes on your profit.There is no way to do a tax-free reinvestment, said tax professional Eva Rosenberg, an enrolled agent who runs theTaxMama.comsite. And the time to ask questions like that is before you sell the mutual funds.You still have time to avoid a much bigger mistake: signing up for Social Security now.Your Social...
+#" 
+      
+      scraper = Scraper.new
+            
+      wikipediator = Wikipediator.new
+      newspaper_sections = ["Business", "Technology", "Science", "Health", "Sport", "Art", "Fashion", "Politics", "Education", "Culture", "Movie", "Music", "Television", "Economy"]
+      categories = Array.new
+      total_relatedness = 0
+           
+      newspaper_sections.each do |section|
+         category = wikipediator.complex_search_it(section)
+         categories << {:name => category[0][:name], :wikipedia_article_id => category[0][:wikipedia_article_id]}
+      end
+               
+      wikitopics = wikipediator.wikify_it(text)
+      
+      categories.each do |category|
+         wikitopics.each do |wikitopic|
+            relatedness = wikipediator.compare(wikitopic[:wikipedia_article_id],category[:wikipedia_article_id])
+            total_relatedness = total_relatedness + relatedness.to_f
+         end
+         relatedness_mean = total_relatedness / wikitopics.size
+         category = category[:relatedness_mean] = relatedness_mean 
+         relatedness_mean = 0
+         total_relatedness = 0
+      end 
+          
+      categories = categories.sort_by { |hsh| hsh[:relatedness_mean] }
+      
+      puts "WIKITOPICS"
+      puts wikitopics
+      puts "wikitopics"
+      
+      puts categories
+      puts "CATEGORY SELECTED: "
+      puts categories.last     
+   end
+
+end

@@ -1,0 +1,1093 @@
+class ScraperApplications
+  
+   ##########################
+  #Function that check if de resource if whe need to insert new resource, 
+  #update existing one or do nothing because the resource is already updated
+  #########################
+  def check_resource_storage_state(type_resource,url,recent_hash)
+     result="do_nothing"
+     case type_resource
+        when "event"
+            event=Event.where(:url=> url)                  
+            if event.size > 0   
+              puts event[0].hash_resource           
+              if event[0].hash_resource != recent_hash
+                result="update"              
+              end
+            else
+              result="insert"              
+            end
+        when "application"
+            application=Application.where(:url=> url)
+            if application.size > 0
+              if application[0].hash_resource != recent_hash
+                result="update"            
+              end
+            else
+              result="insert"                 
+            end
+        when "person"
+            person=Application.where(:url=> url)
+            if person.size > 0
+              if person[0].hash_resource != recent_hash
+                result="update"            
+              end
+            else
+              result="insert"                
+            end
+     end
+     return result
+  end
+  
+######################################################################################
+#                           scrape_alternativeto_2                                   #
+######################################################################################
+
+## Escrapea applications de alternativeto según las categorías del itec
+
+ def scrape_alternativeto_2
+    begin
+      scrape_tag_alternativeto_2("art","art")
+      scrape_tag_alternativeto_2("astronomy","astronomy")
+      scrape_tag_alternativeto_2("biology","biology")
+      scrape_tag_alternativeto_2("chemistry","chemistry")   
+      scrape_tag_alternativeto_2("citizenship","citizenship")
+      scrape_tag_alternativeto_2("museum","culture")    
+      scrape_list_alternativeto_2("open-culture","culture")
+      scrape_tag_alternativeto_2("accounting","economics")
+      scrape_list_alternativeto_2("claroline","educational administration")
+      scrape_list_alternativeto_2("busuu-com","foreign language")
+      scrape_list_alternativeto_2("marble","geography")
+      scrape_list_alternativeto_2("gemcom-surpac","geology")
+      scrape_tag_alternativeto_2("medical","health education")
+      scrape_tag_alternativeto_2("personal-finance-management","home economics")
+      scrape_tag_alternativeto_2("operating-system","informatics/ICT")
+      scrape_tag_alternativeto_2("office-suite","informatics/ICT")
+      scrape_tag_alternativeto_2("grammar","language and literature")
+      scrape_tag_alternativeto_2("spelling","language and literature")
+      scrape_tag_alternativeto_2("online-books","language and literature")
+      scrape_list_alternativeto_2("laws-pro","law")
+      scrape_tag_alternativeto_2("mathematics","mathematics")
+      scrape_list_alternativeto_2("adobe-premiere-pro","media education")
+      scrape_tag_alternativeto_2("music-theory","music")
+      scrape_tag_alternativeto_2("music-discovery","music")
+      scrape_tag_alternativeto_2("music-player","music")
+      scrape_tag_alternativeto_2("citizen-science","philosophy")
+      scrape_tag_alternativeto_2("fitness","physical education")
+      scrape_tag_alternativeto_2("exercise","physical education")
+      scrape_tag_alternativeto_2("physics-simulation","physics")
+      scrape_tag_alternativeto_2("news","politics")
+      scrape_tag_alternativeto_2("kids","pre-school education")
+      scrape_tag_alternativeto_2("student","primary education")
+      scrape_tag_alternativeto_2("psychology","psycology")
+      scrape_tag_alternativeto_2("islam","religion")
+      scrape_tag_alternativeto_2("islamic","religion")
+      scrape_tag_alternativeto_2("religion","religion")
+      scrape_tag_alternativeto_2("bible","religion")
+      scrape_tag_alternativeto_2("accessibility","special (needs) education")
+      scrape_tag_alternativeto_2("screen-reader","special (needs) education")
+      scrape_tag_alternativeto_2("screen-magnifier","special (needs) education")
+      scrape_tag_alternativeto_2("disability","special (needs) education")      
+    rescue
+      puts "Exception in scrape_alternativeto_2"
+    end
+  end
+
+  def scrape_list_alternativeto_2(app_name,itec_category,*reintentos)
+    
+    if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+    else
+      reintentos = 2
+    end  
+     
+    url="http://alternativeto.net/software/"+app_name+"/"
+    puts "Scrape Alternativesto --> " + url
+    begin       
+      list_page = Nokogiri::HTML(open(url))
+      reintentos = 2
+      list_page.css('li.item-wrapper').each do |item|
+        url_app="http://alternativeto.net"+item.css('div.item-header > h3')[0].css('a')[0]['href']       
+        tags=Array.new
+        item.css('div.listTags').css('a').each do |html_tag|
+          tags.push(html_tag.text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '))
+        end
+        if !itec_category.in?(tags)
+          tags.push(itec_category)
+        end
+        operating_systems = Array.new
+        item.css("div.alternative-platform-list").css("a").each do |html_os|
+          operating_systems.push(html_os.text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '))
+        end
+        scrape_application_alternativeto_2(url_app,tags,operating_systems)
+      end      
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Exception in scrape_list_alternativeto_2"
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_list_alternativeto_2(app_name,itec_category,1,reintentos)
+      end
+    end   
+  end  
+
+
+  def scrape_tag_alternativeto_2(tag_name,itec_category,*reintentos)
+       
+    if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+    else
+      reintentos = 2
+    end  
+    
+    url="http://alternativeto.net/tag/"+tag_name+"/"
+    puts "Scrape TAG--> " + url
+    begin       
+      list_page = Nokogiri::HTML(open(url))
+      reintentos = 2
+      list_page.css('li.item-wrapper').each do |item|
+        url_app="http://alternativeto.net"+item.css('div.item-header > h3')[0].css('a')[0]['href']       
+        tags=Array.new
+        item.css('div.listTags').css('a').each do |html_tag|
+          tags.push(html_tag.text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '))
+        end
+        if !itec_category.in?(tags)
+          tags.push(itec_category)
+        end
+        operating_systems = Array.new
+        item.css("div.alternative-platform-list").css("a").each do |html_os|
+          operating_systems.push(html_os.text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '))
+        end
+        scrape_application_alternativeto_2(url_app,tags,operating_systems)
+      end      
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Exception in scrape_tag_alternativeto_2"
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_tag_alternativeto_2(tag_name,itec_category,1,reintentos)
+      end
+    end   
+  end  
+  
+    def scrape_application_alternativeto_2(url,tags,operating_systems,*reintentos)
+      
+    if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+    else
+      reintentos = 2
+    end  
+      
+    puts url
+    scraped_from="http://alternativeto.net"        
+    begin               
+      app_page = Nokogiri::HTML(open(url))
+      name=app_page.css('h1#currentItemHeader').text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ')
+      description=app_page.css('p.mainitem-description')[0].text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ')
+      app_url=app_page.css('a#topWebsiteUrl')[0]['href']
+      if ((!app_url.include? "http://") && (!app_url.include? "https://"))
+        app_url="http://alternativeto.net"+app_url
+      end
+      begin
+        photo_url=app_page.css('img#cph1_cphHeader_ucIconLikesButton_imgIcon')[0]['src']
+      rescue
+        puts "no existe photo"
+        photo_url = nil
+      end     
+      likes = app_page.css(".icon-num-box a")[0].text.strip.gsub("likes","")
+      
+      wikipediator = Wikipediator.new
+      
+      urls = wikipediator.application_translation_urls(name)
+      
+      if Application.where(:url=> app_url).size==0     
+          puts "Entre no repetido: "+ app_url 
+          I18n.locale = "en"        
+          scraped_app=Application.new
+          scraped_app.name=name
+          scraped_app.description=description          
+          scraped_app.url=app_url
+          scraped_app.scraped_from=scraped_from
+          if photo_url!=nil
+            scraped_app.element_image=URI.parse(photo_url)
+          end
+          scraped_app.likes_in_alternative_to = likes.to_i
+           
+          tags.each do |tag|
+            if Tag.find_by_name(tag)!=nil
+              scraped_app.tags << Tag.find_by_name(tag)
+            else
+              new_tag=Tag.new
+              new_tag.name=tag
+              new_tag.save
+              scraped_app.tags << new_tag
+            end
+          end
+          
+          guardados = Array.new
+          
+          operating_systems.each do |os|        
+            case os.downcase
+            when "linux"
+              os = "Linux"
+            when "mac"
+              os = "Mac OS X"
+            when "windows"
+              os = "Windows"
+            when "android"
+              os = "Android"
+            when "iphone", "ipad", "ios"
+              os = "IOS"
+            when "online"
+              os = "Online"
+            end                      
+            if !os.in?(guardados)
+              guardados << os   
+              if OperatingSystem.find_by_name(os)!=nil
+                  annotation = ApplicationOperatingSystemAnnotation.new
+                  annotation.application = scraped_app
+                  annotation.operating_system_id = OperatingSystem.find_by_name(os).id
+                  annotation.save                      
+              end
+            end               
+          end #do operating_systems                                       
+          scraped_app.save                           
+      else
+        puts "Aplicacion repetida no la guardo" 
+      end            
+
+      reintentos = 2
+  
+      #puts name
+      #puts description
+      #puts app_url
+      #puts photo_url
+  
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Exception in scrape_application_alternativeto_2"
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_application_alternativeto_2(url,tags,operating_systems,1,reintentos)
+      end
+    end
+  end
+
+
+ #######################################################
+  #######################################################  
+  ### Parsing app from alternativeto
+  def scrape_alternativeto
+    
+    scrape_list_alternativeto("skype",1)
+    scrape_list_alternativeto("asana",3)
+    scrape_list_alternativeto("mediawiki",4)
+    scrape_list_alternativeto("gimp",5)
+    scrape_list_alternativeto("virtualdub",5)
+    scrape_list_alternativeto("dia",6)
+    scrape_list_alternativeto("libreoffice-impress",7)
+    scrape_list_alternativeto("wikipedia",8)
+    scrape_list_alternativeto("google-docs---forms",9)
+    scrape_list_alternativeto("phpBB",10)
+    scrape_list_alternativeto("libreoffice-writer",11)
+    scrape_list_alternativeto("active-worlds",12)
+             
+  end
+  
+  
+  def scrape_list_alternativeto(app_name,functionality_id) 
+    url="http://alternativeto.net/software/"+app_name+"/"
+    puts "Alternativesto--> " + url
+    begin       
+      list_page = Nokogiri::HTML(open(url))
+      list_page.css('li.item-wrapper').each do |item|
+        url_app="http://alternativeto.net"+item.css('div.item-header > h3')[0].css('a')[0]['href']       
+        tags=Array.new
+        item.css('div.listTags').css('a').each do |html_tag|
+          tags.push(html_tag.text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '))
+        end
+           
+        operating_systems = Array.new
+        item.css("div.alternative-platform-list").css("a").each do |html_os|
+          operating_systems.push(html_os.text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '))
+        end
+        #puts operating_systems
+        #puts tags
+        scrape_application_alternativeto(url_app,functionality_id,tags,operating_systems)
+      end      
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Exception in scrape_list_alternativeto"
+    end   
+  end  
+  
+  
+  def scrape_application_alternativeto(url,functionality_id,tags,operating_systems)
+    puts url
+    scraped_from="http://alternativeto.net"        
+    begin               
+      app_page = Nokogiri::HTML(open(url))
+      name=app_page.css('h1#currentItemHeader').text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ')
+      description=app_page.css('p.mainitem-description')[0].text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ')
+      app_url=app_page.css('a#topWebsiteUrl')[0]['href']
+      if ((!app_url.include? "http://") && (!app_url.include? "https://"))
+        app_url="http://alternativeto.net"+app_url
+      end
+      photo_url=app_page.css('img#cph1_cphHeader_ucIconLikesButton_imgIcon')[0]['src']
+      
+      likes = app_page.css(".icon-num-box a")[0].text.strip.gsub("likes","")
+      
+      
+      if Application.where(:url=> app_url).size==0     
+          puts "Entre no repetido: "+ app_url 
+          I18n.locale = "en"        
+          scraped_app=Application.new
+          scraped_app.name=name
+          scraped_app.description=description          
+          scraped_app.url=app_url
+          scraped_app.scraped_from=scraped_from
+          if photo_url!=nil
+            scraped_app.element_image=URI.parse(photo_url)
+          end
+          scraped_app.likes_in_alternative_to = likes.to_i
+           
+          tags.each do |tag|
+            #puts tag
+            #puts Tag.find_by_name(tag)
+            if Tag.find_by_name(tag)!=nil
+              puts "Ya existe tag lo asocio"
+              scraped_app.tags << Tag.find_by_name(tag)
+            else
+              puts "No existe tag, lo creo"
+              new_tag=Tag.new
+              new_tag.name=tag
+              new_tag.save
+              scraped_app.tags << new_tag
+            end
+          end
+          
+          guardados = Array.new
+          
+          operating_systems.each do |os|        
+            case os.downcase
+            when "linux"
+              os = "Linux"
+            when "mac"
+              os = "Mac OS X"
+            when "windows"
+              os = "Windows"
+            when "android"
+              os = "Android"
+            when "iphone", "ipad", "ios"
+              os = "IOS"
+            when "online"
+              os = "Online"
+            end                      
+            if !os.in?(guardados)
+              guardados << os   
+              if OperatingSystem.find_by_name(os)!=nil
+                  annotation = ApplicationOperatingSystemAnnotation.new
+                  annotation.application = scraped_app
+                  annotation.operating_system_id = OperatingSystem.find_by_name(os).id
+                  annotation.save                      
+              end
+            end               
+          end #do operating_systems
+                                          
+          scraped_app.save                 
+          annotation = ApplicationFunctionalityAnnotation.new             
+          annotation.application = scraped_app             
+          annotation.functionality_id = functionality_id             
+          annotation.level = 4             
+          annotation.save
+          puts "Application, Tags and Application_functionality_annotations saved correct"
+             
+      else
+        puts "Aplicacion repetida no la guardo" 
+      end            
+
+      #puts name
+      #puts description
+      puts app_url
+      #puts photo_url
+  
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Exception in scrape_application_alternativeto"
+    end
+  end
+  
+  
+######################################################################################
+#                           scrape_alternativeto_all                                 #
+######################################################################################
+## Escrapea todas las applications de alternative_to
+
+ def scrape_alternativeto_all(*reintentos)
+    begin
+      source_name = __method__.to_s    
+      #Add new source, or select if exists
+      source = Source.create_or_select_source(source_name, "Application", "http://alternativeto.net")
+      
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end  
+        
+      url="http://alternativeto.net/"
+      puts "Scrape: " + url
+      page = Nokogiri::HTML(open(url))      
+      reintentos = 2
+      page.css("div#catgegorySidebar ul.SidebarItemList li").each do |category|
+        category_url = category.css("div.item-header h4.app-title a")[0]['href']
+        if category_url != "http://alternativeto.net/category//"
+          scrape_category_alternativeto_all(category_url)
+        end
+      end    
+      source.correct_scrape
+    rescue
+      puts "Exception in scrape_alternativeto_completo"
+      puts "Reintamos dos veces, sino abortamos"
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_alternativeto_all(1,reintentos)
+      end
+      source.incorrect_scrape
+    end
+  end
+  
+  
+  def scrape_category_alternativeto_all(category_url,*siguiente)
+       
+    if siguiente[1]==1
+      reintentos = siguiente[2].to_i
+    else
+      reintentos = 2
+    end  
+    
+    puts "  Scrape category--> " + category_url
+    begin
+      if siguiente [1]!=1       
+        category_page = Nokogiri::HTML(open(category_url))
+        reintentos = 2
+        category_page.css('li.item-wrapper').each do |item|
+          url_app="http://alternativeto.net"+item.css('div.item-header > h3')[0].css('a')[0]['href']       
+          tags=Array.new
+          item.css('div.listTags').css('a').each do |html_tag|
+            tags.push(html_tag.text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '))
+          end
+          operating_systems = Array.new
+          operating_systems = item.css("div.alternative-platform-list")[0].text.split(",")
+          scrape_application_alternativeto_all(url_app,tags,operating_systems)
+        end
+      end
+              
+      ################ paginacion ##################
+      if siguiente[1] != 1         
+        siguiente = category_page.css("div#ctl00_ctl00_cph1_cphMain_ucLikedItemList_ucPager_pager a")[0]['href']
+      else
+        siguiente = siguiente[0]
+      end
+
+      while siguiente != nil
+        sleep 2
+        puts "URL_SIGUIENTE --> " + siguiente
+        category_page2 =  Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+             
+        category_page2.css('li.item-wrapper').each do |item|
+          url_app="http://alternativeto.net"+item.css('div.item-header > h3')[0].css('a')[0]['href']       
+          tags=Array.new
+          item.css('div.listTags').css('a').each do |html_tag|
+            tags.push(html_tag.text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '))
+          end
+          operating_systems = Array.new
+          operating_systems = item.css("div.alternative-platform-list")[0].text.split(",")
+          scrape_application_alternativeto_all(url_app,tags,operating_systems)
+        end
+
+        if ((category_page2.css("div#ctl00_ctl00_cph1_cphMain_ucLikedItemList_ucPager_pager a").empty?) || (category_page2.css("div#ctl00_ctl00_cph1_cphMain_ucLikedItemList_ucPager_pager a").length==1)) 
+          siguiente = nil
+        else
+          
+          siguiente = category_page2.css("div#ctl00_ctl00_cph1_cphMain_ucLikedItemList_ucPager_pager a")[1]['href']
+        end
+      end
+      ################ fin paginacion ##############
+                 
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Exception in scrape_category_alternativeto_all"
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        puts reintentos
+        scrape_category_alternativeto_all(category_url,siguiente,1,reintentos)
+      end
+    end   
+  end  
+  
+  def scrape_application_alternativeto_all(url,human_tags,operating_systems,*reintentos)
+      
+    if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+    else
+      reintentos = 2
+    end            
+    puts "    " + url
+    old_url = url
+    scraped_from = "http://alternativeto.net"        
+    idiomas_disponibles = ["en"]
+    details_url = ""
+    scraped_app = Application.new
+    begin                        
+      puts "Entre no repetido: " + url 
+      app_page = Nokogiri::HTML(open(url))
+      begin
+        name = app_page.css('h1#currentItemHeader').text.strip().gsub(/\n/,", ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ')
+        description = app_page.css('p.mainitem-description')[0].text.strip
+        if description.include? "More info"
+          app_page.css("div#mainitem-info div p.mainitem-description a").each do |link|
+            puts link
+            if link.text.include? "More info"
+              details_url = "http://alternativeto.net" + link['href']
+              break
+            end
+          end
+          details_page = Nokogiri::HTML(open(details_url))
+          description = details_page.css("div#content div#informationPage div.KonaBody")[0].text.strip
+        end
+      rescue Exception => e
+        puts "Failed name/description alternativeto_all"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      begin
+        scraped_app.url = app_page.css("div#content-header-metadata div.meta-lists div.content a#websiteUrl.small-icon")[0]['href']
+        if !scraped_app.url.include? "http"
+          scraped_app.url = "http://alternativeto.net" + scraped_app.url
+        end
+      rescue Exception => e
+        puts "Failed URL alternativeto_all"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+
+      begin
+        if !app_page.css('a.fancybox-button img#cph1_cphHeader_ucDisplayScreens_lvScreens_smallScreens_0.smallScreens').empty?
+          photo_url = app_page.css('a.fancybox-button img#cph1_cphHeader_ucDisplayScreens_lvScreens_smallScreens_0.smallScreens')[0]['src']
+        end
+        if photo_url != nil
+          photo_url = photo_url.split("?")[0]
+        end
+        if photo_url == nil
+          photo_url = biggest_image(scraped_app.url)
+        end
+ 
+        if !app_page.css('img#cph1_cphHeader_ucIconLikesButton_imgIcon').empty?
+          icon_url = app_page.css('img#cph1_cphHeader_ucIconLikesButton_imgIcon')[0]['src']
+        end
+      
+      rescue Exception => e
+        puts "no existe photo alternativeto_all"
+        photo_url = nil
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      begin     
+        likes = app_page.css("div.icon-num-box div")[0].text.strip
+      rescue 
+        puts "Failed likes alternativeto_all"
+      end
+                              
+      I18n.locale = "en"        
+      name_en = name
+      description_en = description
+      scraped_app.name = name
+      scraped_app.description = description  
+      begin       
+        wikipediator = Wikipediator.new      
+        urls_translations = wikipediator.application_translation_urls(name)
+        #puts urls_translations
+        urls_translations.each do |url_translations|
+          I18n.locale = url_translations[:lang]
+          wikipedia_page = Nokogiri::HTML(open(url_translations[:url].gsub(" ","%20")))
+          description = ""
+          wikipedia_page.css("div#mw-content-text p").each_with_index do |parrafo, index|
+            if index < 3
+              description = description + parrafo.text
+            end
+          end
+          puts "Obteniendo informacion en idioma: " + url_translations[:lang]
+          idiomas_disponibles << url_translations[:lang]
+          #puts url_translations[:url]
+          #puts description
+          scraped_app.description = description
+        end
+      rescue Exception => e
+        puts "Exception translations alternativeto_all"
+        puts e.message
+        puts e.backtrace.inspect
+      end     
+      I18n.locale = "en"  
+
+      scraped_app.scraped_from = scraped_from
+            
+      scraped_app.likes_in_alternative_to = likes.to_i
+      
+      prosa = name_en + " ." + description_en
+                      
+      scraped_app.persist(idiomas_disponibles,prosa,human_tags,operating_systems,photo_url,icon_url,old_url)
+                   
+      reintentos = 2
+      #puts name
+      #puts description
+      #puts scraped_app.url
+      #puts photo_url
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Exception in scrape_application_alternativeto_all"
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_application_alternativeto_all(url,human_tags,operating_systems,1,reintentos)
+      end
+    end
+  end
+  
+  def biggest_image(external_url)
+    begin
+      hash_images = Hash.new
+      external_page = Nokogiri::HTML(open(external_url))
+      image_url = nil
+      image_matches = external_page.css("img")
+      puts image_matches
+      image_matches.each do |match|
+        begin
+        dummy_application = Application.new
+        # Builds the URL
+        puts match
+        if match['src'] != nil
+          url = match['src']
+          if !match['src'].include? "http"
+            if match['src'][0] != "/"
+              match['src'] = "/" + match['src']
+            end
+            url = "http://" + URI.parse(external_url).host + match['src']
+          end
+          # Parses it
+          puts url
+          dummy_application.element_image = URI.parse(url)
+          hash_images[url] = dummy_application.element_image.size.to_i
+        end
+        rescue
+        end
+      end
+      hash_images = hash_images.sort_by{|k,v| v}
+      puts hash_images
+      image_url = hash_images.last[0]
+      return image_url
+    rescue Exception => e
+      puts "Failed biggest_image"
+      puts e.message
+      puts e.backtrace.inspect
+    end
+  end
+
+
+
+  ####################################################################################################
+  ####################################################################################################
+
+  def scrape_softonic
+    #begin
+      scraped_from="http://www.softonic.com"
+      lista_app = []
+      #parseo de comunicacion y colaboracion
+      base_uri = 'http://en.softonic.com/windows/communication:images'      
+      lista = scrape_aplications_softonic(base_uri,1)
+      lista_app.concat lista
+      puts "check1-- numero aplicaciones = "+lista_app.size.to_s 
+      base_uri = 'http://games.en.softonic.com/windows/puzzle-games:images'
+      lista = scrape_aplications_softonic(base_uri,2)
+      lista_app.concat lista
+      puts "check2"
+      base_uri = 'http://en.softonic.com/windows/project-management-software:images'
+      lista = scrape_aplications_softonic(base_uri,3)
+      lista_app.concat lista
+      puts "check3"
+      base_uri = 'http://en.softonic.com/windows/databases:images'
+      lista = scrape_aplications_softonic(base_uri,4)
+      lista_app.concat lista
+      puts "check4"
+      base_uri = 'http://en.softonic.com/windows/video-editors:images'
+      lista = scrape_aplications_softonic(base_uri,5)
+      lista_app.concat lista     
+      puts "check5"
+      base_uri = 'http://en.softonic.com/windows/presentation:images'
+      lista = scrape_aplications_softonic(base_uri,7)
+      lista_app.concat lista
+      puts "check6"
+      base_uri = 'http://en.softonic.com/windows/text-editing-utilities:images'
+      lista = scrape_aplications_softonic(base_uri,11)
+      lista_app.concat lista
+      puts "check7"
+      
+      
+      lista_app.each do |item|
+        puts item.nombre
+        arr_apps = Application.where(:url=> item.uri)
+        if arr_apps.size==0
+          puts "Entre no repetido: "+item.uri
+          scraped_app=Application.new
+          is_editing=false
+        else
+          scraped_app = arr_apps[0]
+          is_editing=true
+        end
+        
+        I18n.locale = "en"        
+            
+        scraped_app.name=item.nombre
+        scraped_app.description=item.descripcion          
+        scraped_app.url=item.uri
+        scraped_app.scraped_from=scraped_from
+        if item.icon!=nil and item.icon != ""
+           scraped_app.element_image=URI.parse(item.icon)
+        end    
+        
+        
+        if item.tags!=nil                  
+          item.tags.split(",").each do |tag|          
+            puts Tag.find_by_name(tag)
+            if Tag.find_by_name(tag)!=nil
+              puts "Ya existe tag lo asocio"
+              if scraped_app.tags.find_by_name(tag) != nil
+                scraped_app.tags << Tag.find_by_name(tag)
+              end
+            else
+              puts "No existe tag, lo creo"
+              new_tag=Tag.new
+              new_tag.name=tag
+              new_tag.save
+              scraped_app.tags << new_tag
+            end
+          end 
+        end
+        scraped_app.save
+          
+        if is_editing                              
+          annotation = ApplicationFunctionalityAnnotation.new             
+          annotation.application = scraped_app             
+          annotation.functionality_id = item.functionality             
+          annotation.level = 4             
+          annotation.save
+        end
+        puts "Application, Tags and Application_functionality_annotations saved correct"
+               
+       
+      end
+      puts 'FIN'
+    #rescue
+    #  puts "Exception softonic"
+    #end
+  end
+  
+  def scrape_aplications_softonic(base_uri,functionality_id)
+    begin 
+      doc = Nokogiri::HTML(open(base_uri))
+      
+      numero_paginas = doc.css('.title-page-details').text.gsub(/[^0-9]/,'')  
+      paginas = (Integer(numero_paginas) / 12) 
+      
+      #para no comprobar todas 
+      if paginas>10
+        paginas = 10
+      end
+      #paginas=1
+      puts "--paginas "+paginas.to_s
+      arr = []
+      paginas.times do |num|
+        puts num
+        if num >= 1
+          pag = num + 1 
+          uri = base_uri + '/' +String(pag)
+        else 
+          uri = base_uri
+        end
+        puts uri
+        doc = Nokogiri::HTML(open(uri))
+        
+        doc.css('.gallery_program_box').each do |item|
+          #puts item.text.gsub(/\n/,"").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ')
+          new_app = AplicacionSoftonic.new(item.at_css(".tracking_title").text.gsub(/\n/,"").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '), item.at_css(".tracking_title")['href'])
+          puts '--'+ item.at_css(".tracking_title")['href']
+          new_app.set_functionality(functionality_id)
+          #puts item.at_css(".tracking_title").text.gsub(/\n/,"").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ') +' '+ item.at_css(".tracking_title")['href']
+          #puts new_app.get_nombre + ' ' + new_app.get_uri
+          arr << new_app
+        end
+      end
+      puts '--Comprobamos las aplicaciones una a una'
+     
+      arr.each do |item|
+        doc = Nokogiri::HTML(open(item.uri))
+          doc.css('#company_review').each do |item2|
+            item.set_descripcion(item2.at_css('#review_data').text.strip().gsub(/\n/,"").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '))
+            item.set_tags(item2.at_css('#tag-list').text.gsub(/\n/,",").gsub(/\t/,''))
+            item.set_icon(doc.css('.title-page-img')[0]['src'])
+          end
+      end
+      
+      #return arr
+      
+      rescue Exception => e
+        puts "Excepction scraping"+base_uri
+        puts e.message            # Test de excepción
+        #puts e.backtrace.inspect 
+        
+      end # fin begin
+      
+      return arr
+  end # fin scrape_aplications_softonic
+    
+    
+#############################################################
+############      softpedia   ###############################    
+#############################################################
+
+  def scrape_softpedia
+    scraped_from="http://www.softpedia.com"
+    lista_app = []
+    #parseo de comunicacion y colaboracion
+    base_uri = 'http://www.softpedia.com/catList/1,0,3,0,1.html'      
+    lista = scrape_aplications_softpedia(base_uri,1)
+    lista_app.concat lista
+    
+    lista_app.each do |item|
+        puts item.nombre
+        arr_apps = Application.where(:url=> item.uri)
+        if arr_apps.size==0
+          puts "Entre no repetido: "+item.uri
+          scraped_app=Application.new
+          is_editing=false
+        else
+          scraped_app = arr_apps[0]
+          is_editing=true
+        end
+        
+        I18n.locale = "en"        
+            
+        scraped_app.name=item.nombre
+        scraped_app.description=item.descripcion          
+        scraped_app.url=item.uri
+        scraped_app.scraped_from=scraped_from
+        if item.icon!=nil and item.icon != ""
+           scraped_app.element_image=URI.parse(item.icon)
+        end    
+        
+        
+        if item.tags!=nil                  
+          item.tags.split(",").each do |tag|          
+            puts Tag.find_by_name(tag)
+            if Tag.find_by_name(tag)!=nil
+              puts "Ya existe tag lo asocio"
+              if scraped_app.tags.find_by_name(tag) != nil
+                scraped_app.tags << Tag.find_by_name(tag)
+              end
+            else
+              puts "No existe tag, lo creo"
+              new_tag=Tag.new
+              new_tag.name=tag
+              new_tag.save
+              scraped_app.tags << new_tag
+            end
+          end 
+        end
+        scraped_app.save
+          
+        if is_editing                              
+          annotation = ApplicationFunctionalityAnnotation.new             
+          annotation.application = scraped_app             
+          annotation.functionality_id = item.functionality             
+          annotation.level = 4             
+          annotation.save
+        end
+        puts "Application, Tags and Application_functionality_annotations saved correct"
+               
+       
+      end
+      puts 'FIN'
+  end    
+  
+  def scrape_aplications_softpedia(base_uri,functionality_id)
+    begin 
+      doc = Nokogiri::HTML(open(base_uri))
+      puts base_uri
+      tabla_tr = doc.css('.contentheadings')
+      array_pages = tabla_tr[5].text.gsub(/[^0-9\s]+/,'').strip().split()
+      if array_pages.size == 1
+        paginas = 1
+      else
+        paginas = array_pages[array_pages.size - 1 ].to_i
+      end
+      #para no comprobar todas 
+      if paginas>1
+        paginas = 1
+      end
+      #paginas=1
+      puts "--paginas "+paginas.to_s
+      
+      arr = []
+      paginas.times do |num|
+        puts num
+        if num >= 1
+          pag = num + 1
+          #obtenemos la base de la uri que queremos construir
+          base = base_uri[0,base_uri.size - 6] 
+          uri = base +String(pag)+ '.html'
+        else 
+          uri = base_uri
+        end
+        puts uri
+        doc = Nokogiri::HTML(open(uri))
+        
+        doc.css('.listheadings_2').each do |item|
+          puts 'aplicacion'
+          nombre = item.at_css('.padding_tlr15px > h2').text.gsub(/\n/,"").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ').gsub(/\s\[.*\]/,'')
+          url_href = item.at_css('.padding_tlr15px > h2 > a')['href']
+          new_app = AplicacionSoftonic.new(nombre,url_href)
+          #puts '--'+ item.at_css(".tracking_title")['href']
+          #new_app.set_functionality(functionality_id)
+          #puts item.at_css(".tracking_title").text.gsub(/\n/,"").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ') +' '+ item.at_css(".tracking_title")['href']
+          #puts new_app.get_nombre + ' ' + new_app.get_uri
+          
+          arr << new_app
+        end
+      end
+      puts '--Comprobamos las aplicaciones una a una'
+     
+      arr.each do |item|
+        puts item.nombre
+        begin
+        doc = Nokogiri::HTML(open(item.uri))
+          #doc.css('#company_review').each do |item2|
+            
+            item.set_descripcion(doc.css('.desch2 > p').text.strip().gsub(/\n/,"").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '))
+            #item.set_tags(item2.at_css('#tag-list').text.gsub(/\n/,",").gsub(/\t/,''))
+            begin
+              tablas = doc.css('.margin_left25px')[3]
+              elementos = tablas.elements()
+              longitud = elementos[1].elements()[1].elements().size
+              item.set_tags(elementos[1].elements()[1].elements()[longitud-1].text)
+            rescue
+              puts 'fallo en la obtencion de los tags'
+            end
+            puts item.tags
+            item.set_icon(doc.css('.prodname > img')[0]['src'])
+          #end
+          rescue Exception => e
+            puts "Exception cuando vamos escrapear la aplicacion"
+            puts e.message
+          end
+      end
+      
+      #return arr
+      
+      rescue Exception => e
+        puts "Excepction scraping"+base_uri
+        puts e.message            # Test de excepción
+        #puts e.backtrace.inspect 
+        
+      end # fin begin
+      
+      return arr
+  end
+  
+end
+
+
+
+# define las clases  
+class AplicacionSoftonic  
+ 
+  # método inicializar clase
+  def initialize(nombre,uri)  
+    # atributos     
+    @nombre = nombre  
+    @uri = uri
+  end  
+  def set_functionality(functionality)
+    @functionality = functionality
+  end
+  
+  def functionality()
+    return @functionality
+  end
+  
+  def set_nombre(nombre)
+    @nombre = nombre    
+  end  
+ 
+  def nombre()
+    return @nombre
+  end
+  
+  def set_foto(foto)
+    @foto = foto
+  end
+
+  def foto(foto)
+    return @foto
+  end  
+  
+  def set_uri(uri)
+    @uri = uri
+  end
+  
+  def uri()
+    return @uri
+  end
+  
+  def set_descripcion(descripcion)
+    @descripcion = descripcion
+  end
+  
+  def descripcion()
+    return @descripcion
+  end
+  
+  def set_tags(tags)
+    @tags = tags
+  end
+  
+  def tags()
+    return @tags
+  end
+  
+  def set_icon(icon_path)
+    @icon_path = icon_path
+  end
+  
+  def icon()
+    return @icon_path
+  end
+end  
+ 
+

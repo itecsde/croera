@@ -1,0 +1,2 @@
+scraper_biographies = ScraperBiographies.new
+scraper_biographies.scrape_biography

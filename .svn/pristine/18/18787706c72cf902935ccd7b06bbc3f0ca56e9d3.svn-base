@@ -1,0 +1,34 @@
+<%	
+	if box.id == nil
+		component_header = box.components.new
+		component_header.component_type = "header"
+		component_header.id= ""
+		component_header.texts.new
+		component_header.position = 1
+		component_itemize = box.components.new
+		component_itemize.component_type = "itemize"
+		component_itemize.position = 2
+		component_itemize.texts.new
+	else
+		box.components.each do |box_component|
+			case box_component.component_type
+			when "header"
+				component_header = box_component
+			when "itemize"
+				component_itemize = box_component
+			end
+		end		
+	end
+%>
+
+<div class="component_container">
+	<%= hidden_field_tag :component_id, component_header.id %>
+	<%= hidden_field_tag :component_type, "header" %>
+	<%= render :partial => "components/header", :locals => {:component => component_header} %>
+</div>
+
+<div class="component_container">
+	<%= hidden_field_tag :component_id, component_itemize.id %>
+	<%= hidden_field_tag :component_type, "itemize" %>
+	<%= render :partial => "components/itemize", :locals => {:component => component_itemize} %>
+</div>

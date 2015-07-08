@@ -1,0 +1,20 @@
+<li>
+	<%= link_to user_root_path do %>
+		<img src="/images/white_arrow_left.png" title="<%= t('back_to_home') %>"></img>
+	<% end %>	
+</li>
+
+<% if @previous_search_params != nil && @previous_search_params[:advanced_search] == "1" %>
+<li style="background-color: #1887E3">
+<% else %>
+<li>
+<% end %>	
+	<img src="/images/advanced_search.png" title="<%= t('search') %>" onclick="toggle_advanced_search_visibility(this);"></img>
+</li>
+
+<li>
+	<%= form_tag request.path, :method => 'get' do %>  
+    	<%= text_field_tag :search, params[:search], :class => "subnavbar_search" %>&nbsp;&nbsp;<%= submit_tag t('search'),:class => "search_button_subnavbar" %>  
+	<% end %>
+</li>
+	

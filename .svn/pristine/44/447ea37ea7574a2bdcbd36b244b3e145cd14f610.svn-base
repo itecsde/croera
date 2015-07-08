@@ -1,0 +1,21 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'klascement', :actions => "klascements/klascement_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+
+	<% if current_user != nil%>
+		<%= render :partial => "generic_partials/header_show_resource", :locals => {:element => @klascement} %>	
+	<% end %>
+
+	<div id="content_container" class="klascement_container">
+		<%= render "klascement" %>
+	</div> <!-- CONTENT -->
+	<%= render :partial => "generic_partials/related_elements", :locals => {:element_type =>'klascement'} %>
+	
+	<span style="display:none" id="is_edition" data-value="false"></span>	
+	
+	
+	<script src="/javascript/klascements_form.js"></script>
+<% end %>

@@ -1,0 +1,34 @@
+<li>
+	<%= link_to user_root_path,:onclick => 'window.history.back();event.preventDefault();' do %>
+		<img src="/images/white_arrow_left.png" title="<%= t('back_to_home') %>"></img>
+	<% end %>	
+</li>
+
+<% if current_user != nil %>
+	<li>
+		<%= link_to request.path + "/new" do %>
+			<img src="/images/new_resource.png" title="New"></img>
+		<% end %>	
+	</li>
+<% end %>
+
+<% if @previous_search_params != nil && @previous_search_params[:advanced_search] == "1" %>
+<li style="background-color: #1887E3">
+<% else %>
+<li>
+<% end %>	
+
+<% if !request.url.include? "/documents" %>
+
+	<img src="/images/advanced_search.png" title="<%= t('search') %>" onclick="toggle_advanced_search_visibility(this);"></img>
+</li>
+
+<li>
+	<%= form_tag request.path, :method => 'get' do %>  
+    	<%= text_field_tag :search, params[:search], :class => "subnavbar_search" %>&nbsp;&nbsp;<%= submit_tag t('search'),:class => "search_button_subnavbar" %>
+    	<%= hidden_field_tag 'section', params[:section] %>
+    	<%= hidden_field_tag 'date_range', params[:date_range] %>  
+	<% end %>
+</li>
+	
+<% end %>

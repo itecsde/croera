@@ -1,0 +1,151 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'search', :current_layout => "search"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'search', :actions => "list_actions"} %>
+<% end %>
+
+
+<% content_for :content do %>
+	<div class="search_elements_container">
+		
+			<%= render :partial => "generic_partials/resource_disambiguation" %>													
+			
+									
+			<div class="search_elements_type_box">				
+				<div class="prompt"><img src="/images/black_site_100.png" width="50px" height="30px"/><%= t("sites") %><%= link_to t("view_all"), sites_path(:search => @search_text, :article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @sites.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+					<div class="clear"></div>
+				</div>				
+			</div>
+			
+
+			<div class="search_elements_type_box">						
+				<div class="prompt"><img src="/images/black_event_100.png" width="50px" height="30px"/><%= t("events") %><%= link_to t("view_all"), events_path(:search => @search_text,:article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @events.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+					<div class="clear"></div>
+				</div>
+			</div>
+			
+	
+			
+			<div class="search_elements_type_box">									
+				<div class="prompt"><img src="/images/black_biography_100.png" width="50px" height="30px"/><%= t("biographies") %><%= link_to t("view_all"), biographies_path(:search => @search_text,:article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @biographies.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+				<div class="clear"></div>
+			</div>		
+	
+		
+			<div class="search_elements_type_box">								
+				<div class="prompt"><img src="/images/black_lecture_100.png" width="50px" height="30px"/><%= t("lectures") %><%= link_to t("view_all"), lectures_path(:search => @search_text,:article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @lectures.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+					<div class="clear"></div>
+				</div>
+			</div>
+			
+	
+			<div class="search_elements_type_box">					
+				<div class="prompt"><img src="/images/black_documentary_100.png" width="50px" height="30px"/><%= t("documentaries") %><%= link_to t("view_all"), documentaries_path(:search => @search_text,:article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @documentaries.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+					<div class="clear"></div>
+				</div>
+			</div>
+			
+			
+			<div class="search_elements_type_box">
+				<div class="prompt"><img src="/images/black_course_100.png" width="50px" height="30px"/><%= t("courses") %><%= link_to t("view_all"), courses_path(:search => @search_text,:article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @courses.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+					<div class="clear"></div>
+				</div>
+			</div>
+			
+						
+			<div class="search_elements_type_box">						
+				<div class="prompt"><img src="/images/black_article_100.png" width="50px" height="30px"/><%= t("articles") %><%= link_to t("view_all"), articles_path(:search => @search_text,:article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @articles.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+					<div class="clear"></div>
+				</div>
+			</div>
+												
+		
+
+
+			<div class="search_elements_type_box">				
+				<div class="prompt"><img src="/images/black_post_100.png" width="50px" height="30px"/><%= t("posts") %><%= link_to t("view_all"), posts_path(:search => @search_text,:article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @posts.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+					<div class="clear"></div>					
+				</div>
+			</div>
+			
+
+			<div class="search_elements_type_box">					
+				<div class="prompt"><img src="/images/black_slideshow_100.png" width="50px" height="30px"/><%= t("slideshows") %><%= link_to t("view_all"), slideshows_path(:search => @search_text,:article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @slideshows.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+					<div class="clear"></div>					
+				</div>
+			</div>			
+							
+
+			<div class="search_elements_type_box">					
+				<div class="prompt"><img src="/images/black_report_100.png" width="50px" height="30px"/><%= t("reports") %><%= link_to t("view_all"), reports_path(:search => @search_text,:article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @reports.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+					<div class="clear"></div>					
+				</div>
+			</div>
+			
+			<div class="search_elements_type_box">					
+				<div class="prompt"><img src="/images/black_application_100.png" width="50px" height="30px"/><%= t("applications") %><%= link_to t("view_all"), applications_path(:search => @search_text,:article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @applications.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+					<div class="clear"></div>
+				</div>
+			</div>
+			
+			
+			<div class="search_elements_type_box">					
+				<div class="prompt"><img src="/images/black_lre_100.png" width="50px" height="30px"/><%= t("lres") %><%= link_to t("view_all"), lres_path(:search => @search_text,:article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @lres.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+					<div class="clear"></div>
+				</div>
+			</div>
+								
+			
+			
+		</div>	
+		
+<% end %>
+

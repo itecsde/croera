@@ -1,0 +1,104 @@
+<% if @previous_search_params != nil && @previous_search_params[:advanced_search] == "1" %>
+<div class="advanced_search row-fluid visible">
+<% else %>
+<div class="advanced_search row-fluid">
+<% end %>
+	<div class="span12 advanced_search_padding">
+		<form class="advanced_search_form" id="advanced_search_form">
+			<div class="row-fuid">
+				<div class="span3">			
+						<div class="field_label c_white"><%= t('subject') %></div>
+						<% if @previous_search_params[:subject]!=nil && @previous_search_params[:subject]!="" %>
+							<div><%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name",@previous_search_params[:subject]), :prompt => "", :class => "edition_control subject" %></div>
+						<% else %>
+							<div><%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name"), :prompt => "", :class => "edition_control subject" %></div>
+						<% end %>
+						<div class="field_label c_white"><%= t('keywords') %></div>
+						<div>
+							<% if @previous_search_params[:keywords]!=nil && @previous_search_params[:keywords]!="" %>
+								<input type="text" name="keywords" id="keywords" value="<%=@previous_search_params[:keywords]%>"/>
+							<% else %>
+								<input type="text" name="keywords" id="keywords"/>
+							<% end %>										
+						</div>			
+					<div class="row-fuid" style="margin-top: 10px;">
+						<div class="span6">
+							<div class="field_label c_white"><%= t('start_date') %></div>
+							<% if @previous_search_params[:start_date]!=nil && @previous_search_params[:start_date]!="" %>					
+								<input type="text" id="start_date" name="start_date" style="width:auto" size="10" value="<%=@previous_search_params[:start_date]%>"/>
+							<% else %>
+								<input type="text" id="start_date" name="start_date" style="width:auto" size="10"/>
+							<% end %>
+						</div>
+						<div class="span6">
+							<div class="field_label c_white"><%= t('end_date') %></div>
+							<% if @previous_search_params[:end_date]!=nil && @previous_search_params[:end_date]!="" %>					
+								<input type="text" id="end_date" name="end_date" style="width:auto" size="10" value="<%=@previous_search_params[:end_date]%>"/>
+							<% else %>
+								<input type="text" id="end_date" name="end_date" style="width:auto" size="10"/>
+							<% end %>
+						</div>
+					</div>
+				</div>
+				<div class="span2">
+					<div style="text-align: right;">
+						<div class="field_label c_white"><%= t('radius') %></div>
+						<% if @previous_search_params[:radius]!=nil && @previous_search_params[:radius]!="" %>		
+							<input type="number" id="radius" style="width:auto" size="5" name="radius" value="<%=@previous_search_params[:radius]%>"/>
+						<% else %>
+							<input type="number" id="radius" style="width:auto" size="5" name="radius"/>
+						<% end %>
+					</div>
+					
+					<div style="margin-top:30px;">
+						<% if @previous_search_params[:enriched]!=nil && @previous_search_params[:enriched]!="" && @previous_search_params[:enriched]!="1"%>	
+							<button class="button_advanced_search field_label" id="enriched_button" onclick="toogle_enriched_advanced_search(event);"><%= t('enriched_off') %></button>
+							<input type="hidden" id="enriched" name="enriched" value="0"/>												
+						<% else %>
+							<button class="button_advanced_search field_label active" id="enriched_button" onclick="toogle_enriched_advanced_search(event);"><%= t('enriched_on') %></button>
+							<input type="hidden" id="enriched" name="enriched" value="1"/>
+						<% end %>
+					</div>
+					
+					<div style="margin-top:10px;">
+						<button class="button_advanced_search field_label" id="search_button" onclick="submit_advanced_search(event);"><%= t('search') %></button>
+						<input type="hidden" id="advanced_search" name="advanced_search" value="0">
+					</div>
+					
+				</div>
+				<div class="span4">
+					 <div class="row-fluid field editable active">
+						<div class= "span3 field_label c_white"><%= t("address") %>:</div>
+						<div class="span8">
+							<% if @previous_search_params[:event_address]!=nil && @previous_search_params[:event_address]!="" %>	
+								<input type="text" class="address_advanced_search" id="event_address" name="event_address" onChange="change_location_written();" onClick="return press_key(event);" value="<%= @previous_search_params[:event_address] %>"/>
+							<% else %>
+							<input type="text" class="address_advanced_search" id="event_address" name="event_address" onChange="change_location_written();" onClick="return press_key(event);" />
+							<% end %>					
+					 	</div>
+					 	<% if @previous_search_params[:event_latitude]!=nil && @previous_search_params[:event_latitude]!="" %>
+					 		<input type="hidden" id="event_latitude" name="event_latitude" value="<%= @previous_search_params[:event_latitude] %>"/>
+					 		<input type="hidden" id="event_longitude" name="event_longitude" value="<%= @previous_search_params[:event_longitude] %>"/>
+					 	<% else %>
+					 		<input type="hidden" id="event_latitude" name="event_latitude"/>
+					 		<input type="hidden" id="event_longitude" name="event_longitude"/>	
+					 	<% end %>			 	
+					 </div>
+					 
+					 <div class="row-fluid field editable active">				
+					 	<div class="span12 events" id="map-canvas" ></div>			 	
+					 </div>
+		
+				</div>
+				<div class="span3">
+					<div class="row-fluid" style="height: 180px;">
+						<div class="span11 num_results_advanced_search c_white"><%= t('results')%>:&nbsp;<span id="num_results"></span><%=@num_results%></div>
+						<div class="span11 title_advanced_search c_white"><%= t("search") %> </div>
+						<div class="span11 description_advanced_search c_white"><%= t('fill_inputs_and_search') %></div>
+						<div class="clear"></div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>	
+</div>

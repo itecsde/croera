@@ -1,0 +1,71 @@
+<%= devise_error_messages! %>
+<%= form_for(resource, :as => resource_name, :url => registration_path(resource_name)) do |f| %>
+	<div class="profile_box profile_box_sign_up">
+		
+		<div class= "profile_image">		
+			<span class="change_profile_avatar active" onclick= "change_profile_image(1,1);">Change Avatar</span>
+			<%= image_tag "../../images/user/medium/user.png", :class => 'profile_image_preview' %>		
+			<div class="clear"></div>
+		</div>
+		
+		<div class= "profile_sign_up_information">
+			<div class="sign_up_title"><%= t("sign_up") %></div>
+			<div class="prompt">
+				<%= t("first_name") %>
+			</div>
+			<div class="user_first_name">			
+				<%= f.text_field :first_name, :placeholder => t("first_name") %>
+						
+			</div>
+			<div class="clear"></div>
+			<div class="prompt">
+				<%= t("last_name") %>
+			</div>
+			<div class="user_last_name">			
+				<%= f.text_field :last_name, :placeholder => t("last_name")%>							
+			</div>
+			<div class="clear"></div>
+			<div class="prompt">
+				<%= t("email") %>
+			</div>
+			<div class="user_email">			
+				<%= f.email_field :email, :placeholder => "email", :autofocus => true %>					
+			</div>			
+		</div>
+		<div class="profile_sign_up_password">
+			<% if @errors != nil %>
+				<div class="signup_errors">
+					<% @errors.each do |error| %>
+						<div><%= error %></div>
+					<% end %>
+				</div>
+			<% end %>			 
+			<div class="prompt">
+				<%= f.label :password, t("password") %>
+			</div>			
+  			<div class="password">
+  				<%= f.password_field :password %>
+  			</div>
+				
+  			<div class="prompt">
+  				<%= f.label :password_confirmation, t("password_confirmation") %>
+  			</div>
+  			<div class="password_confirmation">
+  				<%= f.password_field :password_confirmation %></div>
+			</div>  				
+		</div>
+		
+		
+		
+		<div class="clear"></div>
+		<div class= "file_upload">
+			<%= f.file_field :avatar, :onchange => "image_profile_preview(this, event);"%>
+		</div>
+			
+	</div>
+	
+	<%= render :partial => "circumstances/circumstance", :locals => {:edition_on => true} %>
+
+	<div class="submit_sign_up"><%= f.submit t("sign_up") %></div>	
+
+<% end %>

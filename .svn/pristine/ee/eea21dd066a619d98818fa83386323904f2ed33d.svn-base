@@ -1,0 +1,125 @@
+# encoding: utf-8
+
+require "nokogiri"
+require "open-uri"
+
+class CreatorCorpusReuters
+   include ActionView::Helpers::SanitizeHelper
+  
+  ###############################################################
+  #######  create_corpus_reuters_21578
+  ###############################################################
+
+   def create_corpus_reuters_21578
+      begin   
+         j=0
+         for i in 0..21
+            if i < 10             
+               a = open('./corpus_reuters_21578/reut2-00' + i.to_s + '.sgm')
+            else
+               a = open('./corpus_reuters_21578/reut2-0' + i.to_s + '.sgm')
+            end
+            document = Nokogiri::HTML(a)
+            document.css('reuters').each do |item|
+               topics = ""
+               places = ""    
+               people = ""      
+               orgs = ""     
+               exchanges = ""
+               companies = ""                
+               name = item.css('title').text.strip
+               puts "Name: "
+               puts name.strip
+               puts "Date: "
+               date = item.css('date').text.strip
+               puts date
+               puts "Description: "
+               description = item.css('text').text.gsub(name,"").gsub(dateline,"").strip
+               puts description
+               puts "End description"
+               
+               puts "Topics"
+               item.css("topics").css("d").each do |topic|
+                  topics = topics + "," + topic.text.strip
+               end
+               topics[0] = ""
+               puts topics     
+                
+               puts "Places"      
+               item.css("places").css("d").each do |place|
+                  places = places + "," + place.text.strip
+               end
+               places[0] = ""               
+               puts places
+               
+               puts "People"      
+               item.css("people").css("d").each do |person|
+                  people = people + "," + person.text.strip
+               end
+               people[0] = ""
+               puts people
+               
+               puts "Orgs"      
+               item.css("orgs").css("d").each do |org|
+                  org = orgs + "," + org.text.strip
+               end
+               orgs[0] = ""               
+               puts orgs               
+
+               puts "Exchanges"      
+               item.css("exchanges").css("d").each do |exchange|
+                  exchanges = exchanges + "," + exchange.text.strip
+               end
+               exchanges[0] = ""               
+               puts exchanges
+               
+               puts "Companies"      
+               item.css("companies").css("d").each do |company|
+                  companies = companies + "," + company.text.strip
+               end
+               companies[0] = ""               
+               puts companies             
+                             
+               has_topics = item['topics']
+               puts "Has topics?"
+               puts has_topics
+               
+               lewissplit = item['lewissplit']
+               puts "Lewis Split"
+               puts lewissplit
+                              
+               cgisplit = item['cgisplit']
+               puts "Cgi Split"
+               puts cgisplit
+               
+               old_id = item['oldid']
+               puts "Old Id"
+               puts old_id
+               
+               new_id = item['newid']
+               puts "New_Id"
+               puts new_id          
+               
+               #reuters_new_item = ReutersNewItem.new
+=begin
+               reuters_new_item.name = name
+               reuters_new_item.description = description
+               reuters_new_item.dateline = date
+               reuters_new_item.has_topics = has_topics
+               reuters_new_item.lewissplit = lewissplit
+               reuters_new_item.cgisplit = cgisplit
+               reuters_new_item.oldid = oldid
+               reuters_new_item.newid = newid
+              
+               reuters_new_item.persist
+=end                                                                                                   
+            end 
+         end
+      rescue Exception => e
+         puts "Exception create_corpus_reuters_21578"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end
+
+end

@@ -1,0 +1,16 @@
+<div class= "paginate_controls">
+	<%= paginate @groups %>
+</div>
+
+<% if @groups.first_page? %>
+	<% if current_layout == "popup" %>
+	<a class="extract_box popup_new_activity_sequence_box new_extract_box" onclick="">+</a>
+	<% else %>
+	<%= link_to "+", new_group_path, html_options = {:class => "extract_box new_extract_box"} %>
+	<% end %>
+<% end %>
+
+
+<% @groups.each do |group| %>
+	<%= render :partial => "elements/element", :locals => {:element => group, :current_layout => current_layout} %>
+<% end %>

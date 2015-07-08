@@ -1,0 +1,18 @@
+<div class= "paginate_controls">
+	<%= paginate @posts %>
+</div>
+
+<% if current_user != nil && @posts.first_page? %>
+	<% if current_layout == "popup" %>
+	<a class="extract_box popup_new_activity_sequence_box new_extract_box" onclick="">+</a>
+	<% else %>
+	<%= link_to "+", new_post_path, html_options = {:class => "extract_box new_extract_box"} %>
+	<% end %>
+<% end %>
+
+<% @posts.each do |post| %>
+	<%= render :partial => "elements/element", :locals => {:element => post, :current_layout => current_layout} %>
+<% end %>
+
+
+

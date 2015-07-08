@@ -1,0 +1,2 @@
+scrape_slideshow = ScraperSlideshows.new
+scrape_slideshow.scrape_slideshare

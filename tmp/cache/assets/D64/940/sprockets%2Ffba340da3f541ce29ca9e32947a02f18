@@ -1,0 +1,69 @@
+o: ActiveSupport::Cache::Entry	:@compressedF:@expires_in0:@created_atf1430901480.4826002:@value{I"
+class:EFI"BundledAsset;
+FI"id;
+F"%85cd60333621171d4a8d82dd5aee635aI"logical_path;
+FI"contextual_settings.css;
+TI"pathname;
+FI">$root/app/assets/stylesheets/contextual_settings.css.scss;
+TI"content_type;
+FI"text/css;
+FI"
+mtime;
+FI"2014-03-17T09:23:50+01:00;
+FI"	body;
+FI"Z/* line 5, ../../app/assets/stylesheets/contextual_settings.css.scss */
+#content_contextual_setting {
+  background: none repeat scroll 0% 0% #fbfbfb;
+  padding: 186px 26px 26px 26px;
+  overflow: hidden;
+}
+
+/* line 11, ../../app/assets/stylesheets/contextual_settings.css.scss */
+.contextual_setting_title {
+  color: #000000;
+  font-weight: bold;
+  font-size: 30px;
+  font-family: "PT sans";
+  width: auto;
+  float: left;
+  margin-right: 10px;
+}
+
+/* line 21, ../../app/assets/stylesheets/contextual_settings.css.scss */
+input#contextual_setting_name {
+  color: #000000;
+  font-weight: bold;
+  font-size: 30px;
+  font-family: "PT sans";
+  margin-right: 10px;
+  margin-bottom: 10px;
+  border: none;
+}
+
+/* line 31, ../../app/assets/stylesheets/contextual_settings.css.scss */
+textarea.contextual_setting_description {
+  width: 95%;
+  border: none;
+  -webkit-transition: height 0.2s;
+  -moz-transition: height 0.2s;
+  transition: height 0.2s;
+  font-family: "Trebuchet MS", Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #333333;
+  text-align: justify;
+  resize: none;
+}
+;
+FI"asset_paths;
+F[I">$root/app/assets/stylesheets/contextual_settings.css.scss;
+TI"dependency_paths;
+F[{I"	path;
+FI">$root/app/assets/stylesheets/contextual_settings.css.scss;
+TI"
+mtime;
+FIu:	Time(Š€¹ _
+:@_zoneI"CET;
+T:nano_numiæ:nano_deni:submicro"#:offsetiI"hexdigest;
+F"%34e180aad589e88979d265bcdaba5cd5I"_version;
+F"%d3399da1890ef54eecbcf24324b9c72a

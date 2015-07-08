@@ -1,0 +1,21 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+require 'watir-webdriver'
+require 'net/http'
+require 'net/https'
+require 'uri'
+require 'mechanize'
+
+class ScraperKlascements
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+  
+
+    
+    
+    
+
+end

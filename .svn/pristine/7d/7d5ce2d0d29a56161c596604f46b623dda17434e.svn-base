@@ -1,0 +1,106 @@
+require 'spec_helper'
+
+feature 'Home' do
+
+  scenario 'page does not have JavaScript errors', :js => true do
+    visit(root_path)
+    expect(page).not_to have_errors
+  end
+
+  scenario 'user logs in correctly', :js => true do
+    #User.create(:email => 'admin@example.com', :password => 'password')
+    
+    #visit user_session_path
+    visit "http://www.klascement.be/aanmelden/?set_language=4"
+   
+    #fill_in 'email', :with => 'capybara@gmail.com'
+    #fill_in 'pass', :with => 'marcos'
+    File.open('capybara_web_0.html', 'w') do |f2|
+      f2.puts page.html
+    end
+    puts "aqui llega"
+    #find('a.btn_main').click
+    #click_button 'header_login'
+    puts "aqui tb llega"
+    fill_in 'idBigLoginEmail', :with => 'itecsde@gmail.com'
+    fill_in 'idBigLoginPassword', :with => 'itecsde'
+    click_button 'Log in'
+    find('li#mainall a').click
+    find('.contribution_survey tbody tr td.title a').click
+
+    puts "imprimiendo pagina a archivo"
+    File.open('capybara_web_1.html', 'w') do |f2|
+      f2.puts page.html
+    end
+    
+    html_resource_page = page.html
+    
+    nokogiri_page = Nokogiri::HTML(html_resource_page)
+    
+    puts "El titulo del recurso es: "
+    name = nokogiri_page.css("div.column h1")[0].text.strip
+    puts name
+    photo_url = nokogiri_page.css("div.logo img")[0]['src']
+    puts "photo_url:"
+    puts photo_url
+    
+         
+    scraped_oer = Lre.new
+    
+    puts "a"
+    
+    scraped_oer.name = name
+    scraped_oer.description = "Description"
+    puts "b"
+    if photo_url!=nil
+      begin
+        a = URI.parse(photo_url)
+        scraped_oer.element_image = URI.parse(photo_url)
+      rescue
+        puts "klascement:  IMAGEN NO GUARDADA"
+        scraped_oer.element_image.clear
+      end
+    end 
+    
+    puts "c"
+    
+    scraped_oer.save
+    
+    puts "d"
+    
+    puts "fin imprimiendo pagina a archivo"
+    
+    save_and_open_page
+    
+    #assert_equal current_path, "/" + I18n.locale.to_s + user_root_path    
+  end
+  
+  scenario 'user switches off enriched mode', :js => true do
+    #User.create(:email => 'admin@example.com', :password => 'password')
+    
+    visit root_path
+    page.find("#flag_en").click
+    page.find("#log_in").click
+    
+    fill_in 'user_email', :with => 'admin@example.com'
+    fill_in 'user_password', :with => 'password'
+    click_button 'Sign in'
+    
+    assert_equal current_path, "/" + I18n.locale.to_s + user_root_path  
+    
+    click_link "Resources"
+    click_link "All"
+    click_link "Events"
+    
+    assert_equal "/" + I18n.locale.to_s + events_path, current_path  
+    page.should have_content('Enriched On')
+    page.should_not have_content('Enriched Off')
+    
+    click_on "Enriched On"    
+    
+    page.should have_content('Enriched Off')                     
+  end
+  
+  
+  
+end

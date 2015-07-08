@@ -1,0 +1,5 @@
+<%= form_for(@application, :html => { :class => "application_form" }) do |fo| %>
+	<%= render :partial => "applications/form" , :locals => {:application_form => fo} %>
+<% end %>
+<input type="hidden" id="edition_mode" value="off"/>
+

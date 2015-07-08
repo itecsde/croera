@@ -1,0 +1,130 @@
+<% if @report.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@report.errors.count, "error") %> prohibited this report from being saved:</h2>
+	
+	  <ul>
+	  <% @report.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+
+
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="report_name field_body">
+		<% if @edition_mode==true %>
+			<textarea id="report_name" name="report[name]" placeholder="<%= t("title") %>"><%= @report.name %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<span><%= @report.name %></span>
+		<% end %>
+	</div>
+	
+		
+	<div class="report_description description field_body">
+		<% if @edition_mode==true %>
+			<textarea id="report_description" name="report[description]" placeholder="<%= t("description") %>"><%= @report.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<div>
+				<% if @report.description != nil %>			
+					<%= raw @report.description.truncate(1000, :separator => " ", :omission => "...") %>
+				<% end %>
+				
+			</div>
+		<% end %>
+	</div>
+	
+	
+	<div class="report_tags element_field_box">
+		<div class="field_prompt"><%= t("keywords") %></div>
+		<div class="field_body">			
+			<% if @edition_mode==true %>    
+		    	<textarea id="report_tags" class="tags" name="report[tag_list]"><% if @report!=nil %><%= @report.tag_list %><% end %></textarea>
+		    	<i class="icon-pencil icon-grey"></i>
+		    <% else %>
+		    	<span class="tags"><% if @report!=nil %><%= @report.tag_list_with_links.html_safe %><% end %></span>	
+		    <% end %>														
+		</div>
+	</div>	
+	
+	<% if @edition_mode != true %>
+	<div class="report_section element_field_box">
+		<div class="field_prompt"><%= t("section") %></div>
+		<div class="field_body">				
+			<span><%= @report.section %></span>
+		</div>		
+	</div>	
+	<% end %>
+	
+	<div class="report_url element_field_box">
+		<div class="field_prompt"><%= t("url") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>    
+		    	<%= report_form.text_field :url %>
+		    	<i class="icon-pencil icon-grey"></i>			    	
+		    <% else %>
+		    	<a href="<%= @report.url %>" target="_blank"><%= @report.url %></a>
+		    <% end %>
+	   </div>		
+	</div>
+	
+	<% if @edition_mode!=true && @report.scraped_from!=nil && @report.scraped_from!="" %>  
+		<div class="report_scraped_from element_field_box">
+			<div class="field_prompt"><%= t("source") %></div>
+			<div class="field_body">
+				<a href="<%= @report.scraped_from %>" target="_blank"><%= @report.scraped_from %></a>
+			</div>
+		</div>
+	<% end %>
+	
+	
+</div>
+
+
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<% if @edition_mode == false && @popup == nil %>	
+		<div class="watermark_container_show">
+			<div class="watermark_show <%=@resource_type.downcase%>_watermark"></div>
+		</div>
+	<% end %>
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>		
+			<% if @report.element_image.url() != "none" %>
+				<%= image_tag @report.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_report.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= report_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		<% else %>
+			<% if @report.element_image.url() != "none" %>
+				<%= image_tag @report.element_image.url(:medium), width:'100%', :class => "image_preview_show" %>
+			<% else %>
+				<%= image_tag "/images/no_photo.png", width:'100%', :class => "image_preview_show" %>
+			<% end %>
+		<% end %>
+	</div>
+
+</div>
+
+
+
+
+
+<% if @edition_mode==true %>
+	<div id="snippets_library" style="display: none">
+		<div class="subject_item">				
+			<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name"), :prompt => "", :class => "subject" %>
+			<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+		</div>
+	</div>
+<% end %>

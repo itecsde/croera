@@ -1,0 +1,2 @@
+scrape_wikipaintings = ScraperArtworks.new
+scrape_wikipaintings.scrape_wikipaintings

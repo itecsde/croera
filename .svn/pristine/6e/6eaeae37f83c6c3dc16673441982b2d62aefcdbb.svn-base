@@ -1,0 +1,109 @@
+.bookmarks_page, .created_elements_page {
+	margin:20px;
+}
+
+.bookmarks_page .list_elements_container img, .created_elements_page .list_elements_container img {
+	height: 70px;
+	width: 70px;
+	margin-right:10px;
+}
+
+.bookmarks_page .list_elements_container .prompt, .created_elements_page .list_elements_container .prompt{
+	font-weight:bold;
+	font-size:18px;
+	color:#433A4A;
+	
+} 
+
+.bookmarks_page .list_elements_container .total_results, .created_elements_page .list_elements_container .total_results {
+	margin-left: 30px;
+	font-size:12px;
+	font-style:italic;
+	font-weight:normal;
+}
+
+
+.bookmarks_page .bookmarked_box, .created_elements_page .created_by_me_box {
+	float:left;
+	margin-left:20px;
+	margin-top:10px;
+	margin-bottom:10px;
+	width:200px;
+	height:200px;
+	position:relative;
+	cursor:pointer;
+	
+	-webkit-box-shadow: 0px 0px 4px rgba(50, 50, 50, 0.5);
+	-moz-box-shadow:    0px 0px 4px rgba(50, 50, 50, 0.5);
+	box-shadow:         0px 0px 4px rgba(50, 50, 50, 0.5);	
+	background-repeat: no-repeat;
+	/*background-size: 100%;*/
+	-webkit-background-size: cover;
+  	-moz-background-size: cover;
+  	-o-background-size: cover;
+  	background-size: cover;
+}
+
+
+
+.bookmarked_box .remove_bookmark{
+	position: absolute;
+	width: 30px;
+	height: 30px;
+	z-index:2;
+	top:0px;
+	right:0px;
+}
+
+.bookmarked_box:hover .remove_bookmark {
+	background: url(/images/black_remove_bookmark_30.png);
+}
+
+
+.bookmarked_box .bookmarked_box_footer, .created_by_me_box .created_by_me_box_footer{
+	position: absolute;
+	width: 200px;
+	bottom: 0px;
+	height: 60px;		
+	background: #463D52;
+	
+	-moz-opacity: 0.85;
+	opacity: 0.85;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=85);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=85);
+	filter:alpha(opacity=85);
+	overflow: hidden	
+	
+}
+.bookmarked_box .bookmarked_box_footer p, .created_by_me_box .created_by_me_box_footer p {
+	color:#FFFFFF;
+	font-size:11px;
+	font-weight:bold;
+	margin:3px 5px 5px 5px;
+	line-height:18px;	
+}
+
+
+.bookmarks_page hr, .created_elements_page hr {
+	clear:both;
+	border-bottom: 1px solid #534A5F;
+	margin-top:10px;
+	margin-bottom:10px;
+	
+	-moz-opacity: 0.30;
+	opacity: 0.30;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=30);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	filter:alpha(opacity=30);
+}
+
+.popup_bookmarks_page, .popup_created_by_me_page {
+	margin: auto;
+    position: relative;
+    top: 20px;
+    width: 1080px;
+}
+
+.popup_bookmarks_page .area_popup, .popup_created_by_me_page .area_popup {
+	background:#FBFDFC;
+}

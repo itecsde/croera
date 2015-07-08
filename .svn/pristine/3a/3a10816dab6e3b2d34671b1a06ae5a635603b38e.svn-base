@@ -1,0 +1,184 @@
+class SitesController < ApplicationController
+  
+  def index
+    @resource_type = "Site"
+    if I18n.locale.to_s == "gl"
+      search_languages=["gl","es"]
+    else 
+      search_languages=[I18n.locale.to_s]
+    end
+    per_page = 32
+
+    if (params[:advanced_search]=="1") 
+      @search=Site.search do          
+          keywords params[:keywords], :fields => [:tags, :name]
+          if params[:radius]!="" && params[:site_latitude]!="" && params[:site_longitude]!=""
+            with(:location).in_radius(params[:site_latitude], params[:site_longitude], params[:radius])
+          end 
+          if params[:site_latitude]!="" && params[:site_longitude]!=""
+            order_by_geodist(:location, params[:site_latitude], params[:site_longitude])
+          end
+          with(:translations, search_languages)                     
+          paginate :page => params[:page], :per_page => per_page           
+        end
+      @sites = @search.results 
+      @num_results=@search.total      
+    elsif (params[:search] != nil && params[:search].size > 0)
+      search_text = params[:search]
+      if search_text.index("#") != 0
+        @disambiguation = Search.disambiguation(search_text)
+      else        
+        #Esto es para tener el termino traducido al ingles para hacer las busquedas con el tag en ingles
+        if I18n.locale.to_s != "en" && search_text.index("@") != nil         
+          clean_search_text = search_text[0,search_text.index("@")]
+          search_text_en_translation = Wikipediator.wikipedia_get_article_title_tranlation(Util.to_tag(clean_search_text),I18n.locale.to_s,"en")
+        #Esto es para traducir el termino al idioma de la vista para ver la info de desambiguacion del termino en ese idioma          
+        elsif I18n.locale.to_s != "en" && search_text.index("@") == nil
+          search_text_locale_translation = Wikipediator.wikipedia_get_article_title_tranlation(Util.to_tag(search_text),"en",I18n.locale.to_s)
+        end
+        search = Search.new
+        if I18n.locale.to_s != "en" && search_text_locale_translation != nil
+          @disambigued_term_info = search.disambigued_term_info(Util.to_hashtag_with_language(search_text_locale_translation))
+        else
+          @disambigued_term_info = search.disambigued_term_info(search_text)  
+        end
+      end 
+             
+      @search = Search.search_elements_by_type('Site', search_text,search_text_en_translation, params[:article_id],per_page,params[:page])                         
+      @sites = @search[:results]
+      @num_results = @search[:total]    
+    else
+      @search = Site.search do |query|
+=begin        
+          if current_user != nil && current_user.circumstances != []
+            #search_terms = current_user.circumstances.first.tag_list_quoted
+            #query.keywords search_terms, :fields => [:tags, :name] {minimum_match 1}
+            search_terms = current_user.circumstances.first.categories.map { |t| '"' + t.name + '"'}.join(", ")+","+current_user.circumstances.first.tag_list_quoted
+            query.keywords search_terms, :fields => [:categories, :tags, :name] {minimum_match 1}
+ 
+          end
+=end          
+          query.with(:translations, search_languages)        
+          query.paginate :page => params[:page],:per_page => per_page 
+      end
+      @sites = @search.results 
+      @num_results=@search.total
+    end  
+                              
+
+    @previous_search_params=params      
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @sites }
+    end
+  end
+  
+  
+  def show
+    @site = Site.find(params[:id])
+    
+    if current_user!=nil
+      current_user.add_preferences_to_user_history(@site.taggable_tag_annotations)
+    end
+    
+    @related_elements=RelatedElement.new(@site)
+    @edition_mode=false
+    @resource_type = "Site"    
+    if notice == 'Site was successfully created.' || notice == 'Site was successfully updated.'
+      @previous_action = 'saved'
+    else
+      @previous_action = 'list'
+    end    
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @site }
+    end
+  end
+  
+  
+  def new
+    if current_user != nil
+      @site = Site.new
+      @edition_mode=true
+  
+      respond_to do |format|
+        format.html # new.html.erb
+        format.json { render json: @site }
+      end
+    else
+      redirect_to sites_path
+    end
+  end
+  
+  def edit
+    @site = Site.find(params[:id])
+    if current_user !=nil && ((@site.owner == current_user) or (@site.owner_type=="Group" && @site.owner.users.exists?(current_user)))
+      @edition_mode=true
+    else
+      redirect_to site_path(@site)
+    end
+  end
+  
+  
+  def create
+    @site = Site.new(params[:site])
+    if (params[:site][:owner_type]==nil)
+      @site.owner_type="User"
+      @site.owner=current_user
+    end
+    @site.creator = current_user
+    @site.save
+
+    respond_to do |format|
+      if @site.save
+        format.html { redirect_to @site, notice: 'Site was successfully created.' }
+        format.json { render json: @site, status: :created, location: @site }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @site.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+  
+  
+  def update
+    @site = Site.find(params[:id])
+    if (params[:site][:owner_type]==nil)
+      @site.owner_type="User"
+      @site.owner=current_user
+    end
+    
+    respond_to do |format|
+      if @site.update_attributes(params[:site])
+        format.html { redirect_to @site, notice: 'Site was successfully updated.' }
+        format.json { head :ok }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @site.errors, status: :unprocessable_entity }
+      end
+    end    
+  end
+  
+  
+  def destroy
+    @site = Site.find(params[:id])
+    @site.destroy
+
+    respond_to do |format|
+      format.html { redirect_to sites_url }
+      format.json { head :ok }
+    end
+  end
+  
+  
+  def popup_show_site
+    @site = Site.find(params[:element_id])
+    @edition_mode=false
+
+    respond_to do |format|
+      format.js
+    end
+  end
+  
+  
+end

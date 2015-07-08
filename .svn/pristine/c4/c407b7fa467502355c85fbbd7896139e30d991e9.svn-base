@@ -1,0 +1,13 @@
+<% 
+	details_id= ""
+	if resource.class.name == "Application"
+		if resource.external == "true" 
+			details_id= ""
+		else
+			details_id= ""
+		end
+	end
+	
+%>
+
+<%= render :partial => "elements/element", :locals => {:element => resource, :current_layout => "popup"} %>

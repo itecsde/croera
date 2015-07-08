@@ -1,0 +1,3 @@
+class Evaluation < ActiveRecord::Base
+  belongs_to :document, :polymorphic => true
+end

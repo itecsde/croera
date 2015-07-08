@@ -1,0 +1,14 @@
+<%= render :partial => "header", :locals => {:section_title => (t ("Groups")), :actions => "groups/list_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'groups', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => t('groups'), :actions => "groups/list_actions"} %>
+<% end %>
+
+	<% content_for :content do %>
+	<div id="content_index">	
+		<%= render :partial => "list", :locals => { :current_layout => "application" }%>
+	</div> <!-- CONTENT -->
+	
+	<script src="/javascript/groups_index.js"></script>
+<% end %>

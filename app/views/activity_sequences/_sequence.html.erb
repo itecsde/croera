@@ -1,0 +1,4 @@
+<%= form_for(@activity_sequence,:html => { :class => "sequence_form" }) do |f_sequence| %>
+		<%= render :partial => "activity_sequences/form" , :locals => {:f => f_sequence} %>
+<% end %>
+<input type="hidden" id="edition_mode" value="off"/>

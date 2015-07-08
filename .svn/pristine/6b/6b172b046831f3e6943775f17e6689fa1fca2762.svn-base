@@ -1,0 +1,14 @@
+<div class="<%= tool_type %>_square_box has_edition_controls active">
+	<div class="link_bar">
+		<div class="edition_controls_bar">
+			<div class="trash edition_control" name="<%= selected_tool.id %>" onclick="deselect_<%= tool_type %>(this)"><i class="icon-remove icon-grey"></i></div>
+		</div>
+		<div class="controls_bar">
+			<div class="view_details_button" href="#tool_view_box" onclick="tool_details_view('<%=selected_tool.id%>',this)"><i class="icon-search icon-grey"></i></div>
+		</div>
+	</div>
+	<span class="selected_<%= tool_type %>_id" style="display: none;" name="<%= selected_tool.id %>"><%= selected_tool.id %></span>
+	<span class="selected_<%= tool_type %>_name"><%= selected_tool.name %></span>
+	<input type="hidden" class="selected_<%= tool_type %>_itec_id" value="<%= selected_tool.itec_id %>" />
+	<input type="hidden" class="selected_<%= tool_type %>_ld_id" value="<%= selected_tool.ld_id %>" />
+</div>

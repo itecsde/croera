@@ -1,0 +1,7 @@
+alice_dashboard:
+  name: "Alice dashboard"
+  dashboard_owner: alice (Teacher)
+  
+teleco_dashboard:
+  name: "Teleco dashboard"
+  dashboard_owner: teleco_teachers (Group)  

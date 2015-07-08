@@ -1,0 +1,16 @@
+<div class= "paginate_controls">
+	<%= paginate @events %>
+</div>
+
+<% if current_user != nil && @events.first_page? %>
+	<% if current_layout == "popup" %>
+		<a class="extract_box popup_new_activity_sequence_box new_extract_box" onclick="">+</a>
+	<% else %>
+		<%= link_to "+", new_event_path, html_options = {:class => "extract_box new_extract_box"} %>
+	<% end %>
+<% end %>
+
+
+<% @events.each do |event| %>
+	<%= render :partial => "elements/element", :locals => {:element => event, :current_layout => current_layout} %>
+<% end %>

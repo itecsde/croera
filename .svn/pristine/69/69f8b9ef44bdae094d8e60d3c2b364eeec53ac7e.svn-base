@@ -1,0 +1,7 @@
+classificator = Classify.new
+
+training_secuence = [150,50,5]
+
+training_secuence.each do |training_elements|
+   classificator.twenty_newsgroups_semantic_classifier(0.01, training_elements)
+end

@@ -1,0 +1,16 @@
+# == Schema Information
+#
+# Table name: requirements
+#
+#  id          :integer          not null, primary key
+#  name        :string(255)
+#  description :text
+#  created_at  :datetime
+#  updated_at  :datetime
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+video_conference_tool:
+  name: 'Video Conference Tool'
+  description: 'A video conference tool to allow online presentations'

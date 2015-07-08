@@ -1,0 +1,27 @@
+
+<li class="dropdown">
+    <a data-toggle="dropdown" class="dropdown-toggle" href="#"><%= image_tag("/images/languages/"+I18n.locale.to_s.underscore+".gif") %><%= t('language') %> <b class="caret"></b></a>
+    <ul class="dropdown-menu">
+      <li><%= link_to params.merge({:locale => :en}) do %>
+      		<%= image_tag("/images/languages/en.gif") %>
+      		<%= t('English')%>
+      	  <%end -%>
+      </li>
+      <li><%= link_to params.merge({:locale => :gl}) do %>
+      		<%= image_tag("/images/languages/gl.gif") %>
+      		<%= t('Galician')%>
+      		<%end -%>
+      </li>
+      <li><%= link_to params.merge({:locale => :es}) do %>
+      	  <%= image_tag("/images/languages/es.gif") %>
+      	  <%= t('Spanish')%>
+      	  <%end -%>
+      </li>
+	  <li><%= link_to params.merge({:locale => :fi}) do%>
+	  	  <%= image_tag("/images/languages/fi.gif") %>
+	  	  <%= t('Finland')%>
+	  	  <%end -%>
+	  </li>
+    </ul>
+  </li>
+

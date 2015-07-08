@@ -1,0 +1,254 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+
+#require "capybara/dsl"
+class ScraperArtworks
+  include ActionView::Helpers::SanitizeHelper
+  #include Capybara::DSL
+  #############################################################
+  ####### scrape_google_art_project
+  #############################################################
+   
+  def scrape_google_art_project(*reintentos)
+    begin
+      source_name = __method__.to_s    
+      #Add new source, or select it if exists
+      source = Source.create_or_select_source(source_name, "Artwork", "https://www.google.com/culturalinstitute/project/art-project")
+          
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+      
+      
+=begin            
+      collection_id = -1
+      Capybara.register_driver :webkit_ignore_ssl do |app|
+        browser = Capybara::Driver::Webkit::Browser.new(:ignore_ssl_errors => true)
+        Capybara::Driver::Webkit.new(app, :browser => browser)
+      end
+      Capybara.javascript_driver = :webkit_ignore_ssl
+      session = Capybara::Session.new(:webkit)   
+      session.visit "https://www.google.com/culturalinstitute/collections"
+
+      collections_urls = Array.new
+      
+      nokogiri_page = Nokogiri::HTML(session.body)
+      total_number_of_collections = nokogiri_page.css("span.gci-partners-list-count")[0].text.split(" of ")[1].to_i
+      
+      puts "Total number of collections: "
+      puts total_number_of_collections
+      number_of_collections = 0 
+      
+      nokogiri_page = Nokogiri::HTML(session.body)
+      puts "Number of collections"
+        
+      
+      while number_of_collections < total_number_of_collections
+        nokogiri_page.css("li.gci-longlist-item").each do |collection|
+          collection_id += 1
+          puts "Collection ID = " + collection_id.to_s
+          session.all('li.gci-longlist-item')[collection_id].click
+          sleep 2
+          puts session.current_url
+          collections_urls << session.current_url
+          File.open('links_collections_google_art_project', 'a') do |f2|
+            f2.puts session.current_url
+          end
+          sleep 2
+          session.execute_script('window.history.back();')
+          sleep 1
+          times_to_scroll = collection_id / 12 + 1
+          for j in 1..times_to_scroll
+            session.execute_script '$(".gci-scroller-vertical").scrollTop(500000);'       
+            nokogiri_current_page = Nokogiri::HTML(session.body)
+            number_of_collections = nokogiri_current_page.css("li.gci-longlist-item").size.to_i
+            puts number_of_collections
+            sleep 1
+          end
+        end
+      end
+=end
+
+      #url de donde se saca el fichero con los partners --> https://www.google.com/culturalinstitute/consumer/api/get-partners-list?hl=en
+
+      collection_urls = Array.new
+      fentrada = File.new "javascript.txt","r"
+      line = fentrada.gets         
+
+      until line == nil
+        if line.include? ',["partner","url_name",'        
+          collection_url = "https://www.google.com/culturalinstitute/collection/" + line.split(',,,,["')[1].split('"]')[0]
+          collection_urls << collection_url
+        end
+        line = fentrada.gets
+      end
+
+      fentrada.close
+      
+      collection_urls.each do |url|
+        scrape_collection_google_art_project url
+      end
+ 
+      reintentos = 2
+      source.correct_scrape
+    rescue Exception => e
+      puts "Failed scrape_google_art_project"
+      puts e.message
+      puts e.backtrace.inspect
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_google_art_project(1,reintentos)
+      end
+      source.incorrect_scrape
+    end 
+  end
+  
+  def scrape_collection_google_art_project(collection_url)
+    begin
+      puts "Collection url: " + collection_url
+      disabled = false
+      artwork_id = -1
+      i=0
+      
+      Capybara.register_driver :webkit_ignore_ssl do |app|
+        browser = Capybara::Driver::Webkit::Browser.new(:ignore_ssl_errors => true)
+        Capybara::Driver::Webkit.new(app, :browser => browser)
+      end
+      Capybara.javascript_driver = :webkit_ignore_ssl
+      session = Capybara::Session.new(:webkit)   
+      session.visit collection_url
+      
+      puts "Recorriendo la galeria."
+      
+      while disabled != true
+        session.find('.SPRITE_icon_asset_viewer_nav_right_arrow').click
+        sleep 0.3
+        nokogiri_clicked_page = Nokogiri::HTML(session.body)
+        if nokogiri_clicked_page.css("div.gci-page-arrow")[1]['disabled'] == "disabled"
+          disabled = true
+        end
+      end
+     
+      sleep 1            
+      puts "Disfrutando de la coleccion."                              
+  
+      nokogiri_html_collection_page = Nokogiri::HTML(session.body)
+      nokogiri_html_collection_page.css("div.gci-asset-gallery-item").each do |artwork|
+        sleep 1  
+        artwork_id += 1
+        begin
+          photo_url = artwork.css(".gci-asset-gallery div.collections-image-holder div.holder-background")[0]['style']
+          if photo_url.include? "=s"
+            photo_url = photo_url.split("url(")[1].split("=s")[0]
+          else
+            photo_url = photo_url.split("url(")[1].split(");")[0]
+          end
+        rescue Exception => e
+          puts "Exception photo_url art_project"
+          puts e.message
+          puts e.backtrace.inspect
+        end  
+        begin    
+          session.all('.gci-asset-gallery div.gci-asset-title-date a.gci-asset-title')[artwork_id].click
+          sleep 1
+          session.click_button 'Details'
+          sleep 1
+          nokogiri_html_detail_page = Nokogiri::HTML(session.body)
+          artwork_url = session.current_url
+          scrape_artwork_google_art_project artwork_url, photo_url, nokogiri_html_detail_page
+        rescue Exception => e
+          puts "Exception artwork -> collection_google_art_project"
+          puts e.message
+          puts e.backtrace.inspect
+        end      
+      end #do artwork
+    rescue Exception => e
+      puts "Failed scrape_collection_google_art_project"
+      puts e.message
+      puts e.backtrace.inspect
+    end 
+  end
+  
+  def scrape_artwork_google_art_project(artwork_url, photo_url, nokogiri_html_detail_page)
+    begin
+      manual_tags = Array.new
+      name = ""
+      description = ""
+      prosa = ""
+      idiomas_disponibles = []
+      
+      puts artwork_url
+      puts "photo_url"
+      puts photo_url
+      
+      begin
+        name = nokogiri_html_detail_page.css("h1.gci-unified-header-title-container span.gci-asset-viewer-title")[0].text.strip
+      rescue
+        puts "Exception name art_project"
+      end
+      
+      puts name
+      
+      begin
+        description = nokogiri_html_detail_page.css("div.gci-asset-viewer-tab-description-content")[0].text.strip
+      rescue
+        puts "Exception description art_project"
+      end
+      
+      begin
+        author = nokogiri_html_detail_page.css("span.gci-asset-viewer-creator")[0].text.strip       
+      rescue
+        puts "Failed Author art_project"
+      end
+
+      begin
+        museum = nokogiri_html_detail_page.css("a.gci-asset-viewer-partner")[0].text.strip       
+      rescue
+        puts "Failed museum art_project"
+      end
+      
+      begin
+        url = artwork_url
+      rescue
+        puts "Exception URL art_project"
+      end      
+      
+      manual_tags << author
+      manual_tags << museum
+
+      if name != nil
+        prosa = prosa + name
+      end
+      if description != nil
+        prosa = prosa + ". " + description
+      end   
+
+      scraped_artwork = Artwork.new
+      scraped_artwork.name = name
+      scraped_artwork.description = description
+      if photo_url!=nil
+        begin
+          scraped_artwork.element_image = URI.parse(photo_url)
+        rescue
+          puts "art_project: IMAGEN NO GUARDADA"
+          scraped_artwork.element_image.clear
+        end
+      end      
+      scraped_artwork.url = url
+      scraped_artwork.link = url
+      scraped_artwork.scraped_from = "https://www.google.com/culturalinstitute/project/art-project"
+      scraped_artwork.persist(idiomas_disponibles, prosa, manual_tags)
+    rescue Exception => e
+      puts "Failed scrape_artwork_google_art_project"
+      puts e.message
+      puts e.backtrace.inspect
+    end
+  end
+
+end #class

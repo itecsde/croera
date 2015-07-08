@@ -1,0 +1,23 @@
+<%= render :partial => "header", :locals => {:section_title => (t :Event), :actions => "event_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'event', :actions => "events/event_actions"} %>
+<% end -%>
+
+<% content_for :content do %>
+
+	<% if current_user != nil%>
+		<%= render :partial => "generic_partials/header_show_resource", :locals => {:element => @event} %>	
+	<% end %>		
+	
+	<div id="content_container" class="event_container">		
+		<%= render "event" %>
+	</div> <!-- CONTENT -->
+	
+	<%= render :partial => "generic_partials/related_elements", :locals => {:element_type =>'Event'} %>
+
+	<span style="display:none" id="is_edition" data-value="false"></span>	
+
+	<script src="/javascript/events_form.js"></script>
+<% end %>

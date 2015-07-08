@@ -1,0 +1,43 @@
+<%
+	@templates = Activity.find(:all,:conditions => { :template => true })
+%>
+<div class= "popup_content">
+	<div class="popup_header">
+		<div id="section_header" class="activity_header">
+			<div id="actions" class="a-left">
+				<%= render :partial => "activities/popup_list_actions" %>
+			</div>
+			<div id="section_title" class="a-right">
+				<p><%= t("activities") %></p>
+			</div>		
+		</div>		
+	</div>
+	<!--<%= render :partial => "activities/filters" %>-->
+	<div class="popup_body">
+		<div class= "paginate_controls"></div>
+		<div id= "activity_list" class="activity_list element_list"></div>
+		<div class="clear"></div>
+			<div class="template_list">
+				<% @templates.each do |template| %>
+					<%= render :partial => "elements/element", :locals => {:element => template, :current_layout => "popup"} %>
+				<% end %>
+			</div>
+	</div>
+</div>
+<div class= "popup_details_content">
+	<div class="popup_header">
+		<div id="section_header" class="activity_header">
+			<div id="actions" class="a-left">
+				<a class="back_icon has_tooltip" onclick ="popup_go_back('#<%=popup_id%>');">
+					 <%= image_tag("/images/icons/atras_30.png") %>
+					<span class="tooltip"><%= t("go_back")%></span>
+				</a>
+			</div>
+			<div id="section_title" class="a-right">
+				<p><%= t(details_header_title) %></p>
+			</div>		
+		</div>			
+	</div>
+	<div class="popup_body">
+	</div>
+</div>

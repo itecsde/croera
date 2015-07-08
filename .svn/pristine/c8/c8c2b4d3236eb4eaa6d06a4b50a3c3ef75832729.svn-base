@@ -1,0 +1,22 @@
+<%= render :partial => "header", :locals => {:section_title => (t :new_group), :actions => "form_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'groups', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => t('new_group'), :actions => "groups/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<div id="content_container" class="group_container">
+		<input type="hidden" id="edition_mode" value="on">
+		<%= form_for(@group, :html => { :class => "group_form" }) do |f_group| %>
+			<%= render :partial => "form" , :locals => {:group_form => f_group} %>
+			<%= render :partial => "submit", :locals => {:group_form => f_group} %>
+		<% end %>
+		
+		<div id="popups">
+			<%= render :partial => "adding_popups" %>
+		</div>
+	</div>	
+	
+	<script src="/javascript/groups_form.js"></script>
+<% end %>

@@ -1,0 +1,9 @@
+<% if current_layout == "popup" %>
+<a class="extract_box popup_new_technological_setting_box new_extract_box" onclick="new_technological_setting();">+</a>
+<% else %>
+<%= link_to "+", new_technological_setting_path, html_options = {:class => "extract_box new_technological_setting_box new_extract_box"} %>
+<% end %>
+
+<% @technological_settings.each do |technological_setting| %>
+	<%= render :partial => "elements/element", :locals => {:element => technological_setting, :current_layout => current_layout} %>
+<% end %>

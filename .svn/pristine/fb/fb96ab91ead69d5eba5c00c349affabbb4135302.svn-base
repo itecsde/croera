@@ -1,0 +1,199 @@
+class HarvesterLearningActivities
+  include ActionView::Helpers::SanitizeHelper  
+  
+  def harvest_learning_activities
+    begin
+      i=0
+      url = "http://itec-composer.eun.org/composer/activities/public-activities"
+      
+      page = Nokogiri::HTML(open(url))    
+       
+      page.css("div.well").each do |learning_activity|
+        puts i+=1
+        harvest_learning_activity "http://itec-composer.eun.org" +learning_activity.css("div div.ff_view a.view-item-button")[0]['href']
+      end
+    
+    rescue Exception => e
+      puts e.message
+      puts e.backtrace.inspect
+      puts "Exception harvest learning activities"
+    end
+  end #harvest learning activities
+  
+end
+
+
+def harvest_learning_activity(learning_activity_url,*opcionales)
+  begin  
+    sleep 1  
+        
+    puts learning_activity_url
+    
+    if opcionales[0]==1
+      reintentos = opcionales[1].to_i
+    else
+      reintentos = 2
+    end   
+      
+    learning_activity_page = Nokogiri::HTML(open(learning_activity_url))
+  
+    activity_template = Activity.find(15)
+    learning_activity = Activity.new()
+    learning_activity.save
+    activity_template.boxes.each do |box|   
+      box_clone = box.clone_with_associations
+      box_clone.document_id = learning_activity.id
+      learning_activity.boxes << box_clone
+    end
+   
+    reintentos = 2
+    
+    begin
+      name = learning_activity_page.css("div.resource_image h1")[0].text.strip
+      name = name.gsub("Title","")
+      puts "Name: " + name
+    rescue
+      puts "Exception name harvest_learning_activity"
+    end
+    
+    begin
+      description = strip_tags learning_activity_page.css("div.row-fluid div.span12")[0].text.strip
+      description = description.gsub("Description","")
+      puts "Description: " + description
+    rescue
+      puts "Exception description harvest_learning_activity"
+    end
+      
+    text = Text.create(
+      content: "Mi texto de pruebaa",
+      position: 0
+    )  
+     
+    learning_activity.boxes.first.components.last.texts.destroy_all
+    learning_activity.boxes.second.components.last.texts.destroy_all
+    learning_activity.boxes[4].components.last.texts.destroy_all
+    learning_activity.boxes[5].components.last.texts.destroy_all
+    learning_activity.boxes[6].components.last.texts.destroy_all
+    learning_activity.boxes[7].components.last.texts.destroy_all
+    learning_activity.boxes.last.components.last.texts.destroy_all
+
+    learning_activity_page.css("div.Form-activity-registration div.row-fluid div.span6 ul").each do |box|
+      begin
+        case box.previous_element['class'].strip
+        when "pretty_value_label motivation_teacher"
+          box.css("li").each_with_index do |li,index|
+            text = Text.create(
+              content: li.text.strip,
+              position: index
+            )
+            learning_activity.boxes.first.components.last.texts << text   
+          end
+        when "pretty_value_label learning_outcome"
+          box.css("li").each_with_index do |li,index|
+            text = Text.create(
+              content: li.text.strip,
+              position: index
+            )
+            learning_activity.boxes.second.components.last.texts << text   
+          end
+        when "pretty_value_label guidelines_preparation"
+          box.css("li").each_with_index do |li,index|
+            text = Text.create(
+              content: li.text.strip,
+              position: index
+            )
+            learning_activity.boxes[4].components.last.texts << text   
+          end
+        when "pretty_value_label guidelines_introduction"
+          box.css("li").each_with_index do |li,index|
+            text = Text.create(
+              content: li.text.strip,
+              position: index
+            )
+            learning_activity.boxes[5].components.last.texts << text   
+          end
+        when "pretty_value_label guidelines_activity"
+          box.css("li").each_with_index do |li,index|
+            text = Text.create(
+              content: li.text.strip,
+              position: index
+            )
+            learning_activity.boxes[6].components.last.texts << text   
+          end
+        when "pretty_value_label guidelines_assessment"
+          box.css("li").each_with_index do |li,index|
+            text = Text.create(
+              content: li.text.strip,
+              position: index
+            )
+            learning_activity.boxes[7].components.last.texts << text   
+          end
+        end
+      rescue Exception => e
+        puts "Exception"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+    end
+    
+    technologies = ""
+    begin
+      learning_activity_page.css("div.Form-activity-registration div.row-fluid div.span12").each do |span|
+        if span.text.include? "Ideas for using technology"
+          technologies = span.text.strip.gsub("Ideas for using technology","")
+        end
+      end
+      array_technologies = technologies.split(" ")
+      array_technologies.each_with_index do |technology, index|
+        text = Text.create(
+          content: technology.strip,
+          position: index
+        )
+        learning_activity.boxes.last.components.last.texts << text
+      end         
+    rescue Exception => e
+      puts "Exception Technology"
+      puts e.message
+      puts e.backtrace.inspect
+    end   
+
+    begin
+      photo_url = learning_activity_page.css("div.resource_image img.image")[0]['src']
+      photo_url = "http://itec-composer.eun.org" + photo_url
+      puts "photo_url: " + photo_url
+    rescue
+      puts "Exception capturando photo harvest_learning_activity"
+      photo_url = nil
+    end
+    
+    if photo_url!=nil
+      begin
+        a = URI.parse(photo_url)
+        learning_activity.element_image=URI.parse(photo_url)
+      rescue
+        puts "harvest_learning_activity:  IMAGEN NO GUARDADA"
+        learning_activity.element_image.clear
+      end
+    end
+    
+    I18n.locale = "en"
+    learning_activity.name = name
+    learning_activity.description = description
+    learning_activity.status = "class"     
+    learning_activity.save
+    learning_activity.reload
+    Sunspot.index learning_activity
+    Sunspot.commit       
+   
+  rescue Exception => e
+    puts "Exception harvest_learning_activity"
+    puts "Reintentamos dos veces, sino saltamos a la siguiente learning activity"
+    puts e.backtrace.inspect
+    puts e.message
+    if reintentos > 0
+      reintentos-=1
+      sleep 2
+      harvest_learning_activity(learning_activity_url,1,reintentos)
+    end
+  end
+end #harvest_learning_activity

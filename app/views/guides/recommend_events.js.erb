@@ -1,0 +1,7 @@
+<% if @recommended_events.length == 0 %>
+	var recommended_events= ("<p class='no_recommend_text'><%=j t("no_recommends") %></p>");
+<% else %>
+	var recommended_events= ("<% @recommended_events.each_with_index do |event, index| %><%=j render :partial => "recommended_resource", :locals => {:resource => event, :details_button => "event_details_button", :select_button => "select_event_resource", :recommendation_position => index + 1} %><% end %>");
+<% end %>
+
+recommend_events_callback();

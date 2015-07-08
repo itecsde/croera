@@ -1,0 +1,23 @@
+<li>
+<% if @previous_action == "list" %>
+	<%=link_to  "javascript: history.back();", :class => "back_icon has_tooltip" do %>
+		 <img src="/images/white_arrow_left.png" title="<%= t('back_to_home') %>"></img>
+	<% end %>
+<% else %>
+	<%=link_to  lres_path, :class => "back_icon has_tooltip" do %>
+		 <img src="/images/white_arrow_left.png" title="<%= t('back_to_home') %>"></img>
+	<% end %>
+<% end %>
+</li>
+<% if current_user != nil && ((@lre.owner == current_user) or (@lre.owner_type=="Group" && @lre.owner.users.exists?(current_user)))%>
+	<li>
+	<%=link_to edit_lre_path(@lre), :class => "has_tooltip" do %>
+		 <img src="/images/white_edit.png" title="<%= t('edit') %>"></img>
+	</li>
+	<% end %>
+	<li>
+	<%=link_to  @lre, confirm: t('are_you_sure'), method: :delete, :class => "has_tooltip" do %>
+		<img src="/images/white_delete.png" title="<%= t('delete') %>"></img>
+	<% end %>	
+	</li>
+<% end %>

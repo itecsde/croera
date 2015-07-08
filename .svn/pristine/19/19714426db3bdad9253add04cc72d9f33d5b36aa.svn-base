@@ -1,0 +1,485 @@
+var current_position;
+
+$(document).ready(function() {
+	experience_form_init();
+});
+
+function experience_form_init(){
+	confirmation_needed = true;
+	check_edition_mode(".experience_container");
+	/** HACK SUCIO ***/
+	if($("#edition_mode").val() == "on")
+		$(".alternatives").css("display","none");
+	$(".experience_form textarea").autosize();
+	$(".experience_form #youtube_input").enterKey(function (e) {
+	    change_video(this);
+	    e.preventDefault();
+	    return false;
+	});
+	
+	$(".experience_step_body .contributions" ).sortable({
+		items: ".experience_box_container",
+		appendTo: "contributions",
+		handle: ".draggable_button",
+		start: function( event, ui ) {
+				ui.helper.addClass("dragging");
+				ui.helper.closest(".contributions").find(".experience_box_container").addClass("dragging_other");
+		},
+		beforeStop: function( event, ui ) {
+			ui.helper.removeClass("dragging");
+			ui.helper.closest(".contributions").find(".experience_box_container").removeClass("dragging_other");
+		}
+	});
+	$(".experience_form").submit(function(){
+		confirmation_needed = false;
+		build_experience_attribute_strings();
+	});
+	
+	// Enables the infinite scroll on the popups
+	popup_infinite_scroll_init('#event_assignment_selection #event_list','.extract_box', '"#event_assignment_selection .popup_body:first"', 'event_assignment_selection');		
+	popup_infinite_scroll_init('#tool_assignment_selection #tool_list','.extract_box', '"#tool_assignment_selection .popup_body:first"', 'tool_assignment_selection');	
+	popup_infinite_scroll_init('#biography_assignment_selection #biographies_list','.extract_box', '"#biography_assignment_selection .popup_body:first"', 'biography_assignment_selection');	
+	popup_infinite_scroll_init('#lecture_assignment_selection #lecture_list','.extract_box', '"#lecture_assignment_selection .popup_body:first"', 'lecture_assignment_selection');
+	popup_infinite_scroll_init('#site_assignment_selection #site_list','.extract_box', '"#site_assignment_selection .popup_body:first"', 'site_assignment_selection');
+	popup_infinite_scroll_init('#documentary_assignment_selection #documentary_list','.extract_box', '"#documentary_assignment_selection .popup_body:first"', 'documentary_assignment_selection');
+	popup_infinite_scroll_init('#course_assignment_selection #course_list','.extract_box', '"#course_assignment_selection .popup_body:first"', 'course_assignment_selection');
+	popup_infinite_scroll_init('#article_assignment_selection #article_list','.extract_box', '"#article_assignment_selection .popup_body:first"', 'article_assignment_selection');
+	popup_infinite_scroll_init('#artwork_assignment_selection #artwork_list','.extract_box', '"#artwork_assignment_selection .popup_body:first"', 'artwork_assignment_selection');				
+	popup_infinite_scroll_init('#post_assignment_selection #post_list','.extract_box', '"#post_assignment_selection .popup_body:first"', 'post_assignment_selection');
+	popup_infinite_scroll_init('#slideshow_assignment_selection #slideshow_list','.extract_box', '"#slideshow_assignment_selection .popup_body:first"', 'slideshow_assignment_selection');
+	popup_infinite_scroll_init('#report_assignment_selection #report_list','.extract_box', '"#report_assignment_selection .popup_body:first"', 'report_assignment_selection');
+	popup_infinite_scroll_init('#lre_assignment_selection #lre_list','.extract_box', '"#lre_assignment_selection .popup_body:first"', 'lre_assignment_selection');					
+	popup_infinite_scroll_init('#widget_assignment_selection #widget_list','.extract_box', '"#widget_assignment_selection .popup_body:first"', 'widget_assignment_selection');
+	popup_infinite_scroll_init('#activity_assignment_selection #activity_list','.extract_box', '"#activity_assignment_selection .popup_body:first"', 'activity_assignment_selection');
+
+}
+
+function add_contribution(button, contribution_type){
+	var contributions =$(button).closest(".experience_step_body").find(".contributions");
+	var box= $("#elements_library").find("#new_" + contribution_type + " .experience_box_container").clone();
+	eval(contribution_type + "_init(box)");
+	contributions.append(box);
+}
+
+// This function is called when the user clicks on the event icon in the bar for inserting elements in an experience
+function display_events(button, contribution_type) {
+	$("#event_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#event_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#event_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#event_assignment_selection",'/selectors/paginate_elements/?element_class=event_assignment_selection');
+	$("#event_assignment_selection .event_list").masonry();
+}
+
+// This function is called when the user clicks on the application icon in the bar for inserting elements in an experience
+function display_applications(button, contribution_type) {
+	$("#tool_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#tool_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#tool_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#tool_assignment_selection",'/selectors/paginate_elements/?element_class=tool_assignment_selection');
+	$("#tool_assignment_selection .tool_list").masonry();
+}
+
+function display_biographies(button, contribution_type) {
+	$("#biography_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;	
+	$.each($("#biography_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#biography_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#biography_assignment_selection",'/selectors/paginate_elements/?element_class=biography_assignment_selection');
+	$("#biography_assignment_selection .biographies_list").masonry();
+}
+
+function display_lectures(button, contribution_type) {
+	$("#lecture_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#lecture_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#lecture_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#lecture_assignment_selection",'/selectors/paginate_elements/?element_class=lecture_assignment_selection');
+	$("#lecture_assignment_selection .lectures_list").masonry();
+}
+
+function display_sites(button, contribution_type) {
+	$("#site_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#site_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#site_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#site_assignment_selection",'/selectors/paginate_elements/?element_class=site_assignment_selection');
+	$("#site_assignment_selection .sites_list").masonry();
+}
+
+function display_documentaries(button, contribution_type) {
+	$("#documentary_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#documentary_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#documentary_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#documentary_assignment_selection",'/selectors/paginate_elements/?element_class=documentary_assignment_selection');
+	$("#documentary_assignment_selection .documentaries_list").masonry();
+}
+
+function display_courses(button, contribution_type) {
+	$("#course_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#course_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#course_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#course_assignment_selection",'/selectors/paginate_elements/?element_class=course_assignment_selection');
+	$("#course_assignment_selection .courses_list").masonry();
+}
+
+
+function display_articles(button, contribution_type) {
+	$("#article_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#article_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#article_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#article_assignment_selection",'/selectors/paginate_elements/?element_class=article_assignment_selection');
+	$("#article_assignment_selection .articles_list").masonry();
+}
+
+function display_posts(button, contribution_type) {
+	$("#post_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#post_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#post_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#post_assignment_selection",'/selectors/paginate_elements/?element_class=post_assignment_selection');
+	$("#post_assignment_selection .posts_list").masonry();
+}
+
+
+function display_slideshows(button, contribution_type) {
+	$("#slideshow_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#slideshow_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#slideshow_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#slideshow_assignment_selection",'/selectors/paginate_elements/?element_class=slideshow_assignment_selection');
+	$("#slideshow_assignment_selection .slideshows_list").masonry();
+}
+
+function display_reports(button, contribution_type) {
+	$("#report_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#report_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#report_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#report_assignment_selection",'/selectors/paginate_elements/?element_class=report_assignment_selection');
+	$("#report_assignment_selection .reports_list").masonry();
+}
+
+function display_artworks(button, contribution_type) {
+	$("#artwork_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#artwork_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#artwork_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#artwork_assignment_selection",'/selectors/paginate_elements/?element_class=artwork_assignment_selection');
+	$("#artwork_assignment_selection .artworks_list").masonry();
+}
+
+function display_lres(button, contribution_type) {
+	$("#lre_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#lre_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#lre_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#lre_assignment_selection",'/selectors/paginate_elements/?element_class=lre_assignment_selection');
+	$("#lre_assignment_selection .lres_list").masonry();
+}
+
+function display_widgets(button, contribution_type) {
+	$("#widget_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	$.each($("#widget_assignment_selection").find(".my_activities_filter"), function (index,value){
+		$(value).removeClass("disabled");		
+	}); 
+	$($("#widget_assignment_selection").find(".my_activities_filter")[0]).toggleClass("disabled");
+	// Opens a popup to select an element
+	open_area_popup("#widget_assignment_selection",'/selectors/paginate_elements/?element_class=widget_assignment_selection');
+	$("#widget_assignment_selection .widgets_list").masonry();
+}
+
+
+function display_activities(button, contribution_type) {
+	$("#activity_assignment_selection .element_list").html("");
+	// Saves the current_position
+	current_position = button;
+	// Opens a popup to select an element
+	open_area_popup("#activity_assignment_selection",'/selectors/paginate_elements/?element_class=activity_assignment_selection');
+	$("#activity_assignment_selection .activities_list").masonry();
+}
+
+function display_alternatives(button, contribution_type, contribution_id) {
+	// Saves the current_position
+	$("#element_assignment_selection .element_list").html("");
+	current_position = button;
+	// Opens a popup to select an element
+	open_area_popup("#element_assignment_selection",'/selectors/paginate_elements/?element_class=alternatives&contribution_type='+contribution_type+'&contribution_id='+contribution_id);
+	$("#element_assignment_selection .element_list").masonry(); //Por el Hack aqui va sin s
+}
+
+
+
+// This function is called when the user has selected a particular element in order to insert it in an experience
+function insert_element(element_class) {
+	/*if (element_class == 'Application')
+		element_class = 'tool';
+	if (element_class == 'Person')
+		element_class = 'person';
+	if (element_class == 'Event')
+		element_class = 'event';
+	if (element_class == 'Lecture')
+		element_class = 'lecture';
+	if (element_class == 'Site')
+		element_class = 'site';
+	if (element_class == 'Activity')
+		element_class = 'activity';*/
+	element_class=element_class.toLowerCase();
+	/* HACK DEBIDO A NOMENCLATURA */
+	if (element_class == 'application')
+		element_class = 'tool';			
+		
+	// Composes the id of the popup
+	popup_id = "#" + element_class + "_assignment_selection";
+	// Gets the element_id
+	element_id = $(popup_id).find(".selected_elements").find(".element_id").val();
+	if (element_class == 'tool')
+		element_class = 'Application';
+	if (element_class == 'biography')
+		element_class = 'Biography';	
+	if (element_class == 'event')
+		element_class = 'Event';
+	if (element_class == 'lecture')
+		element_class = 'Lecture';
+	if (element_class == 'site')
+		element_class = 'Site';
+	if (element_class == 'documentary')
+		element_class = 'Documentary';
+	if (element_class == 'course')
+		element_class = 'Course';
+	if (element_class == 'article')
+		element_class = 'Article';
+	if (element_class == 'lre')
+		element_class = 'Lre';	
+	if (element_class == 'post')
+		element_class = 'Post';	
+	if (element_class == 'slideshow')
+		element_class = 'Slideshow';
+	if (element_class == 'report')
+		element_class = 'Report';
+	if (element_class == 'artwork')
+		element_class = 'Artwork';
+	if (element_class == 'widget')
+		element_class = 'Widget';																									
+	if (element_class == 'activity')
+		element_class = 'Activity';	
+	// Now it retrieves the HTML code of the excerpt from the server
+	get_element_excerpt(element_id, element_class);
+		
+}
+
+// This function retrieves the HTML code of an event's excerpt from the server
+function get_element_excerpt(element_id, element_class) {
+	// Composes the URL taking the locale into account
+	query_url= "/" + $("#locale").val() + "/experiences/get_element_excerpt";
+	// Issues an AJAX request
+	jQuery.ajax({
+		url: query_url,
+		type: "GET",
+		data: {"element_id": element_id, "element_class": element_class}
+	}).success(function(result){
+		//var contributions =$(current_position).closest(".experience_step_body").find(".contributions");
+		//contributions.append($(element_excerpt).html());
+		var contributions =$(current_position).closest(".experience_step_body").find(".contributions");
+		
+		$("#elements_library").find("#new_" + "element" + " .experience_box_container").find(".excerpt").html($(element_excerpt).find(".excerpt").html());
+		$("#elements_library").find("#new_" + "element" + " .experience_box_container").find("#experience_step_contribution_annotation_contribution_id").val(element_id);
+		$("#elements_library").find("#new_" + "element" + " .experience_box_container").find("#experience_step_contribution_annotation_contribution_type").val(element_class);
+		var box= $("#elements_library").find("#new_" + "element" + " .experience_box_container").clone();
+		contributions.append(box);
+		/** HACK SUCIO ***/
+		if($("#edition_mode").val() == "on")
+			$(".alternatives").css("display","none");
+	});
+}
+
+function free_text_init(box){
+	box.find("textarea").autosize();
+}
+
+function positive_comment_init(box){
+	box.find("textarea").autosize();
+}
+
+function negative_comment_init(box){
+	box.find("textarea").autosize();
+}
+
+function picture_init(box){
+	box.find("textarea").autosize();
+}
+
+function video_init(box){
+	box.find("#youtube_input").enterKey(function (e) {
+	    change_video(this);
+	    e.preventDefault();
+	    return false;
+	});
+}
+
+function remove_experience_contribution(remove_button){
+	var contribution_id = $(remove_button).closest(".experience_box_container").find("#experience_step_contribution_annotation_id").val();
+	var experience_box_container = $(remove_button).closest(".experience_box_container");
+	
+	if (contribution_id != ""){
+		experience_box_container.addClass("deleted");
+		experience_box_container.fadeOut('slow');
+	}else{
+		experience_box_container.remove();
+	}
+}
+
+function change_video(change_button){
+	var user_video_url= $(change_button).val();
+	var video_id= youtube_parser(user_video_url);
+	var video_url= "https://www.youtube.com/embed/" + video_id;
+	var video_preview= $(change_button).closest(".video_container").find(".video_preview");
+	var video_iframe= $("#elements_library").find("#youtube_iframe iframe").clone();
+	$(change_button).closest(".video_container").find("#text_content").val(video_id);
+	video_iframe.attr('src',video_url);
+	video_preview.html(video_iframe);
+}
+
+function youtube_parser(url){
+  var re = new RegExp("v(?:=([^&]*))?", "i");
+  var pm = re.exec(decodeURIComponent(url));
+  if(pm === null){
+  	 return youtube_parser1(url);
+  }else{
+  	return pm[1] || "";
+  }
+}
+
+
+function youtube_parser1(url){
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    if (match&&match[7].length==11){
+        return match[7];
+    }else{
+        alert("Error Url");
+    }
+}
+
+function save_experience_form(){
+	confirmation_needed = false;
+	$(".experience_form").submit();
+}
+
+function maximize_experience_step(element){
+	$(element).find("i").toggleClass("minimize");
+	$(element).closest(".experience_step").find(".minimizable_area").toggle("slow");	
+}
+
+function build_experience_attribute_strings(){
+	$("#experience_steps .experience_step").each(function(index, element){
+		$(element).find("#experience_step_id").attr('name','experience[experience_steps_attributes]['+index+'][id]');
+		$(element).find("#experience_step_name").attr('name','experience[experience_steps_attributes]['+index+'][name]');
+		$(element).find("#experience_step_description").attr('name','experience[experience_steps_attributes]['+index+'][description]');
+		$(element).find("#experience_step_position").attr('name','experience[experience_steps_attributes]['+index+'][position]');
+		$(element).find(".experience_box_container").each(function(contribution_index, contribution_element){
+			var annotation_id= $(contribution_element).find("#experience_step_contribution_annotation_id").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][id]');
+			if ($(contribution_element).hasClass("deleted")){				
+				$(contribution_element).append("<input type=\"hidden\" value=\"1\" id=\"destroy\" name=\"experience[experience_steps_attributes]["+index+"][experience_step_contribution_annotations_attributes]["+contribution_index+"][_destroy]\">");
+			}else{
+				var annotation_id= $(contribution_element).find("#experience_step_contribution_annotation_id").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][id]');
+				var contribution_type= $(contribution_element).find("#experience_step_contribution_annotation_contribution_type").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_type]');
+				var contribution_id= $(contribution_element).find("#experience_step_contribution_annotation_contribution_id").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_id]');
+				var annotation_position= $(contribution_element).find("#experience_step_contribution_annotation_position");
+				annotation_position.attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][position]');
+				annotation_position.val(contribution_index + 1);
+				
+				if ($(contribution_element).hasClass("Picture")){
+					$(contribution_element).find("#picture_id").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][id]');
+				}else if ($(contribution_element).hasClass("FreeText")){ 	
+					$(contribution_element).find("#free_text_id").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][id]');
+				}else if ($(contribution_element).hasClass("NegativeComment")){ 	
+					$(contribution_element).find("#negative_comment_id").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][id]');
+				}else if ($(contribution_element).hasClass("PositiveComment")){ 	
+					$(contribution_element).find("#positive_comment_id").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][id]');
+				}else if ($(contribution_element).hasClass("YoutubeItem")){ 	
+					$(contribution_element).find("#youtube_item_id").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][id]');
+				}
+				
+				var box_container= $(contribution_element).find(".box_container");
+				var box_id = box_container.find("#box_id").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][boxes_attributes][0][id]');
+				var box_type = box_container.find("#box_type").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][boxes_attributes][0][box_type]');
+				
+				box_container.find(".component_container").each(function(component_index, component_element){
+					var component_id = $(component_element).find("#component_id").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][boxes_attributes][0][components_attributes]['+component_index+'][id]');
+					var component_type = $(component_element).find("#component_type").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][boxes_attributes][0][components_attributes]['+component_index+'][component_type]');
+					$(component_element).find("#area_image").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][boxes_attributes][0][components_attributes]['+component_index+'][area_image]');
+					
+					$(component_element).find(".text_container").each(function(text_index, text_container){
+						$(text_container).find(".text_id").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][boxes_attributes][0][components_attributes]['+component_index+'][texts_attributes]['+text_index+'][id]');
+						$(text_container).find(".text_content").attr('name','experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][boxes_attributes][0][components_attributes]['+component_index+'][texts_attributes]['+text_index+'][content]');
+						if ($(text_container).hasClass('deleted') && contribution_type != 'Application' && contribution_type != 'Event' && contribution_type != 'Biography' && contribution_type != 'Lecture' && contribution_type != 'Site' && contribution_type != 'Documentary' && contribution_type != 'Course' && contribution_type != 'Article' && contribution_type != 'Lre' && contribution_type != 'Post' && contribution_type != 'Slideshow' && contribution_type != 'Report'  && contribution_type != 'Artwork' && contribution_type != 'Widget') {
+							$(text_container).append('<input type=\"hidden\" value=\"1\" id=\"destroy\" name=\"experience[experience_steps_attributes]['+index+'][experience_step_contribution_annotations_attributes]['+contribution_index+'][contribution_attributes][boxes_attributes][0][components_attributes]['+component_index+'][texts_attributes]['+text_index+'][_destroy]\">');
+						}	
+					});
+					
+				});
+			}			
+		});
+	});
+		
+	return false;
+}

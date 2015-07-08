@@ -1,0 +1,704 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl" 
+
+class ScraperLectures
+  include ActionView::Helpers::SanitizeHelper
+    include Capybara::DSL
+
+  #############################################################################
+  #                               scrape_ted                                  #
+  #############################################################################
+  
+  def scrape_ted
+    begin
+      url = "http://www.ted.com/translate/languages"
+      idiomas_permitidos = ["en"]
+      page = Nokogiri::HTML(open(url))
+      idiomas_disponibles = Array.new
+      page.css("div.col ul.bullets li").each do |pais|
+        url_pais = pais.css("a")[0]['href']
+        idioma = url_pais.split("/")
+        idiomas_disponibles << idioma[idioma.length-1] 
+      end
+      
+      #cambiar esto aqui y darle la vuelta para que busque
+      
+      idiomas_disponibles.each do |idioma|
+        if idioma.in? idiomas_permitidos
+          puts idioma
+          scrape_ted_idioma(idioma)
+        end
+      end   
+      
+    rescue Exception => e
+      puts "Exception scrape_ted"
+      puts e.message
+      puts e.backtrace.inspect
+    end
+  end
+  
+  
+  def scrape_ted_idioma(idioma,*siguiente)
+    begin
+      i=0   
+      if siguiente[1]==1
+        reintentos = siguiente[2]
+      else
+        reintentos = 2
+      end
+
+      url = "http://www.ted.com/translate/languages/" + idioma + "?page=1"
+      puts "Escrapeando pais " + idioma
+      #I18n.locale = idioma
+      puts url
+
+      page = Nokogiri::HTML(open(url))
+
+      if siguiente[1]!=1
+        page.css("div#list.talkListContainer dl.talkMedallion").each do |item|
+          i+=1
+          puts "lecture_number --> " + i.to_s
+          photo_url = item.css("dt.thumbnail a img")[1]['src']
+          #sleep 2
+          scrape_lecture_ted "http://www.ted.com" + item.css("dt.thumbnail a")[0]['href'], photo_url
+        end
+      end
+
+      if siguiente[1] != 1         
+        siguiente = "http://www.ted.com" + page.css("div#maincontent div.pagination ul li.next a")[0]['href']
+      else
+        siguiente = siguiente[0]
+      end
+
+      while siguiente != nil
+        sleep 2
+        puts "URL_SIGUIENTE --> " + siguiente
+        page2 =  Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+       
+        page2.css("div#list.talkListContainer dl.talkMedallion").each do |item|
+          i+=1
+          puts "lecture_number --> " + i.to_s
+          photo_url = item.css("dt.thumbnail a img")[1]['src']
+          scrape_lecture_ted "http://www.ted.com" + item.css("dt.thumbnail a")[0]['href'], photo_url
+          #sleep 2
+        end
+
+        if page2.css("div#maincontent div.pagination ul li.next a").empty?
+          siguiente = nil
+        else
+          siguiente = "http://www.ted.com" + page2.css("div#maincontent div.pagination ul li.next a")[0]['href']
+        end
+      end
+
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Exception in scrape_ted_idioma"
+      if reintentos > 0
+        reintentos-=1
+        scrape_ted(idioma,siguiente,1,reintentos)
+      end
+    end
+
+  end #scrape_ted_idioma
+
+
+def scrape_lecture_ted(lecture_url, photo_url, *reintentos)   
+    begin
+      name = ""
+      description = ""
+      puts lecture_url
+      idiomas_ue = ["gl","de","bg","cs","hr","da","sk","sl","es","et","fi","fr","el","hu","en","ga","it","lv","lt","mt","nl","pl","pt","ro","sv","tr","no"]
+  
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+          
+      lecture_page = Nokogiri::HTML(open(lecture_url))
+      scraped_lecture = Lecture.new
+      name = ""
+      description = ""
+      name_en = ""
+      description_en = ""
+      more_info = "" 
+      full_bio_info = ""
+      
+      idiomas_disponibles = Array.new
+         lecture_page.css("div.talk-tools select#languageCode option").each do |idioma|
+           idiomas_disponibles << idioma['value']
+         end
+      idiomas_disponibles.delete_if { |element| element == ""}       
+      idiomas_disponibles.delete_if { |element| !element.in? idiomas_ue}  #elimina del array de idiomas disponibles aquellos idiomas que no pertenezcan a la ue
+
+      if idiomas_disponibles == []
+        puts "El array está vacío, le metemos inglés"
+        idiomas_disponibles << "en"
+      end
+
+      idiomas_disponibles.each do |idioma|
+        begin
+          I18n.locale = idioma
+          lecture_url_locale = lecture_url.gsub("/talks/","/talks/lang/" + idioma + "/")
+          #puts lecture_url_locale
+          puts "Obteniendo información en idioma " + idioma
+          lecture_page = Nokogiri::HTML(open(lecture_url_locale))
+          begin
+            name=lecture_page.css("div div#body.viewTemplate h1 span#altHeadline.notranslate")[0].text.strip().gsub(/\n/," ").gsub(/\s+/,' ')
+            if idioma == "en" #para que el wikipediador tenga la prosa en ingles
+              name_en = name
+            end
+            scraped_lecture.name = name
+            puts "Name: " + name
+          rescue
+            puts "Failed name ted"
+          end       
+          begin
+            description = strip_tags lecture_page.css("div.about div.talk-intro p")[0].text.strip
+            if idioma == "en"
+              description_en = description #para que el wikipediador tenga la prosa en ingles
+            end
+            more_info = strip_tags lecture_page.css("div.about div.talk-intro p")[1].text.strip #mas info para el wikipediador
+            scraped_lecture.description = description
+            #puts "Description: " + description
+          rescue
+            puts "Failed description ted"        
+          end
+          
+          begin
+            full_bio_url = "http://www.ted.com/" + lecture_page.css("div.about div.talk-intro p a")[0]['href']
+            full_bio_page = Nokogiri::HTML(open(full_bio_url))
+            clearfix = full_bio_page.css("div#speakerscontent div.clearfix")[0].text.strip
+            why = full_bio_page.css("div#speakerscontent div.why")[0].text.strip
+            full_bio_info = clearfix + why
+          rescue Exception => e
+            puts "Failed Full Bio info ted"
+            puts e.message
+            puts e.backtrace.inspect
+          end
+          
+          scraped_lecture.link = lecture_url_locale    
+          
+        rescue Exception => e
+          puts "Failed name-description idiomas ted"
+          puts e.message
+          puts e.backtrace.inspect
+        end     
+      end #do |idioma|
+      
+      I18n.locale = "en"
+      
+      begin    
+        human_tags = Array.new      
+        lecture_page.css("div.about div.contentPod div.related dl dd.clearfix ul li a").each do |tag|      
+          human_tags << tag.text.strip      
+        end
+      rescue
+        puts "Failed Human Tags ted"
+      end
+=begin                                      
+         begin
+           idiomas = Array.new
+           lecture_page.css("div.talk-tools select#languageCode option").each do |idioma|
+             idiomas << idioma.text
+           end
+           idiomas.delete_if { |element| element == "Show transcript"} 
+            
+           idiomas.each do |idioma|
+              if Language.find_by_language(idioma)!=nil
+                annotation = GlobalizableLanguageAnnotation.new
+                annotation.globalizable = scraped_lecture
+                annotation.language = Language.find_by_language(idioma)
+                annotation.save
+              end #if
+           end # do |idioma|         
+        rescue
+          puts "Failed languages TED"
+        end
+=end
+        scraped_from="http://www.ted.com"
+      scraped_lecture.url=lecture_url
+      scraped_lecture.scraped_from=scraped_from
+  
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_lecture.element_image=URI.parse(photo_url)
+        rescue
+          puts "ted:  IMAGEN NO GUARDADA"
+          scraped_lecture.element_image.clear
+        end
+      end
+      
+      prosa = name_en + ". " + description_en + ". " +  more_info + ". " + full_bio_info #el wikipediador de momento razona sólo en ingles
+      scraped_lecture.persist(idiomas_disponibles, prosa, human_tags)          
+      reintentos = 2  
+       
+    rescue Exception => e
+      puts "Exception scrape_lecture_ted"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 3
+        scrape_lecture_ted(lecture_url,photo_url, 1, reintentos)
+      end
+    end
+
+  end #scrape_lecture_ted
+  
+  
+  #############################################################################
+  #                               scrape_videolectures                        #
+  #############################################################################
+  
+  def scrape_videolectures(*siguiente)
+
+    begin
+      i=0
+      description=""     
+      if siguiente[1]==1
+        reintentos = siguiente[2]
+        m = siguiente[3].to_i
+        url = siguiente[0]
+        num_pags = siguiente[4].to_i        
+      else
+        url = "http://videolectures.net/site/ajax/drilldown/?t=vl&cid=1&w=5&l=en&p=1"
+        page = Nokogiri::HTML(open(url))
+        num_pags = page.css("div.paginator strong")[0].next.text.split("of")[1].strip.to_i
+        reintentos = 2
+        m=1   
+      end
+
+             
+      (m..num_pags).each do |n|
+         sleep 2
+      
+         if siguiente[1] == 1
+           url = siguiente[0]         
+         else
+           url = "http://videolectures.net/site/ajax/drilldown/?t=vl&cid=1&w=5&l=en&p=" + n.to_s           
+         end
+        
+         puts "URL_SIGUIENTE --> " + url    
+         begin                  
+          page = Nokogiri::HTML(open(url))
+          
+          if n == 1
+           num_pags = page.css("div.paginator strong")[0].next.text.split("of")[1].strip.to_i                        
+          else
+           num_pags = page.css("div.paginator a")[1].next.text.split("of")[1].strip.to_i   
+          end
+          
+          reintentos = 2 
+          page.css("div#drilldown_thumblist div.lec_thumb").each do |item|
+            i+=1
+            puts "lecture_number --> " + i.to_s
+            begin
+            photo_url = item.css("a div div.lec_thumb_img")[0]['style']
+            photo_url = photo_url.split("(")[1].split(")")[0]       
+            photo_url[0]=""
+            photo_url[photo_url.length-1]=""
+            rescue
+            end
+            scrape_lecture_videolectures "http://www.videolectures.net" + item.css("a")[0]['href'], photo_url
+          end #do
+          rescue  Exception => e
+            puts e.backtrace.inspect
+            puts e.message
+            puts "Excepcion paginando, reintentamos dos veces, sino saltamos a la siguiente página"
+            if reintentos > 0
+              puts reintentos
+              reintentos-=1
+              sleep 1
+              scrape_videolectures(url,1,reintentos,n,num_pags)
+            else
+              reintentos = 2
+              siguiente[1]=0
+            end
+          end             
+       end #for
+
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Exception in scrape_videolectures"
+    end
+
+  end #scrape_videolectures
+
+ def scrape_lecture_videolectures(lecture_url, photo_url, *reintentos)
+    
+    begin
+      name = ""
+      description = "" 
+      puts lecture_url
+      idiomas_disponibles = ["en"]
+  
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+      
+      lecture_page = Nokogiri::HTML(open(lecture_url))
+      scraped_lecture=Lecture.new
+     
+       begin
+        name=lecture_page.css("div#drilldown_list span#vl_desc h2")[0].text.strip().gsub(/\n/," ").gsub(/\s+/,' ')
+        puts "Name: " + name
+       rescue
+        puts "Failed Name videolectures"
+       end      
+                          
+       begin
+        description = strip_tags lecture_page.css("div#description.mod_body div#lec_desc_edit.wiki")[0].text.strip
+        #puts "Description: " + description
+      rescue
+        puts "Failed Description videolectures"
+      end
+
+      begin    
+        human_tags = Array.new      
+        lecture_page.css("span#vl_desc fieldset#categories ul li span a").each do |tag|
+          if tag.text.strip!="Top"      
+            human_tags << tag.text.strip  
+          end    
+        end     
+       rescue
+         puts "Failed (Human) Tags videolectures"
+       end                
+        prosa = name + ". " + description         
+        
+=begin          
+         begin
+           idioma = "English"         
+           if Language.find_by_language(idioma)!=nil
+            annotation = GlobalizableLanguageAnnotation.new
+            annotation.globalizable = scraped_lecture
+            annotation.language = Language.find_by_language(idioma)
+            annotation.save
+           end #if      
+         rescue
+          puts "Failed languages videolectures"
+         end
+=end         
+        scraped_from="http://videolectures.net"
+      I18n.locale = "en"
+      scraped_lecture.name=name
+      scraped_lecture.description=description
+      scraped_lecture.url=lecture_url
+      scraped_lecture.link = lecture_url    
+      scraped_lecture.scraped_from=scraped_from
+  
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_lecture.element_image=URI.parse(photo_url)
+        rescue
+          puts "videolectures:  IMAGEN NO GUARDADA"
+          scraped_lecture.element_image.clear
+        end
+      end
+      
+      scraped_lecture.persist(idiomas_disponibles,prosa,human_tags)
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_lecture_videolectures"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 3
+        scrape_lecture_videolectures(lecture_url,photo_url, 1, reintentos)
+      end        
+    end
+  end #scrape_lecture_videolectures
+  
+  
+  #############################################################################
+  #                               scrape_khanacademy                          #
+  #############################################################################
+  
+ def scrape_khanacademy(*reintentos)
+
+    require 'rubygems'
+    require 'nokogiri'
+    require 'open-uri'
+
+    url="https://www.khanacademy.org/library"
+    begin
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+      page = Nokogiri::HTML(open(url))
+      reintentos = 2
+      page.css(".subjects-column-first td.subject-cell").each do |category|
+        scrape_category_khanacademy "http://www.khanacademy.org" + category.css("a")[0]['href']
+      end
+    rescue  Exception => e
+      puts "Exception in scrape_khanacademy"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_khanacademy(1,reintentos)
+      end
+    end
+  end #scrape_khanacademy
+  
+  def scrape_category_khanacademy(category_url, *reintentos)
+
+    puts "category: " + category_url
+
+    begin
+
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+
+      i=0
+      category_page = Nokogiri::HTML(open(category_url))
+      reintentos = 2
+      category_page.css("div.span6 a.topic-list-item").each do |subcategory|
+        photo_url = subcategory.css("div.thumb img")[0]['src']
+        scrape_subcategory_khanacademy "http://www.khanacademy.org" + subcategory['href'], photo_url
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_category_khanacademy"
+      puts "Reintentamos dos veces, sino saltamos de categoria"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_category_khanacademy(category_url,1,reintentos)
+      end
+    end
+
+  end #scrape_category_khanacademy
+
+  
+ def scrape_subcategory_khanacademy (subcategory_url, photo_url, *reintentos)
+
+    puts "  subcategory- "  + subcategory_url
+
+    begin
+
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+
+      i=0
+      subcategory_page = Nokogiri::HTML(open(subcategory_url))
+      reintentos = 2
+      subcategory_page.css("ul.progress-container li.progress-item").each do |lecture|
+
+        tipo_item = lecture.css("a.progress-item-link div.subway-icon div.status")[0]['class'].split(" ")[2]
+
+        if tipo_item == "video-node"
+          scrape_lecture_khanacademy "http://www.khanacademy.org" + lecture.css(".progress-item-link")[0]['href'], photo_url
+        end
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_subcategory_khanacademy"
+      puts "Reintentamos dos veces, sino saltamos de subcategoria"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_subcategory_khanacademy(subcategory_url, photo_url,1,reintentos)
+      end
+
+    end
+
+  end #scrape_subcategory_khanacademy
+ 
+ def scrape_lecture_khanacademy(lecture_url, photo_url,*reintentos)
+
+    begin
+      name = ""
+      description = ""
+      puts "    lecture---" + lecture_url
+      idiomas_ue = ["gl","de","bg","cs","hr","da","sk","sl","es","et","fi","fr","el","hu","en","ga","it","lv","lt","mt","nl","pl","pt","ro","sv","no"]
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+                    
+      idiomas_disponibles = Array.new
+      lecture_page = Nokogiri::HTML(open(lecture_url))
+      scraped_lecture=Lecture.new
+      name = ""
+      description = ""
+      name_en = ""
+      description_en = ""
+      idiomas_disponibles = Array.new
+      lecture_page.css("select#language_picker option").each do |idioma|
+        idiomas_disponibles << idioma['value']
+      end
+      idiomas_disponibles.delete_if { |element| !element.in? idiomas_ue}  #elimina del array de idiomas disponibles aquellos idiomas que no pertenezcan a la ue
+
+      idiomas_disponibles.each do |idioma|
+        begin
+          I18n.locale = idioma
+          lecture_url_locale = lecture_url.gsub("www", idioma)
+          #puts lecture_url_locale
+          puts "Obteniendo información en idioma " + idioma
+          lecture_page = Nokogiri::HTML(open(lecture_url_locale))
+          begin
+            lecture_page.css("meta").each do |meta|
+              if meta['property'] == "og:title"
+                name = meta['content'].strip().gsub(/\n/," ").gsub(/\s+/,' ')
+              end
+            end
+            if idioma == "en" #para que el wikipediador tenga la prosa en ingles
+              name_en = name
+            end
+            scraped_lecture.name = name
+            puts "Name: " + name
+          rescue
+            puts "Failed name khanacademy"
+          end       
+          begin
+            lecture_page.css("meta").each do |meta|
+              if meta['property']=="og:description"
+                description=strip_tags meta['content'].strip().gsub(/\n/," ").gsub(/\s+/,' ')
+              end
+            end
+            if idioma == "en" #para que el wikipediador tenga la prosa en ingles
+              description_en = description
+            end
+            scraped_lecture.description = description
+            #puts "Description: " + description
+          rescue
+            puts "Failed description khanacademy"        
+          end
+          
+          scraped_lecture.link = lecture_url_locale    
+          
+        rescue Exception => e
+          puts "Failed name-description idiomas khanacademy"
+          puts e.message
+          puts e.backtrace.inspect
+        end     
+      end #do |idioma|
+                          
+      I18n.locale = "en"
+
+      begin    
+        human_tags = Array.new       
+        etiquetas = lecture_url.split("org/")[1].split("/")
+        human_tags << etiquetas[0].strip
+        human_tags << etiquetas[1].strip
+        human_tags << etiquetas[2].strip   
+      rescue Exception => e
+        puts "Failed Human Tags khanacademy"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+
+      more_prosa_to_wikify = ""
+      begin
+        resource = lecture_url.split("/")
+        resource = resource[resource.length-1]
+        url_json = "https://www.khanacademy.org/api/v1/discussions/video/" + resource + "/questions?casing=camel&sort=1&limit=10&page=0&lang=en&_=1393252285984"
+        
+        reviews_json = Nokogiri::HTML(open(url_json))
+        parsed_reviews_json = JSON.parse reviews_json
+               
+        reviews = parsed_reviews_json['feedback']
+        reviews.each do |review|
+          begin
+            more_prosa_to_wikify = more_prosa_to_wikify + review['content']
+            answers = review['answers']
+          rescue
+          end
+          begin
+            more_prosa_to_wikify = more_prosa_to_wikify + answers[0]['content']
+          rescue
+          end
+        end
+                 
+      rescue Exception => e
+        puts "Failed more prosa to wikify khanacademy"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+                
+      prosa = name_en + ". " + description_en + more_prosa_to_wikify        
+
+=begin               
+         begin
+           idiomas = Array.new
+           lecture_page.css("select#language_picker option").each do |idioma|
+             idiomas << idioma.text
+           end        
+
+           idiomas.each do |idioma|    
+             if Language.find_by_language(idioma)!=nil
+              annotation = GlobalizableLanguageAnnotation.new
+              annotation.globalizable = scraped_lecture
+              annotation.language = Language.find_by_language(idioma)
+              annotation.save
+             end #if
+           end #do |idioma|      
+         rescue
+          puts "Failed languages khanacademy"
+         end
+=end  
+        scraped_from="https://www.khanacademy.org/"
+      scraped_lecture.url=lecture_url
+      scraped_lecture.scraped_from=scraped_from
+
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_lecture.element_image=URI.parse(photo_url)
+        rescue
+          puts "khanacademy:  IMAGEN NO GUARDADA"
+          scraped_lecture.element_image.clear
+        end
+      end
+      
+      scraped_lecture.persist(idiomas_disponibles,prosa,human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_lecture_khanacademy"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_lecture_khanacademy(lecture_url,photo_url, 1, reintentos)
+      end
+    end
+
+  end #scrape_lecture_khanacademy
+
+
+  
+end

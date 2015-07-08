@@ -1,0 +1,47 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'search', :current_layout => "search"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'search', :actions => "list_actions"} %>
+<% end %>
+
+
+<% content_for :content do %>
+	<div class="search_elements_container">
+		
+		<%= render :partial => "generic_partials/resource_disambiguation" %>
+		
+		<% if @best_results != nil && @best_results.size > 0 %>
+			<div class="search_elements_type_box">				
+				<div class="prompt"><img src="/images/black_best_results_100.png" width="50px" height="30px"/>&nbsp;&nbsp;<%= t("best_results") %><%= link_to t("view_all"), all_best_search_results_path(:search => @search_text, :article_id => params[:article_id]),:class => "view_all" %></div>
+				<div class="body">
+					<% @best_results.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+					<div class="clear"></div>
+				</div>				
+			</div>
+		<% end %>								
+		
+
+		<% @array_resources_types.each do |resource| %>	
+			<% if eval("#{resource['elements']}").size > 0 %>
+				<div class="search_elements_type_box search_<%= resource['name'].downcase %>">					
+					<%= render :partial => 'search_results/partial_search_results', locals: { elements: eval("#{resource['elements']}"), element_type: resource['name'], search_text: @search_text, article_id: @article_id } %>																			
+				</div>
+				<div class="clear"></div>
+			<% end %>
+		<% end %>
+															
+										
+	
+		<% if @no_results %>		
+			<div class="no_results"><%= t('no_results')%></div>			
+		<% end %>
+		
+		</div>	
+		
+<% end %>
+
+
+
+
+	

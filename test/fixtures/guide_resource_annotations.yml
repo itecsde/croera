@@ -1,0 +1,11 @@
+one:
+  guide: laws_of_motion_guide
+  resource: wikipedia_first_law_of_motion
+
+two:
+  guide: laws_of_motion_guide
+  resource: wikipedia_second_law_of_motion
+  
+three:
+  guide: laws_of_motion_guide
+  resource: wikipedia_third_law_of_motion    

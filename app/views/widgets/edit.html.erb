@@ -1,0 +1,22 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'editing_widget', :actions => "widgets/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@widget, :html => { :class => "widget_form" }) do |f_widget| %>
+		<div id="element_header">
+			<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @widget,:element_type=>"widget"} %> 
+			<hr />
+			<div class="clear"></div>
+		</div>
+		<div id="content_container" class="widget_container">
+			<input type="hidden" id="edition_mode" value="on">
+				<%= render :partial => "form" , :locals => {:widget_form => f_widget} %>
+				<%= render :partial => "submit", :locals => {:widget_form => f_widget} %>			
+		</div>			
+		<span style="display:none" id="is_edition" data-value="true"></span>	
+		
+		<script src="/javascript/widgets_form.js"></script>
+	<% end %>
+<% end %>

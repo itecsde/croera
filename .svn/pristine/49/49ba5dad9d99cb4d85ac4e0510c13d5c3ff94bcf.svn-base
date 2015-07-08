@@ -1,0 +1,3 @@
+<div class="klascement_form_actions form_actions">
+	<%= klascement_form.submit t("save"), :class => 'klascement_save' %>
+</div>	

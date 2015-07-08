@@ -1,0 +1,47 @@
+class HomeController < ApplicationController
+  def index
+    #@activities = Activity.find(:all,:conditions => { :template => nil, :status => 'class' }).last(5).reverse
+    #@sequences= ActivitySequence.find(:all,:conditions => { :status => 'class' }).last(5).reverse
+    #@guides= Guide.last(5).reverse
+    
+    ## Create
+    
+    if Person.all.size > 0    
+      counter = Person.where("element_image_file_size != ?", "").count
+      if counter>0  
+        @person=Person.where("element_image_file_size != ?", "").offset(rand(counter)).first
+      else
+        @person=Person.first(:offset => rand(Person.count))
+      end   
+    end
+
+    if Event.all.size > 0    
+      counter = Event.where("element_image_file_size != ?", "").count
+      if counter>0
+        @event=Event.where("element_image_file_size != ?", "").offset(rand(counter)).first
+      else
+        @event=Event.first(:offset => rand(Event.count)) 
+      end
+    end
+    
+    if Application.all.size > 0    
+      counter = Application.where("element_image_file_size != ?", "").count
+      if counter>0
+        @application=Application.where("element_image_file_size != ?", "").offset(rand(counter)).first
+      else
+        @application=Application.first(:offset => rand(Application.count)) 
+      end
+    end
+    
+    if Lecture.all.size > 0    
+      counter = Lecture.where("element_image_file_size != ?", "").count
+      if counter>0
+        @lecture=Lecture.where("element_image_file_size != ?", "").offset(rand(counter)).first
+      else
+        @lecture=Lecture.first(:offset => rand(Lecture.count)) 
+      end
+    end        
+    
+  end
+
+end

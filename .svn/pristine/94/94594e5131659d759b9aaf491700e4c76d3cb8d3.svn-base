@@ -1,0 +1,23 @@
+<%= render :partial => "header", :locals => {:section_title => (t :Editing_person), :actions => "form_actions"} %>
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'editing_person', :actions => "people/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@person, :html => { :class => "person_form" }) do |f_person| %>
+		<div id="element_header">
+			<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @person,:element_type=>"person"} %> 
+			<hr />
+			<div class="clear"></div>
+		</div>
+		<div id="content_container" class="person_container">
+			<input type="hidden" id="edition_mode" value="on">
+				<%= render :partial => "form" , :locals => {:person_form => f_person} %>
+				<%= render :partial => "submit", :locals => {:person_form => f_person} %>			
+		</div>			
+		<span style="display:none" id="is_edition" data-value="true"></span>	
+		
+		<script src="/javascript/people_form.js"></script>
+	<% end %>
+<% end %>

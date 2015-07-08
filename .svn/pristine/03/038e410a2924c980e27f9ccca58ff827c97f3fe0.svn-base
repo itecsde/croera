@@ -1,0 +1,3 @@
+<div class="picture_form_actions form_actions">
+	<%= f.submit t("save"), :class => 'picture_save' %>
+</div>

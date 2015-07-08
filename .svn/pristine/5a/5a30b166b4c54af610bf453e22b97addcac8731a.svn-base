@@ -1,0 +1,11 @@
+laws_of_motion_guide:
+  name: 'Guide for the Laws of Motion'
+  description: 'Guide to learn the three laws of Motion'
+  abstract_activity: round_robin (Activity)
+  classroom: classroom_1course
+  
+laws_of_thermodynamics_guide:
+  name: 'Guide for the Laws of Thermodynamics'
+  description: 'Guide to learn the two laws of Thermodynamics'
+  abstract_activity: think_pair_share (ActivitySequence)
+  classroom: classroom_1course  

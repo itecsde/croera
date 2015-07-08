@@ -1,0 +1,196 @@
+<%
+	element_type = element.class.name.underscore
+	element_path = element_type + "_path(element)"
+	popup_show_element_path = "popup_show_" + element_type + "_path"
+%>
+
+<div class="source_box">
+	
+	<div class="selection_info_box">
+		<div class="selection_info">
+			<input type="hidden" class="element_id" value="<%= element.id %>">
+			<% if element_type!="user"%>
+				<input type="hidden" class="element_name" value="<%= element.name %>">
+			<% else %>
+				<input type="hidden" class="element_name" value="<%= element.email%>">			
+			<% end %>
+			<input type="hidden" class="element_class" value="<%= element_type %>">
+			<% case element_type %>
+			<% when 'device', 'application' %>
+			<input type="hidden" class="itec_id" value="<%= element.itec_id %>">
+			<input type="hidden" class="ld_id" value="<%= element.ld_id %>">
+			<% end %>
+		</div>
+	</div>
+	
+	<% if current_layout == "popup"%>
+	<div class="extract_box_button">
+	<% else %>
+	<div class="extract_box_button">
+	<% end %>
+	
+			
+		<div class= "watermark_container">
+			<div class="watermark <%= element_type %>_watermark"></div>
+		</div>
+		<% if element_type!="user"%>
+			<span class="extract_image"></span><% if element.element_image.url() != "none" %>
+				<%= image_tag element.element_image.url(:medium), width:'75', :class => "image_preview" %>
+				<%= link_to t("Delete"), administrations_path(:element_type => element.source_type,:task => "delete", :url => element.url),:data => { :confirm => "Are you sure?" },:class => "delete_source" %>
+			<div class="clear"></div>
+			<% elsif element.element_image.url() == "none" %>
+				<% if  element.url.include? "tripadvisor" %>
+					<% image_route = "../images/logos/trip_advisor.jpeg" %>
+				<% elsif  element.url.include? "unesco" %>
+					<% image_route = "../images/logos/unesco.jpeg" %>
+				<% elsif  element.url.include? "spainisculture" %>
+					<% image_route = "../images/logos/spain_is_culture.jpeg" %>					
+				<% elsif  element.url.include? "alternativeto" %>
+					<% image_route = "../images/logos/alternativeto.jpg" %>				
+				<% elsif  element.url.include? "biography" %>
+					<% image_route = "../images/logos/biography.png" %>		
+				<% elsif  element.url.include? "lreforschools" %>
+					<% image_route = "../images/logos/lre.png" %>		
+				<% elsif  element.url.include? "slideshare" %>
+					<% image_route = "../images/logos/slideshare.png" %>		
+				<% elsif  element.url.include? "sciencedaily" %>
+					<% image_route = "../images/logos/sciencedaily.png" %>	
+				<% elsif  element.url.include? "coursera" %>
+					<% image_route = "../images/logos/coursera.jpeg" %>	
+				<% elsif  element.url.include? "mit" %>
+					<% image_route = "../images/logos/mit.png" %>						
+				<% elsif  element.url.include? "edx" %>
+					<% image_route = "../images/logos/edx.png" %>			
+				<% elsif  element.url.include? "ted" %>
+					<% image_route = "../images/logos/ted.png" %>	
+				<% elsif  element.url.include? "videolectures" %>
+					<% image_route = "../images/logos/video_lectures.png" %>
+				<% elsif  element.url.include? "khanacademy" %>
+					<% image_route = "../images/logos/khan_academy.jpeg" %>								
+				<% elsif  element.url.include? "topdocumentaryfilms.com" %>
+					<% image_route = "../images/logos/top_documentary_films.jpeg" %>	
+				<% elsif  element.url.include? "documentariosvarios.wordpress.com" %>
+					<% image_route =  "../images/logos/documentariosvarios.jpg" %>
+				<% elsif  element.url.include? "ciberdocumentales.com" %>
+					<% image_route =  "../images/logos/ciberdocumentales.png" %>
+				<% elsif  element.url.include? "documentaryaddict.com" %>
+					<% image_route = "../images/logos/documentary_addict.gif" %>		
+				<% elsif  element.url.include? "documentaryheaven.com" %>
+					<% image_route =  "../images/logos/documentary_heaven.png" %>	
+				<% elsif  element.url.include? "docunet.nl" %>
+					<% image_route =  "../images/logos/docunet.png" %>
+				<% elsif  element.url.include? "belgesell.com" %>
+					<% image_route =  "../images/logos/belgesel.png" %>
+				<% elsif  element.url.include? "dokumentarne.sk" %>
+					<% image_route =  "../images/logos/dokumentarne.png" %>
+				<% elsif  element.url.include? "magyarvagyok.com" %>
+					<% image_route =  "../images/logos/magyarvagyok.jpg" %>
+				<% elsif  element.url.include? "lrt.lt" %>
+					<% image_route =  "../images/logos/lrt.png" %>		
+				<% elsif  element.url.include? "nrk.no" %>
+					<% image_route =  "../images/logos/nrkskole.png" %>		
+				<% elsif  element.url.include? "docverdade.blogspot.com" %>
+					<% image_route =  "../images/logos/docverdade.jpg" %>		
+				<% elsif  element.url.include? "documentairenet.nl" %>
+					<% image_route =  "../images/logos/documentairenet.png" %>
+				<% elsif  element.url.include? "linkedin.com" %>
+					<% image_route =  "../images/logos/linkedin.png" %>
+				<% elsif  element.url.include? "scholar.google" %>
+					<% image_route =  "../images/logos/google_scholar.jpg" %>
+				<% elsif  element.url.include? "allconferences.com" %>
+					<% image_route =  "../images/logos/allconferences.png" %>
+				<% elsif  element.url.include? "spainisculture.com" %>
+					<% image_route =  "../images/logos/spain_is_culture.jpeg" %>
+				<% elsif  element.url.include? "spainisculture.com" %>
+					<% image_route =  "../images/logos/spain_is_culture.jpeg" %>
+				<% elsif  element.url.include? "globaleventslist" %>
+					<% image_route =  "../images/logos/globaleventslist.jpg" %>
+				<% elsif  element.url.include? "worldconferencecalendar.com" %>
+					<% image_route =  "../images/logos/worldconferencecalendar.jpg" %>	
+				<% elsif  element.url.include? "visit-hungary.com" %>
+					<% image_route =  "../images/logos/visithungary.jpg" %>
+				<% elsif  element.url.include? "visitportugal.com" %>
+					<% image_route =  "../images/logos/visitportugal.png" %>
+				<% elsif  element.url.include? "ulisboa.pt" %>
+					<% image_route =  "../images/logos/ulisboa.png" %>
+				<% elsif  element.url.include? "uio.no" %>
+					<% image_route =  "../images/logos/uoslo.png" %>
+				<% elsif  element.url.include? "google.com/calendar" %>
+					<% image_route =  "../images/logos/google_calendar.jpeg" %>
+				<% elsif  element.url.include? "visitbudapest.travel" %>
+					<% image_route =  "../images/logos/visitbudapest.jpg" %>
+				<% elsif  element.url.include? "visitbrussels.be" %>
+					<% image_route =  "../images/logos/visitbrussels.jpeg" %>
+				<% elsif  element.url.include? "belgica-turismo.es" %>
+					<% image_route =  "../images/logos/belgicaturismo.png" %>	
+				<% elsif  element.url.include? "ualg.pt" %>
+					<% image_route =  "../images/logos/ualgarve.png" %>
+				<% elsif  element.url.include? "noticias.up.pt" %>
+					<% image_route =  "../images/logos/uporto.gif" %>
+				<% elsif  element.url.include? "conferencealerts.com" %>
+					<% image_route =  "../images/logos/conferencealerts.gif" %>			
+				<% elsif  element.url.include? "best.eu.org" %>
+					<% image_route =  "../images/logos/best.png" %>		
+				<% elsif  element.url.include? "discoveringfinland.com" %>
+					<% image_route =  "../images/logos/discoveringfinland.gif" %>		
+				<% elsif  element.url.include? "finnbay.com" %>
+					<% image_route =  "../images/logos/finnbay.png" %>
+				<% elsif  element.url.include? "openeducationeuropa.eu" %>
+					<% image_route =  "../images/logos/openeducationeuropa.jpeg" %>																																																																
+				<% end %>
+				<% if image_route != nil %>				
+					<%= image_tag src = image_route, width:'75', :class => "image_preview" %>
+				<% end %>
+				<%= link_to t("Delete"), administrations_path(:element_type => element.source_type,:task => "delete", :url => element.url),:data => { :confirm => "Are you sure?" },:class => "delete_source" %>	
+			<% end %>
+			</span>
+    		<span class="extract_name"><% if element.name!= nil %><%= raw element.name.truncate(72, :separator => " ", :omission => "...") %><% end %>
+    		<% if element.number_of_resources!= nil %> (<%= raw element.number_of_resources %>)<% end %></span>
+    		<span class="extract_last_scraping">Last Scraping at: <%= raw element.last_scraping %>
+    		<% if element.scraped_correct == true %>
+    			<img src="/images/v_with_border.png" width="20px" height="10px"/>
+    		<% else %>
+    			<img src="/images/x_with_border.png" width="20px" height="10px"/>
+    		<% end %>
+    		<% if element.scrape_status == "finished" %>	
+    			<% if element.name.include? "tripadvisor" %>
+    				<% place = element.name.split("|")[1].strip %>
+    				<%= link_to t("Scrape Now"), administrations_path(:task => "scrape" , :url => element.url, :element_type => element.source_type, :place => place),:class => "scrape_now" %>
+    			<% else %>
+    				<%= link_to t("Scrape Now"), administrations_path(:task => "scrape" , :url => element.url, :element_type => element.source_type),:class => "scrape_now" %>
+    			<% end %>
+    		<% elsif element.scrape_status == "active" %>
+    			<img src="/images/icons/loader.gif" width="20px" height="10px"/>
+    		<% end %></span>	
+    		<span class="extract_last_scraping">Last Tagged at: <%= raw element.last_tagged %>
+    		<% if element.tagged_correct == true %>
+    			<img src="/images/v_with_border.png" width="20px" height="10px"/>
+    		<% else %>
+    			<img src="/images/x_with_border.png" width="20px" height="10px"/>
+    		<% end %>
+    		<%= link_to t("Tag Now"), administrations_path(:element_type => element.source_type, :task => "tag" ,:url => element.url),:class => "tag_now" %></span>		
+    		<span class="extract_last_scraping">Last Categorized at: <%= raw element.last_categorize %>
+    		<% if element.categorized_correct == true %>
+    			<img src="/images/v_with_border.png" width="20px" height="10px"/>
+    		<% else %>
+    			<img src="/images/x_with_border.png" width="20px" height="10px"/>
+    		<% end %>
+    		<%= link_to t("Categorize Now"), administrations_path(:task => "categorize" ,:url => element.url),:class => "categorize_now" %></span>	
+    		<% if element.source_type == "Event" or element.source_type == "Site"  %>
+	    		<span class="extract_last_scraping">Last Geolocalized at: <%= raw element.last_geolocalize %>
+	    		<% if element.categorized_correct == true %>
+	    			<img src="/images/v_with_border.png" width="20px" height="10px"/>
+	    		<% else %>
+	    			<img src="/images/x_with_border.png" width="20px" height="10px"/>
+	    		<% end %>
+	    		<%= link_to t("Geolocalize Now"), administrations_path(:task => "geolocalize" ,:url => element.url),:class => "geolocalize_now" %></span>
+	    	<% end %>		
+	    	<br />
+	    		    	
+	    	</div>
+    	<% else %>
+    	</div>
+    	<% end %>
+    	
+		
+</div>

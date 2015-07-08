@@ -1,0 +1,2 @@
+scrape_articles = ScraperArticles.new
+scrape_articles.scrape_sciencedaily

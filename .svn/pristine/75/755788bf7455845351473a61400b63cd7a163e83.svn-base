@@ -1,0 +1,16 @@
+<%= render :partial => "header", :locals => {:section_title => (t :group), :actions => "group_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'groups', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => t('group'), :actions => "groups/group_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+
+	<div id="content_container" class="group_container">
+		<%= render "group" %>
+	</div> <!-- CONTENT -->
+	<span style="display:none" id="is_edition" data-value="false"></span>
+		
+	<script src="/javascript/groups_form.js"></script>
+<% end %>

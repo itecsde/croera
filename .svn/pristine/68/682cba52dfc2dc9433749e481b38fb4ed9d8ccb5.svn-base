@@ -1,0 +1,27 @@
+<% content_for :meta do %>
+	<%= render :partial => "/generic_partials/meta", :locals => {:element => @documentary}%>
+<% end %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'documentary', :actions => "documentaries/documentary_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	
+	<% if current_user != nil%>
+		<%= render :partial => "generic_partials/header_show_resource", :locals => {:element => @documentary} %>	
+	<% end %>
+
+	<div id="content_container" class="documentary_container">
+		<%= render "documentary" %>
+		<%= render :partial => "search_results/related_elements_same_type",:locals => {:related_title =>'related_documentaries'} %>				
+	</div> <!-- CONTENT -->
+	<%= render :partial => "search_results/related_elements", :locals => {:element_type =>'Documentary'} %>
+
+	
+	<span style="display:none" id="is_edition" data-value="false"></span>	
+	
+	
+	<script src="/javascript/documentaries_form.js"></script>
+<% end %>

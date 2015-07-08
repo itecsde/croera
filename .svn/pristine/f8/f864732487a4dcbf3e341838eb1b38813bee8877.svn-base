@@ -1,0 +1,23 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'new_course', :actions => "courses/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@course, :html => { :class => "course_form" }) do |f_course| %>
+		<div id="element_header">
+			<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @course,:element_type=>"course"} %> 
+			<hr />
+			<div class="clear"></div>
+		</div>
+		<div id="content_container" class="course_container">
+			<input type="hidden" id="edition_mode" value="on">
+				<%= render :partial => "form" , :locals => {:course_form => f_course} %>
+				<%= render :partial => "submit", :locals => {:course_form => f_course} %>
+		</div>	
+		
+		<span style="display:none" id="is_edition" data-value="true"></span>	
+		
+		<script src="/javascript/courses_form.js"></script>
+	<% end%>
+<% end %>

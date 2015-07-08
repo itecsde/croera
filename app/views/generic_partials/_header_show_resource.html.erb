@@ -1,0 +1,12 @@
+
+<div id="element_header" class="show_header">
+	<div class="scraped_from_image">
+		
+	</div>				
+	<% if element.bookmarked_by.find_by_id(current_user.id)!=nil %>
+		<div class="bookmark bookmarked" onclick="change_element_bookmark_state_in_show(this,'<%= element.class.to_s.downcase %>',<%= element.id %>);event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();"></div>
+	<% else %>
+		<div class="bookmark add_bookmark" onclick="change_element_bookmark_state_in_show(this,'<%= element.class.to_s.downcase %>',<%= element.id %>);event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();"></div>
+	<% end %>									 
+	<div class="clear"></div>
+</div>

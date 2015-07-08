@@ -1,0 +1,2134 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+
+class ScraperDocumentaries
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+ def scrape_topdocumentaryfilms(*reintentos)
+    begin
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+
+      url = "http://topdocumentaryfilms.com/"
+      page = Nokogiri::HTML(open(url))
+      reintentos = 2
+
+      page.css("div.sidebar2 ul li ul.dotted_wrap li.cat-item").each do |category|  
+        scrape_category_topdocumentaryfilms category.css("a")[0]['href']
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_topdocumentaryfilms"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_topdocumentaryfilms(1,reintentos)
+      end
+    end
+  end #scrape_topdocumentaryfilms
+  
+ def scrape_category_topdocumentaryfilms(category_url, *siguiente)
+    begin
+      puts "category: " + category_url
+
+      if siguiente[1]==1
+      reintentos = siguiente[2]
+      else
+      reintentos = 2
+      end
+       
+      if siguiente[1]!=1
+        category_page = Nokogiri::HTML(open(category_url))
+        reintentos = 2      
+        category_page.css("div#contentwrapper div#content div.post").each do |documentary|
+          scrape_documentary_topdocumentaryfilms documentary.css("div.wrapexcerpt h2.postTitle a")[0]['href']
+        end
+      end
+
+      if siguiente[1]!=1
+        siguiente = category_page.css("div.pagination a")[0]['href']
+      else
+        siguiente = siguiente[0]
+      end
+      while siguiente != nil
+        puts "URL SIGUIENTE --> " + siguiente
+        category_page2 = Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+        
+        category_page2.css("div#contentwrapper div#content div.post").each do |documentary|
+          scrape_documentary_topdocumentaryfilms documentary.css("div.wrapexcerpt h2.postTitle a")[0]['href']
+        end
+        
+        category_page2.css("div.pagination a").each do |pagina|
+          if pagina.text == "Next" 
+            siguiente = pagina['href']
+          else
+            siguiente = nil
+          end
+        end
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_category_topdocumentaryfilms"
+      puts "Reintentamos dos veces, sino saltamos de categoria"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_category_topdocumentaryfilms(category_url,siguiente,1,reintentos)
+      end
+    end
+  end #scrape_category_topdocumentaryfilms
+  
+  def scrape_documentary_topdocumentaryfilms(documentary_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts "documentary---" + documentary_url
+      idiomas_disponibles = ["en"]
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end              
+      documentary_page = Nokogiri::HTML(open(documentary_url))
+      scraped_documentary = Documentary.new      
+                          
+      begin
+        name = documentary_page.css("div#content div.post h1.postTitle")[0].text.strip
+        puts "Name: " + name 
+      rescue
+        puts "Exception name topdocumentaryfilms"
+      end
+      description = ""
+      begin
+        documentary_page.css("div#content div.post div.postContent div p").each do |parrafo|
+          description = description + strip_tags(parrafo.text)
+        end
+        #puts "Description: " + description 
+      rescue
+        puts "Exception description topdocumentaryfilms"
+      end
+
+      begin
+        photo_url = documentary_page.css("div.post div.postContent p img.alignleft")[0]['src']
+        photo_url = photo_url.gsub("-95x125","")
+        puts "photo_url: " + photo_url
+      rescue
+        puts "Exception photo topdocumentaryfilms"
+        photo_url = nil
+      end
+
+      begin
+        human_tags = Array.new
+        human_tag = documentary_page.css("div.postMeta span a span")[1].text.strip
+        puts "Human Tag: " + human_tag  
+        human_tags << human_tag     
+      rescue Exception => e
+        puts "Failed Human Tags topdocumentaryfilms"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      prosa = name + ". " + description
+             
+      scraped_from="http://topdocumentaryfilms.com/"
+      I18n.locale = "en"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url=documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_documentary.element_image=URI.parse(photo_url)
+        rescue
+          puts "topdocumentaryfilms:  IMAGEN NO GUARDADA"
+          scraped_documentary.element_image.clear
+        end
+      end
+      
+      scraped_documentary.persist(idiomas_disponibles,prosa,human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentary_topdocumentariyfilms"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_documentary_topdocumentaryfilms(documentary_url,1,reintentos)
+      end
+    end
+    
+  end #scrape_documentary_topdocumentaryfilms
+  
+  #############################################################
+  ####### SCRAPE CIBERDOCUMENTALES
+  ###########################################################3
+  
+  
+   def scrape_ciberdocumentales(*reintentos)
+    begin
+
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+
+      url = "http://www.ciberdocumentales.com/"
+      page = Nokogiri::HTML(open(url))
+      reintentos = 2
+
+      page.css("div#contenidodrc div.bloquedrc2 ul li").each do |category|
+        scrape_category_ciberdocumentales "http://www.ciberdocumentales.com" + category.css("a")[0]['href'] 
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_ciberdocumentales"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_ciberdocumentales(1,reintentos)
+      end
+    end
+  end #scrape_ciberdocumentales
+  
+  def scrape_category_ciberdocumentales(category_url, *siguiente)
+    begin
+      
+      puts "category: " + category_url
+
+      if siguiente[1]==1
+      reintentos = siguiente[2]
+      else
+      reintentos = 2
+      end
+      
+      if siguiente[1]!=1
+        category_page = Nokogiri::HTML(open(category_url))
+        reintentos = 2      
+        category_page.css("div#contenido div#contenidoizq div.fotonoticia").each do |documentary|
+          photo_url = "http://www.ciberdocumentales.com" + documentary.css("a img")[0]['src']
+          scrape_documentary_ciberdocumentales "http://www.ciberdocumentales.com" + documentary.css("a")[0]['href'], photo_url
+        end
+      end
+
+      if siguiente[1]!=1
+        siguiente = "http://www.ciberdocumentales.com" + category_page.css("div#paginador div.pagination a")[category_page.css("div#paginador div.pagination a strong").length-1]['href']
+      else
+        siguiente = siguiente[0]
+      end
+      while siguiente != nil
+        puts "URL SIGUIENTE --> " + siguiente
+        sleep 2
+        category_page2 = Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+        
+        category_page2.css("div#contenido div#contenidoizq div.fotonoticia").each do |documentary|
+          photo_url = "http://www.ciberdocumentales.com" + documentary.css("a img")[0]['src']
+          scrape_documentary_ciberdocumentales "http://www.ciberdocumentales.com" + documentary.css("a")[0]['href'], photo_url
+        end
+       
+        category_page2.css("div#paginador div.pagination a").each do |pagina|
+          if pagina.text == ">>>" 
+            siguiente = "http://www.ciberdocumentales.com" + pagina['href']
+          else
+            siguiente = nil
+          end
+        end
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_category_ciberdocumentales"
+      puts "Reintentamos dos veces, sino saltamos de categoria"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_category_ciberdocumentales(category_url,siguiente,1,reintentos)
+      end
+    end
+  end #scrape_category_ciberdocumentales
+  
+ def scrape_documentary_ciberdocumentales(documentary_url, photo_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts "documentary---" + documentary_url
+      idiomas_disponibles = ["es"]
+      sleep 3
+
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+      documentary_page = Nokogiri::HTML(open(documentary_url))
+      scraped_documentary = Documentary.new
+
+      begin
+        name = documentary_page.css("div#contenidoizq1 div.seccionizq2 div h1")[0].text.strip
+        puts "Name: " + name
+      rescue
+        puts "Exception name ciberdocumentales"
+      end
+      description = ""
+      begin
+        description = strip_tags documentary_page.css("div#contenidoizq1 p")[0].text
+        #puts "Description: " + description
+      rescue
+        puts "Exception description ciberdocumentales"
+      end
+
+      begin
+        human_tags = Array.new
+        categoria = documentary_page.css("div.opciones2 div.opcionesbot2 a")[0].text.strip
+        human_tags << categoria
+        documentary_page.css("div.opciones3 div.opcionesbot3 a").each do |tag|
+          human_tags << tag.text.strip
+        end
+      rescue Exception => e
+        puts "Failed Human Tags ciberdocumentales"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+
+      prosa = name + ". " + description
+
+      scraped_from="www.ciberdocumentales.com"
+      I18n.locale = "es"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url=documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_documentary.element_image=URI.parse(photo_url)
+        rescue
+          puts "ciberdocumentales:  IMAGEN NO GUARDADA"
+        scraped_documentary.element_image.clear
+        end
+      end
+
+    scraped_documentary.persist(idiomas_disponibles,prosa,human_tags)
+    reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentary_topdocumentariyfilms"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_documentary_ciberdocumentales(documentary_url,photo_url,1,reintentos)
+      end
+    end
+
+  end #scrape_documentary_ciberdocumentales
+  
+  ##############################################################
+  ####    SCRAPE DOCUMENTARIOSVARIOS
+  ##############################################################
+  
+   def scrape_documentariosvarios(*reintentos)
+    begin
+
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+
+      url = "http://documentariosvarios.wordpress.com/"
+      page = Nokogiri::HTML(open(url))
+      reintentos = 2
+
+      page.css("aside#categories-2.widget ul li.cat-item").each do |category|
+        scrape_category_documentariosvarios category.css("a")[0]['href']
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_documentariosvarios"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_documentariosvarios(1,reintentos)
+      end
+    end
+  end #scrape_documentariosvarios
+  
+  def scrape_category_documentariosvarios(category_url, *siguiente)
+    begin
+      puts "category: " + category_url
+
+      if siguiente[1]==1
+      reintentos = siguiente[2]
+      else
+      reintentos = 2
+      end
+       
+      if siguiente[1]!=1
+        category_page = Nokogiri::HTML(open(category_url))
+        reintentos = 2      
+        category_page.css("div#content article").each do |documentary|
+          begin
+            photo_url = documentary.css("div a img")[0]['src']
+            photo_url = photo_url.split("?")[0]
+            #puts photo_url
+          rescue
+            puts "Failed Photo documentariosvarios"
+            photo_url = nil
+          end
+          scrape_documentary_documentariosvarios documentary.css("div a")[0]['href'],photo_url
+        end
+      end
+
+      if siguiente[1]!=1
+        if !category_page.css("nav#nav-below.site-navigation div.nav-previous a").empty?
+          siguiente = category_page.css("nav#nav-below.site-navigation div.nav-previous a")[0]['href']
+        else
+          siguiente = nil
+        end
+      else
+        siguiente = siguiente[0]
+      end
+      while siguiente != nil
+        puts "URL SIGUIENTE --> " + siguiente
+        category_page2 = Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+        
+        category_page2.css("div#content article").each do |documentary|
+          begin
+            photo_url = documentary.css("div a img")[0]['src']
+            photo_url = photo_url.split("?")[0]
+            #puts photo_url
+          rescue
+            puts "Failed Photo documentariosvarios"
+            photo_url = nil
+          end
+          scrape_documentary_documentariosvarios documentary.css("div a")[0]['href'],photo_url
+        end
+        
+        if category_page2.css("nav#nav-below.site-navigation div.nav-previous a").empty?
+          siguiente = nil
+        else
+          siguiente = category_page2.css("nav#nav-below.site-navigation div.nav-previous a")[0]['href']
+        end
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_category_documentariosvarios"
+      puts "Reintentamos dos veces, sino saltamos de categoria"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_category_documentariosvarios(category_url,siguiente,1,reintentos)
+      end
+    end
+  end #scrape_category_documentariosvarios
+  
+  def scrape_documentary_documentariosvarios(documentary_url,photo_url,*reintentos)
+    begin
+      name = ""
+      description = ""
+      puts ""
+      puts ""
+      puts "DOCUMENTARY --- > " + documentary_url
+      idiomas_disponibles = ["pt"]
+      sleep 1
+      
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+      documentary_page = Nokogiri::HTML(open(documentary_url))
+      scraped_documentary = Documentary.new
+      begin
+        name = documentary_page.css("h1.entry-title")[0].text.strip
+        puts "Name: " + name
+      rescue
+        puts "Exception name documentariosvarios"
+      end
+            
+      begin
+        documentary_page.css("div.entry-content p").each_with_index do |parrafo,index|
+          if index < 2
+            description = description + (strip_tags parrafo.text)
+          end
+        end
+        description = description.gsub("Este slideshow necessita de JavaScript.","")
+        #puts "Description: " + description
+      rescue
+        puts "Exception description documentariosvarios"
+      end
+
+      begin
+        human_tags = Array.new
+        documentary_page.css("div.entry-categories span.cat-links a").each do |tag|
+          human_tags << tag.text.strip.capitalize
+        end
+      rescue
+        puts "Failed Human Tags documentariosvarios"
+      end
+
+      I18n.locale = "pt"          
+      prosa = name + ". " + description
+      
+      scraped_from="http://documentariosvarios.wordpress.com/"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url= documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_documentary.element_image=URI.parse(photo_url)
+        rescue
+          puts "documentariosvarios:  IMAGEN NO GUARDADA"
+          scraped_documentary.element_image.clear
+        end
+      end
+      scraped_documentary.persist(idiomas_disponibles,prosa,human_tags)
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentariosvarios"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_documentary_documentariosvarios(documentary_url,photo_url,1,reintentos)
+      end
+    end
+
+  end #scrape_documentary_documentariosvarios
+  
+  #############################################################
+  ####### SCRAPE DOCUMENTARYADDICT
+  ###########################################################
+  
+ def scrape_documentaryaddict (*siguiente)
+    begin
+      if siguiente[1]==1
+        reintentos = siguiente[2]
+      else
+        reintentos = 2
+      end
+
+      url = "http://documentaryaddict.com/list-all-documentaries"
+
+      if siguiente[1]!=1
+        page = Nokogiri::HTML(open(url))
+        #page = Nokogiri::HTML(open(url, "User-Agent" => "Ruby/#{RUBY_VERSION}"))
+        #page = Nokogiri::HTML(open(url, :proxy => 'http://84.124.18.132:3128'))
+        reintentos = 2
+        page.css("div#filmdetailspage.row div.large-3 div.imgbg a").each do |documentary|
+          documentary_url = "http://documentaryaddict.com/" + documentary['href']
+          documentary_id = documentary_url.split("-")[1].split("-")[0]
+          photo_url = "http://cdn.documentaryaddict.com/data/images/film/" + documentary_id + ".jpg"
+          scrape_documentary_documentaryaddict documentary_url, photo_url
+        end
+      end      
+
+      if siguiente[1]!=1
+        page.css("div.pagination a").each do |paginator|
+          if paginator.text == " Next Page "
+            siguiente = paginator['href']
+            siguiente[0] = ""
+            siguiente = "http://documentaryaddict.com" + siguiente
+            break
+          else
+            siguiente = nil
+          end
+        end
+      else
+        siguiente = siguiente[0]
+      end
+
+      while siguiente != nil
+        sleep 2
+        puts "URL_SIGUIENTE --> " + siguiente
+        page2 =  Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+
+        page2.css("div#filmdetailspage.row div.large-3 div.imgbg a").each do |documentary|
+          documentary_url = "http://documentaryaddict.com/" + documentary['href']
+          documentary_id = documentary_url.split("-")[1].split("-")[0]
+          photo_url = "http://cdn.documentaryaddict.com/data/images/film/" + documentary_id + ".jpg"
+          scrape_documentary_documentaryaddict documentary_url, photo_url
+        end
+
+        page2.css("div.pagination a").each do |paginator|
+          if paginator.text == " Next Page "
+            siguiente = paginator['href']
+            siguiente[0] = ""
+            siguiente = "http://documentaryaddict.com" + siguiente
+            break
+          else
+            siguiente = nil
+          end
+        end
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_documentaryaddict"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_documentaryaddict(siguiente,1,reintentos)
+      end
+    end
+  end #scrape_documentaryaddict
+
+  def scrape_documentary_documentaryaddict(documentary_url, photo_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts "documentary---" + documentary_url
+      idiomas_disponibles = ["en"]
+      human_tags = Array.new
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end              
+      documentary_page = Nokogiri::HTML(open(documentary_url))
+      scraped_documentary = Documentary.new      
+                 
+      begin
+        name = documentary_page.css("div.row div.large-12 h2 span")[0].text.strip
+        puts "Name: " + name 
+      rescue
+        puts "Exception name documentaryaddict"
+      end
+      description = ""
+      begin
+        description = strip_tags documentary_page.css("div.row div.large-7 div.text-justify")[0].text.strip
+        #puts "Description: " + description 
+      rescue
+        puts "Exception description documentaryaddict"
+      end
+
+      begin
+        human_tag = documentary_page.css("div.large-12 p a span em")[0].text.strip
+        #puts "Human Tag: " + human_tag  
+        human_tags << human_tag     
+      rescue Exception => e
+        puts "Failed Human Tags documentaryaddict"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      prosa = name + ". " + description
+             
+      scraped_from = "http://documentaryaddict.com/"
+      I18n.locale = "en"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url=documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_documentary.element_image=URI.parse(photo_url)
+        rescue
+          puts "documentaryaddict  IMAGEN NO GUARDADA"
+          scraped_documentary.element_image.clear
+        end
+      end
+      
+      scraped_documentary.persist(idiomas_disponibles,prosa,human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentary_documentaryaddict"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_documentary_documentaryaddict(documentary_url,photo_url,1,reintentos)
+      end
+    end
+    
+  end #scrape_documentary_documentaryaddict
+  
+  def scrape_documentaryheaven(*reintentos)
+    begin
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+
+      url = "http://documentaryheaven.com/watch-online/"
+      page = Nokogiri::HTML(open(url))
+      reintentos = 2
+
+      page.css("div#catListItem ul.lcp_catlist li a").each_with_index do |documentary, index| 
+        puts index 
+        puts documentary['href']
+        scrape_documentary_documentaryheaven documentary['href']
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_documentaryheaven"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_documentaryheaven(1,reintentos)
+      end
+    end
+  end #scrape_documentaryheaven
+  
+  def scrape_documentary_documentaryheaven(documentary_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts "documentary --->" + documentary_url
+      idiomas_disponibles = ["en"]
+      human_tags = Array.new
+      sleep 1
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end              
+      documentary_page = Nokogiri::HTML(open(documentary_url))
+      scraped_documentary = Documentary.new      
+   
+      begin
+        name = documentary_page.css("header h2")[0].text.strip
+        puts "Name: " + name 
+      rescue
+        puts "Exception name documentaryheaven"
+      end
+      description = ""
+      begin
+        description = strip_tags documentary_page.css("section.post_content div.singleContent")[0].text.strip
+        #puts "Description: " + description 
+      rescue
+        puts "Exception description documentaryheaven"
+      end
+
+      begin
+        documentary_page.css("header div.singleCats a").each do |category| 
+          human_tags << category.text.strip
+        end
+        #puts human_tags
+      rescue Exception => e
+        puts "Failed Human Tags documentaryheaven"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+    
+      begin
+        photo_url = documentary_page.css("div.infoTabs div#tabWrap.tab-content div#tabs5-pane1.tab-pane div.shareVideoBoxes ul li img.shareBoxThumb")[0]['src']
+        photo_url = photo_url.split("x")[0].chop.chop.chop.chop + File.extname(URI.parse(photo_url).path)
+        #puts "photo_url: " + photo_url
+      rescue Exception => e
+        puts "Failed photo documentaryheaven"
+        puts e.message
+        puts e.backtrace.inspect
+        photo_url = nil
+      end
+      
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_documentary.element_image=URI.parse(photo_url)
+        rescue
+          puts "documentaryheaven  IMAGEN NO GUARDADA"
+          scraped_documentary.element_image.clear
+        end
+      end
+      
+      prosa = name + ". " + description
+             
+      scraped_from = "http://documentaryheaven.com"
+      I18n.locale = "en"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url=documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+      
+      scraped_documentary.persist(idiomas_disponibles,prosa,human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentary_documentaryheaven"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_documentary_documentaryheaven(documentary_url,1,reintentos)
+      end
+    end
+    
+  end #scrape_documentary_documentaryheaven
+  
+  #############################################################
+  ####### SCRAPE DOCUNET
+  ###########################################################
+  
+ def scrape_docunet (*siguiente)
+    begin
+      if siguiente[1]==1
+        reintentos = siguiente[2]
+      else
+        reintentos = 2
+      end
+
+      url = "http://docunet.nl/alle-documentaires/"
+
+      if siguiente[1]!=1
+        page = Nokogiri::HTML(open(url))
+        reintentos = 2
+        i=0
+        page.css("div#content div.loop-content div.nag div div.thumb a.clip-link").each do |documentary|
+          documentary_url = documentary['href']
+          photo_url = documentary.css("img")[0]['src']
+          scrape_documentary_docunet documentary_url, photo_url
+        end
+      end      
+
+      if siguiente[1]!=1
+        if page.css("div.loop-nav div.loop-nav-inner a").length == 1
+            siguiente = page.css("div.loop-nav div.loop-nav-inner a")[0]['href']
+          else
+            siguiente = page.css("div.loop-nav div.loop-nav-inner a")[1]['href']
+          end    
+      else
+        siguiente = siguiente[0]
+      end
+
+      while siguiente != nil
+        sleep 2
+        puts "URL_SIGUIENTE --> " + siguiente
+        page2 =  Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+
+        page2.css("div#content div.loop-content div.nag div div.thumb a.clip-link").each do |documentary|
+          documentary_url = documentary['href']
+          photo_url = documentary.css("img")[0]['src']
+          scrape_documentary_docunet documentary_url, photo_url
+        end
+
+        if !page2.css("div.loop-nav div.loop-nav-inner a").empty?
+          if page2.css("div.loop-nav div.loop-nav-inner a").length == 1
+            break
+          else
+            siguiente = page2.css("div.loop-nav div.loop-nav-inner a")[1]['href']
+          end    
+        else
+          siguiente = nil
+        end
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_docunet"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_docunet(siguiente,1,reintentos)
+      end
+    end
+  end #scrape_docunet
+  
+  def scrape_documentary_docunet(documentary_url, photo_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts "documentary---" + documentary_url
+      idiomas_disponibles = ["nl"]
+      human_tags = Array.new
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end              
+      documentary_page = Nokogiri::HTML(open(documentary_url))
+      scraped_documentary = Documentary.new      
+
+      begin
+        name = documentary_page.css("div#headline.cf h1#title")[0].text.strip
+        puts "Name: " + name 
+      rescue
+        puts "Exception name docunet"
+      end
+      
+      description = ""
+      begin
+        description = strip_tags documentary_page.css("div.section-content div#info div.entry-content")[0].text.strip
+      rescue
+        puts "Exception description docunet"
+      end
+      
+      prosa = name + ". " + description
+             
+      scraped_from = "http://docunet.nl"
+      I18n.locale = "nl"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url=documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+      
+      begin
+        documentary_page.css("div.section-content div#info div#extras a").each do |human_tag|  
+          human_tags << human_tag.text.strip     
+        end
+      rescue Exception => e
+        puts "Failed Human Tags docunet"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      translated_human_tags = []
+       
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_documentary.element_image=URI.parse(photo_url)
+        rescue
+          puts "docunet  IMAGEN NO GUARDADA"
+          scraped_documentary.element_image.clear
+        end
+      end
+      
+      scraped_documentary.persist(idiomas_disponibles,prosa,human_tags,translated_human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentary_docunet"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_documentary_docunet(documentary_url,photo_url,1,reintentos)
+      end
+    end
+    
+  end #scrape_documentary_docunet
+  
+  #############################################################
+  ####### SCRAPE_BELGESELL
+  ###########################################################
+  
+   def scrape_belgesell(*reintentos)
+    begin
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+      
+      url = "http://www.belgesell.com/"
+      page = Nokogiri::HTML(open(url))
+      reintentos = 2
+
+      page.css(".sub-menu .menu-item a").each do |category|  
+        scrape_category_belgesell category['href']
+      end
+      
+      scrape_category_belgesell "http://www.belgesell.com/kategori/ayna-programi-belgeselleri"
+
+    rescue  Exception => e
+      puts "Exception in scrape_belgesell"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_belgesell(1,reintentos)
+      end
+    end
+  end #scrape_belgesell
+  
+  def scrape_category_belgesell(category_url, *siguiente)
+    begin
+      puts "category: " + category_url
+
+      if siguiente[1]==1
+      reintentos = siguiente[2]
+      else
+      reintentos = 2
+      end
+       
+      if siguiente[1]!=1
+        category_page = Nokogiri::HTML(open(category_url))
+        reintentos = 2      
+
+        category_page.css("div.latestvideo").each do |documentary|
+          documentary_url = documentary.css(".latestthumb a")[0]['href']
+          photo_url = documentary.css(".latestthumb a img")[0]['src']
+          scrape_documentary_belgesell documentary_url, photo_url
+        end
+      end
+
+      if siguiente[1]!=1
+        if !category_page.css("div.navigation div.Nav a strong").empty?
+          category_page.css("div.navigation div.Nav a strong").each do |pagina|
+            if pagina.text == "»"
+              siguiente = pagina.parent['href']
+            else
+              siguiente = nil
+            end
+          end
+        else
+          siguiente = nil
+        end        
+      else
+        siguiente = siguiente[0]
+      end
+      while siguiente != nil
+        puts "URL SIGUIENTE --> " + siguiente
+        category_page2 = Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+        
+        category_page2.css("div.latestvideo").each do |documentary|
+          documentary_url = documentary.css(".latestthumb a")[0]['href']
+          photo_url = documentary.css(".latestthumb a img")[0]['src']
+          scrape_documentary_belgesell documentary_url, photo_url
+        end
+        
+        category_page2.css("div.navigation div.Nav a strong").each do |pagina|
+          if pagina.text == "»" 
+            siguiente = pagina.parent['href']
+          else
+            siguiente = nil
+          end
+        end
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_category_belgesell"
+      puts "Reintentamos dos veces, sino saltamos de categoria"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_category_belgesell(category_url,siguiente,1,reintentos)
+      end
+    end
+  end #scrape_category_belgesell
+  
+  def scrape_documentary_belgesell(documentary_url, photo_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts "documentary---" + documentary_url
+      idiomas_disponibles = ["tr"]
+      human_tags = Array.new
+      translated_human_tags = Array.new
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end              
+      documentary_page = Nokogiri::HTML(open(documentary_url))
+      scraped_documentary = Documentary.new      
+
+      begin
+        name = documentary_page.css("div.latestpart h2.pagetitle")[0].text.strip
+        puts "Name: " + name 
+      rescue
+        puts "Exception name belgesell"
+      end   
+
+      description = ""
+      begin
+        documentary_page.css("div.latestvideos div.entry div.videoarea p").each do |parrafo|
+          if parrafo.parent.name != "videoarea"
+            description = description + (strip_tags parrafo.text.strip)
+          end
+        end
+        description = description.gsub("Part 1","").gsub("Part 2","").gsub("Part 3","").gsub("Part 4","").gsub("Part 5","").gsub("Part 6","").gsub(/\n/," ").gsub(/\s+/,' ')
+        puts description
+      rescue
+        puts "Exception description belgesell"
+      end
+      
+      prosa = name + ". " + description
+                 
+      scraped_from = "http://www.belgesell.com"
+      I18n.locale = "tr"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url=documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+      
+      begin
+        documentary_page.css("div.latestvideos div.entry div.videoinfo p a").each do |human_tag|  
+          human_tags << human_tag.text.strip     
+        end
+      rescue Exception => e
+        puts "Failed Human Tags belgesell"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      translated_human_tags = []
+       
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_documentary.element_image=URI.parse(photo_url)
+        rescue
+          puts "belgesell  IMAGEN NO GUARDADA"
+          scraped_documentary.element_image.clear
+        end
+      end
+      
+      scraped_documentary.persist(idiomas_disponibles,prosa,human_tags,translated_human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentary_belgesell"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_documentary_belgesell(documentary_url,photo_url,1,reintentos)
+      end
+    end
+    
+  end #scrape_documentary_belgesell
+  
+  
+  #############################################################
+  ####### SCRAPE DOKUMENTARNE
+  ###########################################################
+  
+ def scrape_dokumentarne (*siguiente)
+    begin
+      if siguiente[1]==1
+        reintentos = siguiente[2]
+      else
+        reintentos = 2
+      end
+
+      url = "http://www.dokumentarne.sk/"
+
+      if siguiente[1]!=1
+        page = Nokogiri::HTML(open(url))
+        reintentos = 2
+
+        page.css(".feed-panel div.inner").each do |documentary|
+          documentary_url = documentary.css("div.article-image a.darken")[0]['href']
+          photo_url = documentary.css("div.article-image a.darken img")[0]['src']
+          scrape_documentary_dokumentarne documentary_url, photo_url         
+        end
+      end      
+
+      if siguiente[1]!=1
+        page.css("div.pagination a").each do |pagina|
+          if pagina.text.strip.include? "ale"
+            siguiente = pagina['href']
+            break
+          else
+            siguiente = nil
+          end   
+        end 
+      else
+        siguiente = siguiente[0]
+      end
+
+      while siguiente != nil
+        sleep 2
+        puts "URL_SIGUIENTE --> " + siguiente
+        page2 =  Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+
+        page2.css(".feed-panel div.inner").each do |documentary|
+          documentary_url = documentary.css("div.article-image a.darken")[0]['href']
+          photo_url = documentary.css("div.article-image a.darken img")[0]['src']
+          scrape_documentary_dokumentarne documentary_url, photo_url
+        end
+
+        page2.css("div.pagination a").each do |pagina|
+          if pagina.text.strip.include? "ale"
+            siguiente = pagina['href']
+            break
+          else
+            siguiente = nil
+          end   
+        end 
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_dokumentarne"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_dokumentarne(siguiente,1,reintentos)
+      end
+    end
+  end #scrape_dokumentarne
+  
+  def scrape_documentary_dokumentarne(documentary_url, photo_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts "documentary---" + documentary_url
+      idiomas_disponibles = ["sk"]
+      human_tags = Array.new
+      translated_human_tags = Array.new
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end              
+      documentary_page = Nokogiri::HTML(open(documentary_url))
+      scraped_documentary = Documentary.new      
+      begin
+        name = documentary_page.css("ul#breadcrumbs li.current a")[0].text.strip
+        puts "Name: " + name 
+      rescue
+        puts "Exception name dokumentarne"
+      end   
+      description = ""
+      begin
+        documentary_page.css("div.post-content div p").each do |parrafo|
+          description = description + (strip_tags parrafo.text.strip)
+        end
+        description = description.gsub("komentáre","")
+      rescue
+        puts "Exception description dokumentarne"
+      end
+      
+      prosa = name + ". " + description
+                    
+      scraped_from = "http://www.dokumentarne.sk"
+      I18n.locale = "sk"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url=documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+ 
+      begin
+        documentary_page.css("div.infobox-wrapper div.infobox a").each do |human_tag|  
+          human_tags << human_tag.text.strip     
+        end
+      rescue Exception => e
+        puts "Failed Human Tags dokumentarne"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      translated_human_tags = []
+       
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_documentary.element_image=URI.parse(photo_url)
+        rescue
+          puts "dokumentarne  IMAGEN NO GUARDADA"
+          scraped_documentary.element_image.clear
+        end
+      end
+      
+      scraped_documentary.persist(idiomas_disponibles,prosa,human_tags,translated_human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentary_dokumentarne"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_documentary_dokumentarne(documentary_url,photo_url,1,reintentos)
+      end
+    end
+    
+  end #scrape_documentary_dokumentarne
+  
+  #############################################################
+  ####### SCRAPE MAGYARVAGYOK
+  ###########################################################
+  
+ def scrape_magyarvagyok (*siguiente)
+    begin
+      if siguiente[1]==1
+        reintentos = siguiente[2]
+      else
+        reintentos = 2
+      end
+
+      url = "http://www.magyarvagyok.com/videok/listak/dokumentumfilmek"
+
+      if siguiente[1]!=1
+        page = Nokogiri::HTML(open(url))
+        reintentos = 2
+        page.css(".ns2_vlist1").each_with_index do |list|
+          if list.previous_element.text.strip == "Dokumentumfilmek"
+            list.css("li").each do |documentary|
+              documentary_url = "http://www.magyarvagyok.com" + documentary.css("a")[0]['href']
+              photo_url = documentary.css("a img")[0]['src']
+              if !photo_url.include? "http:"
+                photo_url = "http:" + photo_url
+              end
+              photo_url = photo_url.gsub("-120x180","")
+              scrape_documentary_magyarvagyok documentary_url, photo_url
+            end          
+          end
+        end
+      end      
+
+      if siguiente[1]!=1
+        page.css("div.ns2_paging li a").each do |pagina|
+          if pagina.text.strip.include? "»"
+            siguiente = "http://www.magyarvagyok.com" + pagina['href']
+            break
+          else
+            siguiente = nil
+          end   
+        end 
+      else
+        siguiente = siguiente[0]
+      end
+    
+      last_page = page.css("div.ns2_paging tr td")[0].text.strip.split("/")[1].gsub("oldal","").strip
+      
+      while siguiente != nil
+        sleep 2
+        puts "URL_SIGUIENTE --> " + siguiente
+        page2 =  Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+        if siguiente == "http://www.magyarvagyok.com/videok/listak/dokumentumfilmek/" + last_page + ".html"
+          siguiente = nil
+          break
+        end
+        page2.css(".ns2_vlist1").each_with_index do |list|
+          if list.previous_element.text.strip == "Dokumentumfilmek"
+            list.css("li").each do |documentary|
+              documentary_url = "http://www.magyarvagyok.com" + documentary.css("a")[0]['href']
+              photo_url = documentary.css("a img")[0]['src']
+              if !photo_url.include? "http:"
+                photo_url = "http:" + photo_url
+              end
+              photo_url = photo_url.gsub("-120x180","")
+              scrape_documentary_magyarvagyok documentary_url, photo_url
+            end          
+          end
+        end
+
+        page2.css("div.ns2_paging li a").each do |pagina|
+          if pagina.text.strip.include? "»"
+            siguiente = "http://www.magyarvagyok.com" + pagina['href']
+            break
+          else
+            siguiente = nil
+          end   
+        end 
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_magyarvagyok"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_magyarvagyok(siguiente,1,reintentos)
+      end
+    end
+  end #scrape_magyarvagyok
+  
+  def scrape_documentary_magyarvagyok(documentary_url, photo_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts "documentary---" + documentary_url
+      idiomas_disponibles = ["hu"]
+      human_tags = Array.new
+      translated_human_tags = Array.new
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end              
+      documentary_page = Nokogiri::HTML(open(documentary_url))
+      scraped_documentary = Documentary.new  
+       
+      begin
+        name = documentary_page.css("div.con h1#vname")[0].text.strip
+        puts "Name: " + name 
+      rescue
+        puts "Exception name magyarvagyok"
+      end   
+      description = ""
+      begin
+        description = strip_tags documentary_page.css("div.con div.small")[1].text.strip
+        puts description
+      rescue
+        puts "Exception description magyarvagyok"
+      end
+      
+      prosa = name + ". " + description
+                 
+      scraped_from = "http://www.magyarvagyok.com"
+      I18n.locale = "hu"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url=documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+        
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_documentary.element_image=URI.parse(photo_url)
+        rescue
+          puts "magyarvagyok  IMAGEN NO GUARDADA"
+          scraped_documentary.element_image.clear
+        end
+      end
+      
+      scraped_documentary.persist(idiomas_disponibles,prosa,human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentary_magyarvagyok"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_documentary_magyarvagyok(documentary_url,photo_url,1,reintentos)
+      end
+    end
+    
+  end #scrape_documentary_magyarvagyok
+  
+  
+  #############################################################
+  ####### SCRAPE_LRT
+  ###########################################################
+  
+ def scrape_lrt(*siguiente)
+    begin
+      if siguiente[1]==1
+        reintentos = siguiente[2]
+      else
+        reintentos = 2
+      end
+
+      url = "http://www.lrt.lt/mediateka/temos/1375/Dokumentiniai%20filmai"
+      if siguiente[1]!=1
+        page = Nokogiri::HTML(open(url))
+        reintentos = 2
+        page.css("div.top-scrall_l div.scroll-pane ul li").each do |documentary|
+          documentary_url = "http://www.lrt.lt/" + documentary.css("a")[0]['href']
+          photo_url = "http://www.lrt.lt/" + documentary.css("a img")[0]['src']
+          photo_url = photo_url.gsub("/157/106/","/640/480/")
+          name = documentary.css("div.show-info a.link").text.strip
+          description = documentary.css("div.show-info a.link")[0].next_element.text.strip
+          scrape_documentary_lrt documentary_url, photo_url, name, description
+        end          
+      end      
+      
+      actual_page = nil
+
+      if siguiente[1]!=1
+        page.css("div.paging span").each do |span|
+          if span.text != "..."
+            actual_page = span
+            break
+          end
+        end
+        siguiente = "http://www.lrt.lt/" + actual_page.next_element['href'].gsub(" ","%20")
+      else
+        siguiente = siguiente[0]
+      end
+       
+      last_page = page.css("div.paging a").last.text
+           
+      while siguiente != nil
+        sleep 2
+        puts "URL_SIGUIENTE --> " + siguiente
+        page2 =  Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+
+        page2.css("div.top-scrall_l div.scroll-pane ul li").each do |documentary|
+          documentary_url = "http://www.lrt.lt/" + documentary.css("a")[0]['href']
+          photo_url = "http://www.lrt.lt/" + documentary.css("a img")[0]['src']
+          photo_url = photo_url.gsub("/157/106/","/640/480/")
+          name = documentary.css("div.show-info a.link").text.strip
+          description = documentary.css("div.show-info a.link")[0].next_element.text.strip
+          scrape_documentary_lrt documentary_url, photo_url, name, description
+        end          
+        
+        if siguiente == "http://www.lrt.lt/mediateka/temos/1375/Dokumentiniai%20filmai/page/" + last_page
+          siguiente = nil
+          break
+        end
+
+        page2.css("div.paging span").each do |span|
+          puts span.text
+          if span.text != "..."
+            actual_page = span
+            break
+          end
+        end
+        if !actual_page.next_element != nil
+          siguiente = "http://www.lrt.lt/" + actual_page.next_element['href'].gsub(" ","%20")
+          
+        else
+          siguiente = nil
+        end
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_lrt"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_lrt(siguiente,1,reintentos)
+      end
+    end
+  end #scrape_lrt
+  
+  
+  def scrape_documentary_lrt(documentary_url, photo_url, name, description, *reintentos)
+    begin
+      puts "documentary---" + documentary_url
+      idiomas_disponibles = ["lt"]
+      human_tags = Array.new
+      translated_human_tags = Array.new
+               
+      scraped_documentary = Documentary.new
+      
+      puts name
+      puts description
+              
+      prosa = name + ". " + description
+                 
+      scraped_from = "http://www.lrt.lt"
+      I18n.locale = "lt"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url=documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+        
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_documentary.element_image=URI.parse(photo_url)
+        rescue
+          puts "lrt  IMAGEN NO GUARDADA"
+          scraped_documentary.element_image.clear
+        end
+      end
+      
+      scraped_documentary.persist(idiomas_disponibles,prosa,human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentary_lrt"
+      puts e.backtrace.inspect
+      puts e.message
+    end 
+  end #scrape_documentary_lrt
+  
+ #############################################################
+  ####### SCRAPE_NRKSKOLE
+  ###########################################################
+
+  def scrape_nrkskole(*reintentos)
+    begin
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+
+      url = "http://www.nrk.no/skole/emner/"
+      page = Nokogiri::HTML(open(url))
+      reintentos = 2
+
+      page.css("div.mod div.subjectPanel-content a").each do |category|
+        scrape_category_nrkskole "http://www.nrk.no" + category['href']
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_nrkskole"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_nrkskole(1,reintentos)
+      end
+    end
+  end #scrape_nrkskole
+  
+  def scrape_category_nrkskole(category_url, *siguiente)
+    begin
+      puts "category: " + category_url
+
+      if siguiente[1]==1
+      reintentos = siguiente[2]
+      else
+      reintentos = 2
+      end
+
+      if siguiente[1]!=1
+        category_page = Nokogiri::HTML(open(category_url))
+        reintentos = 2      
+        category_page.css("div.unit div.mod div.categoryThumb-content div.mod-bd").each do |documentary|
+          documentary_url = "http://www.nrk.no" + documentary.css("h3 a")[0]['href']
+          photo_url = documentary.css("img")[0]['src']
+          photo_url_large = photo_url.split("?")[0]
+          scrape_documentary_nrkskole documentary_url, photo_url, photo_url_large
+        end
+      end
+
+      if siguiente[1]!=1
+        if !category_page.css("div.paginator-content ol.mod-bd li.nextPage a").empty?
+          siguiente = "http://www.nrk.no/skole/emnedetalj" + category_page.css("div.paginator-content ol.mod-bd li.nextPage a")[0]['href']
+        else
+          siguiente = nil
+        end        
+      else
+        siguiente = siguiente[0]
+      end
+      while siguiente != nil
+        puts "URL SIGUIENTE --> " + siguiente
+        category_page2 = Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+        
+        category_page2.css("div.unit div.mod div.categoryThumb-content div.mod-bd").each do |documentary|
+          documentary_url = "http://www.nrk.no" + documentary.css("h3 a")[0]['href']
+          photo_url = documentary.css("img")[0]['src']
+          photo_url_large = photo_url.split("?")[0]
+          scrape_documentary_nrkskole documentary_url, photo_url, photo_url_large
+        end
+        
+        if !category_page2.css("div.paginator-content ol.mod-bd li.nextPage a").empty?
+          siguiente = "http://www.nrk.no/skole/emnedetalj" + category_page2.css("div.paginator-content ol.mod-bd li.nextPage a")[0]['href']
+        else
+          siguiente = nil
+        end        
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_category_nrkskole"
+      puts "Reintentamos dos veces, sino saltamos de categoria"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_category_nrkskole(category_url,siguiente,1,reintentos)
+      end
+    end
+  end #scrape_category_nrkskole
+  
+  def scrape_documentary_nrkskole(documentary_url, photo_url, photo_url_large, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts "documentary---" + documentary_url
+      idiomas_disponibles = ["no"]
+      human_tags = Array.new
+      translated_human_tags = Array.new
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end              
+      documentary_page = Nokogiri::HTML(open(documentary_url))
+      scraped_documentary = Documentary.new      
+
+      begin
+        name = documentary_page.css("div.fullWidthCol h1.articleHeading")[0].text.strip
+        puts "Name: " + name 
+      rescue
+        puts "Exception name nrkskole"
+      end   
+
+      description = ""
+      begin
+        if documentary_page.css("div.mediaText div.bodyText p").length == 1
+          description = strip_tags documentary_page.css("div.mediaText div.bodyText p")[0].text.strip
+        elsif documentary_page.css("div.mediaText div.bodyText p").length == 2
+          description = strip_tags documentary_page.css("div.mediaText div.bodyText p")[1].text.strip
+        end
+        puts description
+      rescue
+        puts "Exception description nrkskole"
+      end
+      
+      prosa = name + ". " + description
+                 
+      scraped_from = "http://www.nrk.no"
+      I18n.locale = "no"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url=documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+           
+      begin
+        documentary_page.css("div.sidebarBox-content div.mod-bd ul li a").each do |human_tag|  
+          human_tags << human_tag.text.strip     
+        end
+      rescue Exception => e
+        puts "Failed Human Tags nrkskole"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      translated_human_tags = []
+       
+      if photo_url!=nil
+        begin
+          scraped_documentary.element_image = URI.parse(photo_url_large)
+        rescue
+          puts "nrkskole  IMAGEN NO GUARDADA, probamos con una de menor resolucion"
+          scraped_documentary.element_image = URI.parse(photo_url)
+        end
+      end
+      
+      scraped_documentary.persist(idiomas_disponibles,prosa,human_tags,translated_human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentary_nrkskole"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_documentary_nrkskole(documentary_url,photo_url,photo_url_large,1,reintentos)
+      end
+    end
+    
+  end #scrape_documentary_nrkskole
+  
+  #############################################################
+  ####### SCRAPE_DOCVERDADE
+  ###########################################################
+
+  def scrape_docverdade(*reintentos)
+    begin
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+
+      url = "http://docverdade.blogspot.com.es/"
+      page = Nokogiri::HTML(open(url))
+      reintentos = 2
+      total = 0
+      page.css("div#Label1.widget div.widget-content ul li").each do |category|
+        total = total + category.css("span").text.gsub("(","").gsub(")","").strip.to_i
+        puts category.css("a")[0]['href']
+        scrape_category_docverdade category.css("a")[0]['href']
+      end
+      
+      puts "El total de documentaries es: " + total.to_s
+
+    rescue  Exception => e
+      puts "Exception in scrape_docverdade"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_docverdade(1,reintentos)
+      end
+    end
+  end #scrape_docverdade
+  
+  def scrape_category_docverdade(category_url, *siguiente)
+    begin
+      human_tags = Array.new
+      translated_human_tags = Array.new
+      puts "category: " + category_url
+
+      if siguiente[1]==1
+      reintentos = siguiente[2]
+      else
+      reintentos = 2
+      end
+       
+      if siguiente[1]!=1
+        category_page = Nokogiri::HTML(open(category_url))
+        reintentos = 2     
+        scrape_page(category_page)
+      end
+
+      if siguiente[1]!=1
+        if !category_page.css("div#blog-pager.blog-pager span#blog-pager-older-link a").empty?
+          siguiente = category_page.css("div#blog-pager.blog-pager span#blog-pager-older-link a")[0]['href']
+        else
+          siguiente = nil
+        end
+      else
+        siguiente = siguiente[0]
+      end
+      while siguiente != nil
+        puts "URL SIGUIENTE --> " + siguiente
+        category_page2 = Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+        scrape_page(category_page2)
+        if !category_page2.css("div#blog-pager.blog-pager span#blog-pager-older-link a").empty?
+          siguiente = category_page2.css("div#blog-pager.blog-pager span#blog-pager-older-link a")[0]['href']
+        else
+          siguiente = nil
+        end
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_category_documentariosvarios"
+      puts "Reintentamos dos veces, sino saltamos de categoria"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_category_documentariosvarios(category_url,siguiente,1,reintentos)
+      end
+    end
+  end #scrape_category_documentariosvarios
+  
+  def scrape_page(category_page)
+    begin
+      category_page.css("div.blog-posts div.date-outer").each do |documentary|
+        photo_url = nil
+        human_tags = Array.new
+        name = nil
+        description = nil
+        documentary_url = nil
+        documentary_url = documentary.css("div.post h3.post-title a")[0]['href']
+        image_matches = documentary.css("img")
+        image_matches.each do |match|
+          dummy_documentary = Documentary.new
+          # Builds the URL
+          url = match['src']
+          # Parses it
+          dummy_documentary.element_image = URI.parse(url)
+          # Assigns the image if it is bigger than 2k
+          if dummy_documentary.element_image.size > 2000
+            photo_url = url
+            break
+          end
+        end
+        name = documentary.css("div.post h3.post-title a")[0].text.strip
+        description = documentary.css("div.post div.post-body")[0].text.gsub(/\n/," ").gsub(/\s+/,' ').gsub("&"," ").gsub("%"," ")
+        begin
+          documentary.css("div.post-footer-line span.post-labels a").each do |human_tag|  
+            human_tags << human_tag.text.downcase.gsub("#","").strip  
+          end
+        rescue Exception => e
+          puts "Failed Human Tags docverdade"
+          puts e.message
+          puts e.backtrace.inspect
+        end
+        scrape_documentary_docverdade documentary_url, photo_url, name, description, human_tags
+      end
+    rescue Exception => e
+      puts "Exception scrape_page"
+      puts e.message
+      puts e.backtrace.inspect
+    end
+  end  
+  
+  def scrape_documentary_docverdade(documentary_url, photo_url, name, description, human_tags, *reintentos)
+    begin
+      translated_human_tags = Array.new
+      puts "documentary---" + documentary_url
+      idiomas_disponibles = ["pt"]
+      scraped_documentary = Documentary.new
+      puts name
+      prosa = name + ". " + description
+      translated_human_tags = []
+      scraped_from = "http://docverdade.blogspot.com.es"
+      I18n.locale = "pt"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url=documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+        
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_documentary.element_image=URI.parse(photo_url)
+        rescue
+          puts "docverdade  IMAGEN NO GUARDADA"
+          scraped_documentary.element_image.clear
+        end
+      end
+      
+      scraped_documentary.persist(idiomas_disponibles,prosa,human_tags, translated_human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentary_docverdade"
+      puts e.backtrace.inspect
+      puts e.message
+    end 
+  end #scrape_documentary_docverdade
+
+  #############################################################
+  ####### SCRAPE_DOCUMENTAIRENET
+  ###########################################################
+  
+ def scrape_documentairenet (*siguiente)
+    begin
+      if siguiente[1]==1
+        reintentos = siguiente[2]
+      else
+        reintentos = 2
+      end
+
+      url = "http://www.documentairenet.nl/reviews/categorieen/"
+
+      if siguiente[1]!=1
+        page = Nokogiri::HTML(open(url))
+        reintentos = 2
+        page.css("div#main-content.main-content-other ol#review-list li").each do |documentary|
+          documentary_url = documentary.css("div.review-list-text h3 a")[0]['href']
+          photo_url = documentary.css("div.thumbnail a img.image")[0]['src']
+          photo_url = photo_url.split("src=")[1].split("&h")[0]
+          scrape_documentary_documentairenet documentary_url, photo_url
+        end
+      end  
+
+      if siguiente[1]!=1
+        page.css("div.wp-pagenavi a").each do |pagina|
+          if pagina.text == "›"
+            siguiente = pagina['href']
+            break
+          else
+            siguiente = nil
+          end
+        end
+      else
+        siguiente = siguiente[0]
+      end
+
+      while siguiente != nil
+        sleep 2
+        puts "URL_SIGUIENTE --> " + siguiente
+        page2 =  Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+        
+        page2.css("div#main-content.main-content-other ol#review-list li").each do |documentary|
+          documentary_url = documentary.css("div.review-list-text h3 a")[0]['href']
+          photo_url = documentary.css("div.thumbnail a img.image")[0]['src']
+          photo_url = photo_url.split("src=")[1].split("&h")[0]
+          scrape_documentary_documentairenet documentary_url, photo_url
+        end
+
+        page2.css("div.wp-pagenavi a").each do |pagina|
+          if pagina.text == "›"
+            siguiente = pagina['href']
+            break
+          else
+            siguiente = nil
+          end
+        end
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_documentairenet"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_documentairenet(siguiente,1,reintentos)
+      end
+    end
+  end #scrape_documentairenet
+  
+  def scrape_documentary_documentairenet(documentary_url, photo_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts "documentary---" + documentary_url
+      idiomas_disponibles = ["nl"]
+      human_tags = Array.new
+      translated_human_tags = Array.new
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end              
+      documentary_page = Nokogiri::HTML(open(documentary_url))
+      scraped_documentary = Documentary.new      
+
+      begin
+        name = documentary_page.css("h2.page-title")[0].text.strip
+        puts "Name: " + name 
+      rescue
+        puts "Exception name documentairenet"
+      end   
+
+      description = ""
+      begin
+        documentary_page.css("div#review-stats.review-stats-full p").each do |parrafo|
+          description = description + (strip_tags parrafo.text.strip)
+        end
+      rescue
+        puts "Exception description documentairenet"
+      end
+      
+      prosa = name + ". " + description
+                 
+      scraped_from = "http://www.documentairenet.nl"
+      I18n.locale = "nl"
+      scraped_documentary.name = name
+      scraped_documentary.description = description
+      scraped_documentary.url=documentary_url
+      scraped_documentary.link = documentary_url
+      scraped_documentary.scraped_from=scraped_from
+
+      begin
+        documentary_page.css(" div#review-page-image ul#review-tags-list li a").each do |human_tag|
+          if human_tag.parent.css("strong").text.in? ["Genre:","Productieland:","Ondertiteling:","Tags:"]  
+            human_tags << human_tag.text.strip   
+          end  
+        end
+      rescue Exception => e
+        puts "Failed Human Tags documentairenet"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      translated_human_tags = []
+       
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_documentary.element_image=URI.parse(photo_url)
+        rescue
+          puts "documentairenet  IMAGEN NO GUARDADA"
+          scraped_documentary.element_image.clear
+        end
+      end
+      
+      scraped_documentary.persist(idiomas_disponibles,prosa,human_tags,translated_human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_documentary_documentairenet"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_documentary_documentairenet(documentary_url,photo_url,1,reintentos)
+      end
+    end
+    
+  end #scrape_documentary_documentairenet
+
+  
+
+end #class

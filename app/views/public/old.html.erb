@@ -1,0 +1,18 @@
+
+<div id="public_home_container">
+	<h1 class="title_public">iTEC-SDE</h1>	
+	<%= image_tag("/images/index.png", :class => "web_title_public_image") %>
+	<h2><%= t("Aporta_o_teu_GRAN") %></h2>
+	
+	<%= link_to t("Log_in"),  new_user_session_path ,html_options = {:id=> 'log_in', :name=> 'log_in', :class =>"button"} %>
+	<%= link_to t("Sign_up"),  new_user_registration_path, html_options = {:id=> 'sign_up', :name=> 'sign_up',:class =>"button"} %>
+	
+	<div class="language_selector_container">
+		<ul class="home_language_selector">
+			<li style="display: inline;"><%= link_to image_tag("/images/languages/en.gif"), "/en", html_options = {:id=> 'flag_en', :name=> 'flag_en', :class => 'link_languages'} %></li>
+			<li style="display: inline;"><%= link_to image_tag("/images/languages/gal.gif"), "/gl", html_options = {:id=> 'flag_gl', :name=> 'flag_gl', :class => 'link_languages' } %></li>
+			<li style="display: inline;"><%= link_to image_tag("/images/languages/es.gif"), "/es", html_options = {:id=> 'flag_es', :name=> 'flag_es', :class => 'link_languages'} %></li>
+			
+		</ul>
+	</div>
+</div>

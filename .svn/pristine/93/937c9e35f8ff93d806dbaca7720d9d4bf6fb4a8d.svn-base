@@ -1,0 +1,93 @@
+class HarvesterLearningActivities
+  include ActionView::Helpers::SanitizeHelper  
+  
+  def harvest_learning_activities
+    begin
+      i=0
+      url = "http://itec-composer.eun.org/composer/activities/public-activities"
+      
+      page = Nokogiri::HTML(open(url))    
+       
+      page.css("div.well").each do |learning_activity|
+        puts i+=1
+        harvest_learning_activity "http://itec-composer.eun.org" +learning_activity.css("div div.ff_view a.view-item-button")[0]['href']
+      end
+    
+    rescue Exception => e
+      puts e.message
+      puts e.backtrace.inspect
+      puts "Exception harvest learning activities"
+    end
+  end #harvest learning activities
+  
+end
+
+
+def harvest_learning_activity(learning_activity_url,*opcionales)
+  begin  
+    sleep 1  
+    puts learning_activity_url
+    
+    if opcionales[0]==1
+      reintentos = opcionales[1].to_i
+    else
+      reintentos = 2
+    end   
+      
+    learning_activity_page = Nokogiri::HTML(open(learning_activity_url))
+    learning_activity = Activity.new
+    reintentos = 2
+    
+    begin
+      name = learning_activity_page.css("div.resource_image h1")[0].text.strip
+      name = name.gsub("Title","")
+      puts "Name: " + name
+    rescue
+      puts "Exception name harvest_learning_activity"
+    end
+    
+    begin
+      description = strip_tags learning_activity_page.css("div.row-fluid div.span12")[0].text.strip
+      description = description.gsub("Description","")
+      puts "Description: " + description
+    rescue
+      puts "Exception description harvest_learning_activity"
+    end
+
+    begin
+      photo_url = learning_activity_page.css("div.resource_image img.image")[0]['src']
+      photo_url = "http://itec-composer.eun.org" + photo_url
+      puts "photo_url: " + photo_url
+    rescue
+      puts "Exception capturando photo harvest_learning_activity"
+      photo_url = nil
+    end
+    
+    if photo_url!=nil
+      begin
+        a = URI.parse(photo_url)
+        learning_activity.element_image=URI.parse(photo_url)
+      rescue
+        puts "harvest_learning_activity:  IMAGEN NO GUARDADA"
+        learning_activity.element_image.clear
+      end
+    end
+    
+      I18n.locale = "en"
+      learning_activity.name=name
+      learning_activity.description=description
+      learning_activity.status = "class"     
+      learning_activity.save
+     
+  rescue Exception => e
+    puts "Exception harvest_learning_activity"
+    puts "Reintentamos dos veces, sino saltamos a la siguiente learning activity"
+    puts e.backtrace.inspect
+    puts e.message
+    if reintentos > 0
+      reintentos-=1
+      sleep 2
+      harvest_learning_activity(learning_activity_url,1,reintentos)
+    end
+  end
+end #harvest_learning_activity

@@ -1,0 +1,15 @@
+	
+<div class="prompt">
+	<img src="/images/black_event_100.png" width="50px" height="30px"/>&nbsp;&nbsp;<%= t(date_range) %>
+	<%= link_to_next_page elements, image_tag("/images/arrow_right.png") ,:remote => true, :params => {:controller => "reports",:action => "load_more_reports_by_section_and_date",:section => section,:date_range => date_range } %><%= link_to t("view_all"), reports_path,:class => "view_all" %>
+</div>
+<div class="body">
+	<% if elements.size > 0 %>
+		<% elements.each do |element| %>
+			<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+		<% end %>
+	<% else %>
+		<div class="no_results"><%= t('no_results')%></div>	
+	<% end %>
+	<div class="clear"></div>
+</div>

@@ -1,0 +1,159 @@
+class PostsController < ApplicationController
+  def index
+    @resource_type = "Post"
+    if I18n.locale.to_s == "gl"
+      search_languages=["gl","es"]
+    else 
+      search_languages=[I18n.locale.to_s]
+    end
+    if (params[:advanced_search]=="1") 
+      @search=Post.search do          
+          keywords params[:keywords], :fields => [:tags] 
+          if params[:subject]!=""
+            keywords Subject.find(params[:subject]).name
+          end       
+          with(:translations, search_languages)             
+          paginate :page => params[:page], :per_page => 30           
+        end
+      @posts = @search.results 
+      @num_results=@search.total
+    
+    elsif (params[:search] != nil && params[:search].size > 0)
+      if params[:article_id] == nil
+        @disambiguation = Search.disambiguation(params[:search])
+      end      
+      @search = Search.search_elements_by_type('Post', params[:search],params[:article_id],30,params[:page])
+      @posts = @search[:results]          
+      @num_results = @search[:total]             
+    else
+      @search = Post.search do |query|
+          if current_user != nil && current_user.circumstances != []
+            search_terms = current_user.circumstances.first.tag_list + ", " + current_user.circumstances.first.subject.name
+            query.keywords search_terms, :fields => [:tags, :name] {minimum_match 1}
+          end  
+          query.with(:translations, search_languages)
+          query.paginate :page => params[:page],:per_page => 30 
+      end
+      @posts = @search.results 
+      @num_results=@search.total
+    end  
+     
+    @previous_search_params=params      
+    @subjects=Subject.all
+   
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @posts }
+    end
+  end
+  
+  
+  def show
+    @post = Post.find(params[:id])     
+    @subjects=Subject.all
+    @related_elements=RelatedElement.new(@post)   
+    @edition_mode=false
+    @resource_type="Post"
+    
+    if notice == 'Post was successfully created.' || notice == 'Post was successfully updated.'
+      @previous_action = 'saved'
+    else
+      @previous_action = 'list'
+    end    
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @post }
+    end
+  end
+  
+  
+  def new
+    if current_user !=nil 
+      @post = Post.new
+      @subjects=Subject.all
+      @edition_mode=true
+  
+      respond_to do |format|
+        format.html # new.html.erb
+        format.json { render json: @post }
+      end
+    else
+      redirect_to posts_path
+    end
+  end
+  
+  def edit
+    @post = Post.find(params[:id])
+    if current_user !=nil && ((@post.owner == current_user) or (@post.owner_type=="Group" && @post.owner.users.exists?(current_user)))
+      #@subjects=Subject.all
+      @edition_mode=true
+    else
+      redirect_to post_path(@post) 
+    end
+  end
+  
+  
+  def create
+    @post = Post.new(params[:post])
+    if (params[:post][:owner_type]==nil)
+      @post.owner_type="User"
+      @post.owner=current_user
+    end
+    @post.creator = current_user
+    @post.save
+
+    respond_to do |format|
+      if @post.save
+        format.html { redirect_to @post, notice: 'Post was successfully created.' }
+        format.json { render json: @post, status: :created, location: @post }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @post.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+  
+  
+  def update
+    @post = Post.find(params[:id])
+    if (params[:post][:owner_type]==nil)
+      @post.owner_type="User"
+      @post.owner=current_user
+    end
+    #@post.subjects.destroy_all
+    
+    respond_to do |format|
+      if @post.update_attributes(params[:post])
+        format.html { redirect_to @post, notice: 'Post was successfully updated.' }
+        format.json { head :ok }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @post.errors, status: :unprocessable_entity }
+      end
+    end    
+  end
+  
+  
+  def destroy
+    @post = Post.find(params[:id])
+    @post.destroy
+
+    respond_to do |format|
+      format.html { redirect_to posts_url }
+      format.json { head :ok }
+    end
+  end
+  
+  
+  def popup_show_post
+    @post = Post.find(params[:element_id])
+    @subjects=Subject.all
+    @edition_mode=false
+
+    respond_to do |format|
+      format.js
+    end
+  end
+  
+  
+end

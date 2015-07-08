@@ -1,0 +1,4 @@
+<%= form_for(@event, :html => { :class => "event_form" }) do |fo| %>
+	<%= render :partial => "events/form" , :locals => {:event_form => fo} %>
+<% end %>
+<input type="hidden" id="edition_mode" value="off"/>

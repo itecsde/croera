@@ -1,0 +1,33 @@
+<%
+	element_type = "user"
+	element_path = element_type + "_path(element)"
+	popup_show_element_path = "popup_show_" + element_type + "_path"
+%>
+
+
+<% if element.avatar.url != "none"  %>
+	<div class="small_extract_box" style="background-image: url('<%= element.avatar.url(:medium) %>')">
+<% else %>
+	<div class="small_extract_box" style="background-image: url('/images/watermarks/b_watermark_group.png')">				
+<% end %>
+
+	<div class="selection_info_box">
+		<div class="selection_info">
+			<input type="hidden" class="element_id" value="<%= element.id %>">			
+			<input type="hidden" class="element_name" value="<%= element.email%>">						
+			<input type="hidden" class="element_class" value="<%= element_type %>">		
+		</div>
+	</div>
+	
+	<% if edition_mode == true %>
+		<div class="deselection_button_always_visible" onclick="remove_user_from_group_form(this);">
+			<span class="selection_icon_always_visible">-</span>
+		</div>		
+	<% end %>
+		
+		
+	<div class="small_extract_box_footer">				
+		<p><%= element.email %></p>
+	</div>  
+						
+</div>

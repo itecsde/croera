@@ -1,0 +1,23 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'new_site', :actions => "sites/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@site, :html => { :class => "site_form" }) do |f_site| %>
+		<div id="element_header">
+			<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @site,:element_type=>"site"} %> 
+			<hr />
+			<div class="clear"></div>
+		</div>
+		<div id="content_container" class="site_container">
+			<input type="hidden" id="edition_mode" value="on">
+				<%= render :partial => "form" , :locals => {:site_form => f_site} %>
+				<%= render :partial => "submit", :locals => {:site_form => f_site} %>
+		</div>	
+		
+		<span style="display:none" id="is_edition" data-value="true"></span>	
+		
+		<script src="/javascript/sites_form.js"></script>
+	<% end%>
+<% end %>

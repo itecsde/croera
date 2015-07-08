@@ -1,0 +1,22 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'lre', :actions => "lres/lre_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+
+	<% if current_user != nil%>
+		<%= render :partial => "generic_partials/header_show_resource", :locals => {:element => @lre} %>	
+	<% end %>
+
+	<div id="content_container" class="lre_container">
+		<%= render "lre" %>
+		<%= render :partial => "generic_partials/related_elements_same_type",:locals => {:related_title =>'related_lres'} %>				
+	</div> <!-- CONTENT -->
+	<%= render :partial => "generic_partials/related_elements", :locals => {:element_type =>'lre'} %>
+	
+	<span style="display:none" id="is_edition" data-value="false"></span>	
+	
+	
+	<script src="/javascript/lres_form.js"></script>
+<% end %>

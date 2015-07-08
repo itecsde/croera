@@ -1,0 +1,11 @@
+laws_of_motion_guide_en:
+  guide_id: 60054175
+  locale: 'en'
+  name: 'Laws of motion guide in English'
+  description: 'Description in English'
+
+laws_of_motion_guide_gl:
+  guide_id: 60054175
+  locale: 'gl'
+  name: 'A guia das leis de Newton en galego'
+  description: 'A descripcion da guia das leis de Newton en Galego'

@@ -1,0 +1,3 @@
+<div class="activity_sequences_form_actions form_actions">
+	<%= f.submit t("save"), :class => 'sequence_save' %>
+</div>

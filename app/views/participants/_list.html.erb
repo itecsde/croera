@@ -1,0 +1,13 @@
+<% if @documents == nil %>
+	<div class="no_results"><%= t('no_results')%></div>			
+<% else %>
+	<% @documents.each do |document| %>
+		<%= render :partial => "elements/element_fixed", :locals => {:element => document, :current_layout => current_layout} %>
+	<% end %>
+	
+	<div class="clear"></div>
+	
+	<div class= "paginate_controls active">
+		<%= paginate @documents %>
+	</div>
+<% end %>

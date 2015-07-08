@@ -1,0 +1,24 @@
+# == Schema Information
+#
+# Table name: activities
+#
+#  id               :integer          not null, primary key
+#  title            :string(255)
+#  icon             :string(255)
+#  time_to_complete :integer
+#  created_at       :datetime
+#  updated_at       :datetime
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+round_robin:
+  title: 'Round Robin'
+  icon: MyString
+  timeToComplete: MyString
+  requirements: video_conference_tool
+
+round_table:
+  title: 'Round Table'
+  icon: MyString
+  timeToComplete: MyString

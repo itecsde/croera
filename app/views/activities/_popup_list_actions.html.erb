@@ -1,0 +1,15 @@
+<div class= "my_activities_filter disabled" onclick="all_users_popup_filter(this);"><%= t("activities") %></div>
+<div class= "my_activities_filter" onclick="current_user_popup_filter(this);"><%= t("my_activities") %></div>
+<div class="current_user_input_copy_container">
+	<%= hidden_field_tag :user_id, current_user.id , :class => 'current_user_id' %>
+</div>
+<!--<div class="my_activities_filter toggle_filters" onclick="show_filters(this);"><%= t("filters")%></div>
+<%= text_field_tag 'search', nil, placeholder: 'Enter search term...' %>-->
+
+<!-- Aqui en element_class tuve que poner element_class => 'activity_assignment_selection' en vez de element_class => 'activities' PAra las learning stories nuevas (experiences) Esto hace que el popup antiguo no funcione la barra superior. Si se vuelve a el cambiar -->
+<%= form_tag({:action => 'paginate_elements', :controller => 'selectors', :element_class => 'activity_assignment_selection', :refresh_popup => 'true'}, :class => "search_form", :method => :get, remote: true) do %>
+	<%= text_field_tag :search, params[:search], placeholder: t('enter_search_term') %>
+	<!-- Aqui abajo ponia Activities tampoco funcionalra sequences y demas al cambiarlo por activities assignament selections-->
+	<div class="search_button" onclick='$("#activity_assignment_selection .search_form").submit()'></div>
+	<div class="current_user_input_container"></div>
+<% end %>

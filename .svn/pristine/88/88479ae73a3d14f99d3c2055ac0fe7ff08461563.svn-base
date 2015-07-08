@@ -1,0 +1,16 @@
+
+
+<% if @disambiguation != nil && @disambiguation != [] && @disambiguation.size > 1 %>
+	<div class="disambiguation_box">
+		<div class="prompt"><%= t('see_results_about') %></div>
+		<div class="body">					
+		<% @disambiguation.each do |dis| %>
+			<div class="disambiguation_word">
+				<span class="title"><%= link_to dis[0], params.merge(:search => Util.to_hashtag(dis[0]), :article_id => dis[2]) %></span>:&nbsp;
+				<span class="description"><% if dis[1] != nil && dis[1]!="" %><%= raw dis[1].truncate(150-dis[0].size, :separator => " ", :omission => "...") %><% end %></span>
+			</div>						
+		<% end %>
+		<div class="clear"></div>
+		</div>
+	</div> 
+<% end %>

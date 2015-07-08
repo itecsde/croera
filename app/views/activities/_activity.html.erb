@@ -1,0 +1,5 @@
+<%= form_for(@activity,:html => { :class => "activity_form" }) do |f_activity| %>
+	<%= render :partial => "activities/form" , :locals => {:f => f_activity, :is_in_guide => false} %>
+<% end %>
+<input type="hidden" id="edition_mode" value="off"/>
+<input type="hidden" id="template_edition_mode" value="off"/>

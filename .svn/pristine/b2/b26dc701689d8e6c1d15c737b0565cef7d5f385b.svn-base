@@ -1,0 +1,103 @@
+class AdministrationsController < ApplicationController
+  
+  def index
+    scraper_reports = ScraperReports.new
+    scraper_applications = ScraperApplications.new
+    scraper_people = ScraperPeople.new
+    scraper_events = ScraperEvents.new
+    scraper_lectures = ScraperLectures.new
+    scraper_sites = ScraperSites.new
+    scraper_documentaries = ScraperDocumentaries.new
+    scraper_slideshows = ScraperSlideshows.new
+    scraper_posts = ScraperBlogs.new
+    scraper_biographies = ScraperBiographies.new
+    scraper_lres = ScraperLres.new
+    scraper_courses = ScraperCourses.new
+    scraper_articles = ScraperArticles.new  
+    
+    if params[:rss_feed] != nil && params[:task] == nil
+      Thread.new do
+        begin
+          scraper_reports.scrape_rss_report(params[:rss_feed])   
+        rescue
+        end
+      end        
+    end
+    
+    if params[:task] == "scrape" 
+      if params[:url] != nil && params[:element_type] != nil
+        source = Source.find_by_source_type_and_url(params[:element_type],params[:url])
+        case params[:element_type]
+        when "Event"
+          scraper_events.send(source.name)
+        when "People"
+          scraper_people.send(source.name)          
+        when "Application"
+          scraper_applications.send(source.name)          
+        when "Lecture"
+          scraper_lectures.send(source.name)          
+        when "Documentary"
+          scraper_documentaries.send(source.name)          
+        when "Biography"
+          scraper_biographies.send(source.name)          
+        when "Course"
+          scraper_course.send(source.name)          
+        when "Article"
+          scraper_articles.send(source.name)          
+        when "Lre"
+          scraper_lres.send(source.name)          
+        when "Post"
+          scraper_posts.send(source.name)          
+        when "Slideshow"
+          scraper_slideshows.send(source.name)          
+        when "Site"
+          scraper_sites.send(source.name)                                                                                                                        
+        when "Report"
+          Thread.new do
+            begin
+              scraper_reports.scrape_rss_report(params[:url])   
+            rescue
+            end
+          end
+        end    
+      end
+    elsif params[:task] == "tag"
+      if params[:url] != nil
+        Thread.new do
+          begin
+            resources_array = params[:element_type].constantize.where(:scraped_from => params[:url])
+            resources_array.each do |resource|
+              resource.refresh_automatic_semantic_annotations
+            end   
+          rescue
+          end
+        end
+      elsif params[:url] == nil
+        Thread.new do
+          begin
+            resources_array = params[:element_type].constantize.all
+            resources_array.each do |resource|
+              resource.refresh_automatic_semantic_annotations
+            end
+          rescue
+          end
+        end 
+      end
+    elsif params[:task] == "categorize"
+      #categorize
+    end
+    @sources_sites = Source.where(:source_type => "Site")
+    @sources_events = Source.where(:source_type => "Event")
+    @sources_reports = Source.where(:source_type => "Report")
+    @sources_lectures = Source.where(:source_type => "Lecture")
+    @sources_biographies = Source.where(:source_type => "Biography")
+    @sources_slideshows = Source.where(:source_type => "Slideshow")
+    @sources_documentaries = Source.where(:source_type => "Documentary")
+    @sources_lres = Source.where(:source_type => "Lre")
+    @sources_courses = Source.where(:source_type => "Course")
+    @sources_articles = Source.where(:source_type => "Article")
+    @sources_posts = Source.where(:source_type => "Post")
+    @sources_applications = Source.where(:source_type => "Application")
+    @sources_people = Source.where(:source_type => "Person")  
+  end
+end

@@ -1,0 +1,64 @@
+<div class="navbar navbar-fixed-top">
+	<div class="navbar-inner">
+		<div class="containerr">
+			<a data-target=".navbar-responsive-collapse" data-toggle="collapse" class="btn btn-navbar"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a>
+			<%= link_to "SDE" ,user_root_path, :class=>"brand" %>
+			<div class="nav-collapse collapse navbar-responsive-collapse">
+				<ul class="nav">
+					<li class="hamburger">
+						<div class="icon_hamburger">
+						</div>	
+					</li>	
+					<li class="<% if element_active == 'resources' %> <%= 'active'%> <% end %> dropdown">
+						<!-- <%= link_to t("Resources"), resources_path %> -->
+					    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= t("Resources") %><b class="caret"></b></a>
+					    <ul class="dropdown-menu">
+					      <li><%= link_to t("applications"), applications_path %></li>
+					      <li><%= link_to t("events"), events_path %></li>
+					      <li><%= link_to t("people"), people_path %></li>
+					    </ul>						
+					</li>
+					<li class="<% if element_active == 'activities' %> <%= 'active'%> <% end %>">
+						<%= link_to t("activities"), activities_path %>
+					</li>
+					<li class="<% if element_active == 'activity_sequences' %> <%= 'active'%> <% end %>">
+						<%= link_to t("activity_sequences"), activity_sequences_path %>
+					</li>
+					<!--<li class="<% if element_active == 'scenarios' %> <%= 'active'%> <% end %>"><%= link_to t("scenarios"), scenarios_path %></li> -->
+					<li class="<% if element_active == 'guides' %> <%= 'active'%> <% end %>">
+						<%= link_to t("guides"), guides_path %>
+					</li>
+					<!--<li class="<% if element_active == 'experiences' %> <%= 'active'%> <% end %>"><%= link_to t("experiences"), experiences_path %></li> -->
+					<li class="<% if element_active == 'groups' %> <%= 'active'%> <% end %>">
+						<%= link_to t("groups"), groups_path %>
+					</li>
+				</ul>
+
+				<ul class="nav pull-right">
+
+					<%= render :partial => "header/flags", :locals => {} %>					
+					
+					<% if (current_user.first_name != nil && current_user.first_name != "") %>
+						<% current_user_display = current_user.first_name+" "+current_user.last_name %>
+					<% else %>
+						<% current_user_display = current_user.email %>
+					<% end %>
+					
+					
+					<li class="dropdown">
+						<a data-toggle="dropdown" class="dropdown-toggle" href="#"><%= current_user_display %>&nbsp;<%= image_tag(current_user.avatar.url(:thumb)) %> <b class="caret"></b></a>						
+						
+						<ul class="dropdown-menu">
+							<li>
+								<%= link_to t('Edit'), edit_user_path(current_user) %>
+							</li>
+							<li>
+								<%= link_to t('log_out'), destroy_user_session_path, :method => :delete %>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div><!-- /.nav-collapse -->
+		</div>
+	</div><!-- /navbar-inner -->
+</div>

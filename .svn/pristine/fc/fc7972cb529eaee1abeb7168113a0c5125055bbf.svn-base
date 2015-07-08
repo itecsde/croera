@@ -1,0 +1,30 @@
+<%= render :partial => "header", :locals => {:section_title => (t :experience), :actions => "experience_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'experiences', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => (t ('learning_story')), :actions => "experiences/experience_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<div id="content_container" class="experience_container">
+		<%= render "experience" %>
+		<div class="clear"></div>
+	</div>
+	
+	<script src="/javascript/experience_form.js"></script>
+	<!-- esto es para el popup de show activity para que no se pueda editar -->	
+	<script src="/javascript/activities_form.js"></script>
+
+	<script src="/javascript/jquery.ui.widget.js"></script>
+	<script src="/javascript/jquery.ui.core.min.js"></script>
+	<script src="/javascript/jquery.ui.mouse.min.js"></script>
+	<script src="/javascript/jquery.ui.accordion.min.js"></script>
+	<script src="/javascript/jquery.ui.draggable.min.js"></script>
+	<script src="/javascript/jquery.ui.droppable.min.js"></script>
+	<script src="/javascript/jquery.ui.sortable.min.js"></script>
+<% end %>
+
+<% content_for :popups do %>
+	<%= render :partial => "selectors/element_assignment_selector", :layout => "layouts/popup", :locals => {:popup_id => "element_assignment_selection", :popup_class => "selection simple", :callback => "insert_element('Element')", :details_header_title => "alternative"} %>
+	<%= render :partial => "bookmarks/popup_show", :layout => "layouts/popup", :locals => {:popup_id => "popup_show", :popup_class => "details", :callback => "", :details_header_title => "show"} %>
+<% end %>

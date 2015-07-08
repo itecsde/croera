@@ -1,0 +1,18 @@
+<!-- Technological Setting selector boxes -->
+<!-- Device Technological setting selector -->
+<%= render :partial => "selectors/device_selector", :layout => "layouts/popup", :locals => {:popup_id => "technological_setting_device_selection", :popup_class => "selection multiple", :callback => "select_ts_device()", :deselect_callback => "deselect_ts_device()", :details_header_title => "device"} %>
+<!-- Application Technological setting selector -->
+<%= render :partial => "selectors/application_selector", :layout => "layouts/popup", :locals => {:popup_id => "technological_setting_application_selection", :popup_class => "selection multiple", :callback => "select_ts_application()", :deselect_callback => "deselect_ts_application()", :details_header_title => "application"} %>
+
+<div style="display: none">
+	<div id="tool_view_box" class="tool_view_box" style="padding: 26px">
+		<div id="selector_header">
+			<div class="selector_box_title">
+				<h1 id="list_title"><%=t :Tool %></h1>
+			</div>
+			<div class="clear"></div>
+			<hr/>
+		</div>
+		<div class="details"><iframe class="details_iframe" seamless></iframe></div>
+	</div>
+</div>

@@ -1,0 +1,15 @@
+<div class="navbar">
+  <div class="navbar-inner">
+    <ul class="nav">
+      <%= render 'resources/list_actions' %>	
+      <form class="navbar-form pull-left" action="" method="GET">
+      <input name="search" type="text" class="search-query" placeholder="<%= t('Enter_search_term') %>">
+      <button type="submit" class="btn"><i class="icon-search"></i>Submit</button>
+      </form>
+      
+    </ul>
+    <ul class="nav pull-right">
+      <li class="divider-vertical"><%= t("Applications") %></li>
+	</ul>
+  </div>
+</div>

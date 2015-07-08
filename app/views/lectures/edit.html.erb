@@ -1,0 +1,22 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'editing_lecture', :actions => "lectures/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@lecture, :html => { :class => "lecture_form" }) do |f_lecture| %>
+		<div id="element_header">
+			<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @lecture,:element_type=>"lecture"} %> 
+			<hr />
+			<div class="clear"></div>
+		</div>
+		<div id="content_container" class="lecture_container">
+			<input type="hidden" id="edition_mode" value="on">
+				<%= render :partial => "form" , :locals => {:lecture_form => f_lecture} %>
+				<%= render :partial => "submit", :locals => {:lecture_form => f_lecture} %>			
+		</div>			
+		<span style="display:none" id="is_edition" data-value="true"></span>	
+		
+		<script src="/javascript/lectures_form.js"></script>
+	<% end %>
+<% end %>

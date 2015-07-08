@@ -1,0 +1,3 @@
+learning_activities = HarvesterLearningActivities.new
+
+learning_activities.harvest_learning_activities

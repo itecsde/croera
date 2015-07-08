@@ -1,0 +1,7 @@
+
+scraper_reports = ScraperReports.new
+reports_sources = Source.where(:source_type => "Report")
+reports_sources.each do |source|
+  scraper_reports.scrape_rss_report(source.url)
+end
+

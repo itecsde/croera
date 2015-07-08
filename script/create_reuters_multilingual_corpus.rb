@@ -1,0 +1,2 @@
+a = CorpusCreator.new
+a.create_rcv2_multilingual_english_corpus

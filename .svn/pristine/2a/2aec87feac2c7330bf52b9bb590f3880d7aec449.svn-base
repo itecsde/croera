@@ -1,0 +1,16 @@
+<%= render :partial => "header", :locals => {:section_title => (t (@page)), :actions => "list_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'guides', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => (t (@page)), :actions => "guides/list_actions"} %>
+<% end -%>
+
+<% content_for :content do %>
+
+		<div id="content_index">
+			<%= render :partial => "list", :locals => { :current_layout => "application" }%>	
+		</div> <!-- CONTENT -->
+
+<script src="/javascript/jquery.masonry.min.js"></script>
+<script src="/javascript/guides_index.js"></script>
+<% end -%>

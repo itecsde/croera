@@ -1,0 +1,53 @@
+require 'spec_helper'
+
+feature 'Home' do
+ # background do
+  #  User.create(:email => 'admin@example.com', :password => 'password')
+  #end
+  
+  scenario 'page does not have JavaScript errors', :js => true do
+    visit(root_path)
+    expect(page).not_to have_errors
+  end
+
+  scenario 'user logs in correctly', :js => true do
+    #User.create(:email => 'admin@example.com', :password => 'password')
+    puts root_path
+    url = "http://localhost:3000/"
+    visit url
+    page.find("div.login div.section_title").click
+    fill_in 'user_email', :with => 'marcosmourino@gmail.com'
+    fill_in 'user_password', :with => '1111'
+    click_button 'login'
+    language = current_path.split("/")[1]  
+    assert_equal current_path, "/" + language + user_root_path    
+  end
+  
+  scenario 'user switches off enriched mode', :js => true do
+    #User.create(:email => 'admin@example.com', :password => 'password')
+    visit root_path
+    page.find("#flag_en").click
+    page.find("#log_in").click
+    
+    fill_in 'user_email', :with => 'admin@example.com'
+    fill_in 'user_password', :with => 'password'
+    click_button 'Sign in'
+    
+    assert_equal current_path, "/" + I18n.locale.to_s + user_root_path  
+    
+    click_link "Resources"
+    click_link "All"
+    click_link "Events"
+    
+    assert_equal "/" + I18n.locale.to_s + events_path, current_path  
+    page.should have_content('Enriched On')
+    page.should_not have_content('Enriched Off')
+    
+    click_on "Enriched On"    
+    
+    page.should have_content('Enriched Off')                     
+  end
+  
+  
+  
+end

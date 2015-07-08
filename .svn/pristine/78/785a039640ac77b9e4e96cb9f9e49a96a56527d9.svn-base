@@ -1,0 +1,694 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+require 'watir-webdriver'
+require 'net/http'
+require 'net/https'
+require 'uri'
+require 'mechanize'
+    
+
+class ScraperLres
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+  def scrape_lre(*reintentos)
+    begin
+      source_name = __method__.to_s    
+      #Add new source, or select it if exists
+      source = Source.create_or_select_source(source_name, "Lre", "http://lreforschools.eun.org")
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+
+      url = "http://lreforschools.eun.org/web/guest/resource-details?resourceId="
+
+      for i in 1..1000000
+        scrape_resource_lre url + i.to_s 
+      end      
+      source.correct_scrape
+    rescue  Exception => e
+      puts "Exception in scrape_lre"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_lre(1,reintentos)
+      end
+      source.incorrect_scrape
+    end
+  end #scrape_lre
+  
+  def scrape_resource_lre(resource_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts "resource_url --->" + resource_url
+      idiomas_disponibles = Array.new
+      human_tags = Array.new
+      
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end              
+      resource_page = Nokogiri::HTML(open(resource_url))
+      scraped_resource = Lre.new      
+ 
+      begin
+        name = resource_page.css("h2.resourceTitle")[0].text.strip
+        puts "Name: " + name 
+      rescue Exception => e
+        puts "Exception name lre"
+        puts e.message
+      end
+
+      description = ""
+      begin
+        description = strip_tags resource_page.css("div#tabs-2.ui-tabs-panel")[0].text.strip
+        puts "Description: " + description 
+      rescue
+        puts "Exception description lre"
+      end
+    
+      begin
+        resource_page.css("dt").each do |dt|
+          if dt.text.strip == "Available in:"
+            dt.next.next.css("span.iceOutTxt span.iceOutTxt").each do |language|
+              idiomas_disponibles << language.text.strip
+            end
+          end
+        end
+        language = idiomas_disponibles[0]
+        idiomas_disponibles.clear
+        idiomas_disponibles << language
+        puts idiomas_disponibles
+      rescue Exception => e
+        puts "Failed languages lre"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      I18n.locale = idiomas_disponibles[0]
+      scraped_resource.name = name
+      scraped_resource.description = description
+      
+      I18n.locale = "en"
+
+      begin
+        photo_url = resource_page.css("img")[0]['src']
+        puts "photo_url: " + photo_url
+      rescue Exception => e
+        puts "Failed photo lre"
+        puts e.message
+        puts e.backtrace.inspect
+        photo_url = nil
+      end
+      
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_resource.element_image=URI.parse(photo_url)
+        rescue
+          puts "lre  IMAGEN NO GUARDADA"
+          scraped_resource.element_image.clear
+        end
+      end
+      
+      begin
+        resource_page.css("dt").each do |dt|
+          if dt.text.strip == "Users' Tags" || dt.text.strip == "Descriptors"
+            dt.next.next.css("span.iceOutTxt a").each do |tag|
+              human_tags << tag.text.strip
+            end
+          end
+          if dt.text.strip == "Keywords"
+            dt.next.next.css("span.iceOutTxt").each do |tag|
+              tag.text.split(",").each do |keyword|
+                human_tags << keyword.strip
+              end
+            end
+          end
+        end
+        human_tags.delete("Not Available")
+        puts human_tags.length
+        puts human_tags
+      rescue Exception => e
+        puts "Failed Human Tags lre"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      prosa = name + ". " + description
+             
+      scraped_from = "http://lreforschools.eun.org"
+      I18n.locale = idiomas_disponibles[0]
+
+      scraped_resource.url=resource_url
+      scraped_resource.link = resource_url
+      scraped_resource.scraped_from=scraped_from
+      
+      
+      if name != "Resource unavailable"
+        scraped_resource.persist(idiomas_disponibles,prosa,human_tags)
+      end 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_resource_lre"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_resource_lre(resource_url,1,reintentos)
+      end
+    end
+    
+  end #scrape_resource_lre
+  
+  
+  def scrape_espazo_abalar(*reintentos)
+    begin
+      source_name = __method__.to_s    
+      #Add new source, or select it if exists
+      source = Source.create_or_select_source(source_name, "Lre", "http://www.edu.xunta.es/espazoAbalar/")
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+
+      url = "http://www.edu.xunta.es/espazoAbalar/espazos/recursos"
+      
+      nokogiri_html_page = Nokogiri::HTML(open(url))
+      
+      nokogiri_html_page.css(".teaser div.teaser_desc h4 a").each do |oer|
+        oer_url = "http://www.edu.xunta.es" + oer['href']
+        scrape_oer_espazo_abalar oer_url
+      end
+      
+      if !nokogiri_html_page.css(".nav_sig div.button_bl div.button_br div.button_bk a.active").empty?
+        siguiente = "http://www.edu.xunta.es" + nokogiri_html_page.css(".nav_sig div.button_bl div.button_br div.button_bk a.active")[0]['href']
+      else
+        siguiente = nil
+      end
+
+      while siguiente != nil
+        sleep 2
+        puts "URL_SIGUIENTE --> " + siguiente
+        nokogiri_html_page =  Nokogiri::HTML(open(siguiente))
+        reintentos = 2       
+        nokogiri_html_page.css(".teaser div.teaser_desc h4 a").each do |oer|
+          oer_url = "http://www.edu.xunta.es" + oer['href']
+          scrape_oer_espazo_abalar oer_url
+        end
+        if !nokogiri_html_page.css(".nav_sig div.button_bl div.button_br div.button_bk a.active").empty?
+          siguiente = "http://www.edu.xunta.es" + nokogiri_html_page.css(".nav_sig div.button_bl div.button_br div.button_bk a.active")[0]['href']
+        else
+          siguiente = nil
+        end
+      end      
+      source.correct_scrape
+    rescue  Exception => e
+      puts "Exception in scrape_espazo_abalar"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_espazo_abalar(1,reintentos)
+      end
+      source.incorrect_scrape
+    end      
+  end
+  
+  def scrape_oer_espazo_abalar(oer_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+      puts oer_url
+      idiomas_disponibles = Array.new
+      idiomas_disponibles = ['gl']
+      resource_type = ""
+      platform = ""
+      language = ""
+      
+      manual_tags = Array.new
+      
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+
+      oer_html_page = open(oer_url, &:read)
+      oer_page = Nokogiri::HTML(oer_html_page)
+                    
+      oer_page = Nokogiri::HTML(open(oer_url))
+      scraped_oer = Lre.new      
+ 
+      begin
+        name = oer_page.css("div#contenido_r div.article h4 a.active")[0].text.strip
+        puts "Name: " + name 
+      rescue 
+        puts "Exception name oer_espazo_abalar"
+      end
+
+      begin
+        oer_page.css("div#contenido_r div.article p").each do |p|
+          description = description + p.text.strip
+        end
+        puts "Description: " + description 
+      rescue
+        puts "Exception description oer_espazo_abalar"
+      end
+    
+      begin
+        photo_url = URI.encode(oer_page.css("div#contenido_r div.article div.mod_recurso_detalle img.imagecache")[0]['src'])
+        puts "photo_url: " + photo_url
+      rescue 
+        puts "Failed photo oer_espazo_abalar"
+        photo_url = nil
+      end
+      
+      begin
+        oer_page.css("div.mod_recurso_detalle_data span span").each do |detail|
+          if detail.text.strip == "Tipo de Recurso:"
+            resource_type = detail.next.text.strip
+          elsif detail.text.strip == "Plataforma:"
+            platform = detail.next.text.strip
+          elsif detail.text.strip == "Idioma:"
+            language = detail.next.text.strip
+          end
+        end
+      rescue
+        puts "Failed details oer_espazo_abalar"
+      end
+      
+      manual_tags << resource_type
+      manual_tags << platform
+      manual_tags << language
+         
+      prosa = name + ". " + description
+      
+      I18n.locale = "gl"            
+      scraped_from = "http://www.edu.xunta.es/espazoAbalar/"
+      scraped_oer.name = name
+      scraped_oer.description = description
+      scraped_oer.url = oer_url
+      scraped_oer.link = oer_url
+      scraped_oer.raw_html = oer_html_page
+      scraped_oer.scraped_from = scraped_from
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_oer.element_image=URI.parse(photo_url)
+        rescue
+          puts "espazo_abalar: IMAGEN NO GUARDADA"
+          scraped_oer.element_image.clear
+        end
+      end     
+      scraped_oer.persist(idiomas_disponibles, prosa, manual_tags)
+      reintentos = 2
+    rescue Exception => e
+      puts "Exception scrape_oer_espazo_abalar"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_oer_espazo_abalar(oer_url,1,reintentos)
+      end
+    end   
+  end #scrape_resource_lre
+  
+  
+   def scrape_oercommons(*reintentos)
+      begin
+         source_name = __method__.to_s
+         #Add new source, or select it if exists
+         source = Source.create_or_select_source(source_name, "Lre", "http://www.oercommons.org/")
+
+         if reintentos[0]==1
+            reintentos = reintentos[1].to_i
+         else
+            reintentos = 2
+         end
+
+         url = "http://www.oercommons.org/oer"
+
+         nokogiri_html_page = Nokogiri::HTML(open(url, "User-Agent" => "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0"))
+
+         nokogiri_html_page.css("div.browse-materials table")[1].css("li").each do |material_type|
+            scrape_material_type_oercommons material_type.css("a")[0]['href']
+         end
+
+         source.correct_scrape
+      rescue  Exception => e
+         puts "Exception in scrape_oercommons"
+         puts "Reintentamos dos veces, sino abortamos"
+         puts e.backtrace.inspect
+         puts e.message
+         if reintentos > 0
+            puts reintentos
+            reintentos-=1
+            sleep 2
+            scrape_oercommons(1,reintentos)
+         end
+      source.incorrect_scrape
+      end
+   end
+  
+ def scrape_material_type_oercommons(material_type_url, *reintentos)
+      begin
+         if reintentos[0]==1
+         reintentos = reintentos[1].to_i
+         else
+         reintentos = 2
+         end
+
+         puts material_type_url
+
+         material_type_page = Nokogiri::HTML(open(material_type_url, "User-Agent" => "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0"))
+         material_type_page.css("article.index-item div.item-details div h1 a.item-link").each do |oer|
+            scrape_oer_oercommons oer['href']
+         end
+
+         if !material_type_page.css(".pagination li")[3].css("a").empty?
+            siguiente = "http://www.oercommons.org" + material_type_page.css(".pagination li")[3].css("a")[0]['href']
+         else
+            siguiente = nil
+         end
+
+         while siguiente != nil
+            sleep 2
+            puts "URL_SIGUIENTE --> " + siguiente
+            material_type_page =  Nokogiri::HTML(open(siguiente, "User-Agent" => "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0"))
+            reintentos = 2
+            material_type_page.css("article.index-item div.item-details div h1 a.item-link").each do |oer|
+               scrape_oer_oercommons oer['href']
+            end
+            if !material_type_page.css(".pagination li")[3].css("a").empty?
+               siguiente = "http://www.oercommons.org" + material_type_page.css(".pagination li")[3].css("a")[0]['href']
+            else
+               siguiente = nil
+            end
+         end
+      rescue  Exception => e
+         puts "Exception in scrape_material_type_oercommons"
+         puts "Reintentamos dos veces, sino abortamos"
+         puts e.backtrace.inspect
+         puts e.message
+         if reintentos > 0
+            puts reintentos
+            reintentos-=1
+            sleep 2
+            scrape_material_type_oercommons(material_type_url,1,reintentos)
+         end
+      end
+   end
+  
+   def scrape_oer_oercommons(oer_url, *reintentos)
+      begin
+         name = ""
+         description = ""
+         puts oer_url
+         idiomas_disponibles = Array.new
+         manual_tags = Array.new
+
+         if reintentos[0]==1
+            reintentos = reintentos[1].to_i
+         else
+            reintentos = 2
+         end
+
+         oer_html_page = open(oer_url, "User-Agent" => "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0", &:read)
+         oer_page = Nokogiri::HTML(oer_html_page)
+
+         scraped_oer = Lre.new
+
+         begin
+            name = oer_page.css(".item section.details h1 a span")[0].text.strip
+            puts "Name: " + name
+         rescue
+            puts "Exception name oercommons"
+         end
+
+         begin
+            description = oer_page.css(".item section.details div.information dl dd.text[itemprop='description'] p").text       
+         rescue
+            puts "Exception description oercommons"
+         end
+
+         begin
+            photo_url = URI.encode(oer_page.css(".item section.details div.thumb a img")[0]['src'])
+            @agent = Mechanize.new
+            @agent.user_agent_alias = "Mac Safari"            
+            page = @agent.get(photo_url)
+            photo_url =  page.uri.to_s
+         rescue
+            puts "Failed photo oercommons"
+            photo_url = nil
+         end
+         
+         begin
+            language = oer_page.css(".item section.details div.information dl dd span[itemprop='inLanguage']")[0]['content']       
+         rescue Exception => e
+            puts e.message
+            puts e.backtrace.inspect
+            puts "Exception language oercommons"
+         end
+         
+         begin
+            subject = oer_page.css(".item section.details div.information dl dd span[itemprop='about']")[0].text       
+         rescue Exception => e
+            puts e.message
+            puts e.backtrace.inspect
+            puts "Exception language oercommons"
+         end
+        
+         manual_tags << subject
+
+         prosa = name + ". " + description
+         
+         idiomas_disponibles << language
+         I18n.locale = language
+         scraped_from = "http://www.oercommons.org/"
+         scraped_oer.name = name
+         scraped_oer.description = description
+         scraped_oer.url = oer_url
+         scraped_oer.link = oer_url
+         scraped_oer.raw_html = oer_html_page
+         scraped_oer.scraped_from = scraped_from
+         if photo_url!=nil
+            begin
+               scraped_oer.element_image=URI.parse(photo_url)
+            rescue Exception => e
+               puts e.message
+               puts e.backtrace.inspect
+               puts "oercommons: IMAGEN NO GUARDADA"
+               scraped_oer.element_image.clear
+            end
+         end
+         scraped_oer.persist(idiomas_disponibles, prosa, manual_tags)
+         reintentos = 2
+      rescue Exception => e
+         puts "Exception scrape_oer_oercommons"
+         puts e.backtrace.inspect
+         puts e.message
+         puts reintentos
+         if reintentos > 0
+            reintentos-=1
+            sleep 2
+            scrape_oer_oercommons(oer_url,1,reintentos)
+         end
+      end
+   end #scrape_oer_oercommons
+
+   def scrape_didactalia(*reintentos)
+      begin
+         source_name = __method__.to_s
+         #Add new source, or select it if exists
+         source = Source.create_or_select_source(source_name, "Lre", "http://didactalia.net")
+
+         if reintentos[0]==1
+            reintentos = reintentos[1].to_i
+         else
+            reintentos = 2
+         end
+
+         url = "http://didactalia.net/en/community/materialeducativo/resources"
+
+         @agent = Mechanize.new
+         @agent.user_agent_alias = "Mac Safari"            
+         mechanize_page = @agent.get(url)
+         
+         nokogiri_html_page = Nokogiri::HTML(mechanize_page.body)
+
+         nokogiri_html_page.css("div#ListadoGenerico_controles_ficharecurso_ascx_divResourceInt.box div.wrapDescription div.group h2 a").each do |resource|
+            scrape_oer_didactalia resource['href']
+         end
+               
+         if !nokogiri_html_page.css(".paginadorResultados div#NavegadorPaginasCorreo_Pag.pag a.indiceNavegacion.filtro.ultimaPagina").empty?
+           siguiente = nokogiri_html_page.css(".paginadorResultados div#NavegadorPaginasCorreo_Pag.pag a.indiceNavegacion.filtro.ultimaPagina")[0]['href']
+         else
+           siguiente = nil
+         end
+      
+         while siguiente != nil
+            sleep 2
+            puts "URL_SIGUIENTE --> " + siguiente
+            mechanize_page = @agent.get(siguiente)         
+            nokogiri_html_page = Nokogiri::HTML(mechanize_page.body)
+            reintentos = 2       
+            nokogiri_html_page.css("div#ListadoGenerico_controles_ficharecurso_ascx_divResourceInt.box div.wrapDescription div.group h2 a").each do |resource|
+               scrape_oer_didactalia resource['href']
+            end
+            if !nokogiri_html_page.css(".paginadorResultados div#NavegadorPaginasCorreo_Pag.pag a.indiceNavegacion.filtro.ultimaPagina").empty?
+              siguiente = nokogiri_html_page.css(".paginadorResultados div#NavegadorPaginasCorreo_Pag.pag a.indiceNavegacion.filtro.ultimaPagina")[0]['href']
+            else
+              siguiente = nil
+            end
+         end  
+         source.correct_scrape
+      rescue  Exception => e
+         puts "Exception in scrape_didactalia"
+         puts "Reintentamos dos veces, sino abortamos"
+         puts e.backtrace.inspect
+         puts e.message
+         if reintentos > 0
+            puts reintentos
+            reintentos-=1
+            sleep 2
+            scrape_didactalia(1,reintentos)
+         end
+      source.incorrect_scrape
+      end
+   end
+  
+   def scrape_oer_didactalia(oer_url, *reintentos)
+      begin
+         name = ""
+         description = ""
+         puts oer_url
+         idiomas_disponibles = Array.new
+         manual_tags = Array.new
+         categories = Array.new
+         tags = Array.new
+         idiomas_disponibles = ['es']
+
+         if reintentos[0]==1
+            reintentos = reintentos[1].to_i
+         else
+            reintentos = 2
+         end
+
+         oer_html_page = @agent.get(oer_url)
+
+         oer_page = Nokogiri::HTML(oer_html_page.body)
+
+         scraped_oer = Lre.new
+
+         begin
+            name = oer_page.css(".wrapDescription div.group h1")[0].text.strip
+            puts "Name: " + name
+         rescue
+            puts "Exception name didactalia"
+         end
+         
+         description = ""
+         begin
+            oer_page.css("div#ctl00_ctl00_CPH1_CPHContenido_panContenedorFichaRecurso .box.description .wrapDescription div.group.content div p").each do |p|
+               if p.parent.name == "table" or p.parent.parent.name == "table" or p.parent.parent.parent.name == "table" or p.parent.parent.parent.parent.name == "table"
+               else
+                  description = description + p.text.strip   
+               end
+            end       
+         rescue
+            puts "Exception description didactalia"
+         end
+
+         begin
+            photo_url = URI.encode(oer_page.css("div#ctl00_ctl00_CPH1_CPHContenido_controles_ficharecurso_ascx_divResourceInt.box div.wrapDescription div.group div p img")[0]['src'])
+         rescue
+            puts "Failed photo didactalia"
+            photo_url = nil
+         end
+
+         begin
+            oer_page.css("div#ctl00_ctl00_CPH1_CPHContenido_controles_ficharecurso_ascx_divCategorias.group ul#listCat li a span").each do |category|
+               categories << category.text.strip
+            end
+         rescue Exception => e
+            puts e.message
+            puts e.backtrace.inspect
+            puts "Exception categories didactalia"
+         end
+        
+         begin
+            oer_page.css("div#ctl00_ctl00_CPH1_CPHContenido_controles_ficharecurso_ascx_divEtiquetas.group ul#listTags li a span").each do |tag|
+               tags << tag.text.strip
+            end
+         rescue Exception => e
+            puts e.message
+            puts e.backtrace.inspect
+            puts "Exception tags didactalia"
+         end
+         
+         manual_tags << categories
+         manual_tags << tags
+
+         prosa = name + ". " + description
+         
+         I18n.locale = "es"
+         scraped_from = "http://www.didactalia.net"
+         scraped_oer.name = name
+         scraped_oer.description = description
+         scraped_oer.url = oer_url
+         scraped_oer.link = oer_url
+         scraped_oer.raw_html = oer_html_page.body
+         scraped_oer.scraped_from = scraped_from
+         if photo_url!=nil
+            begin
+               scraped_oer.element_image=URI.parse(photo_url)
+            rescue Exception => e
+               puts e.message
+               puts e.backtrace.inspect
+               puts "didactalia: IMAGEN NO GUARDADA"
+               scraped_oer.element_image.clear
+            end
+         end
+         scraped_oer.persist(idiomas_disponibles, prosa, manual_tags)
+         reintentos = 2
+      rescue Exception => e
+         puts "Exception scrape_oer_didactalia"
+         puts e.backtrace.inspect
+         puts e.message
+         puts reintentos
+         if reintentos > 0
+            reintentos-=1
+            sleep 2
+            scrape_oer_didactalia(oer_url,1,reintentos)
+         end
+      end
+   end #scrape_oer_didactalia
+  
+  
+  
+  
+  
+  
+end

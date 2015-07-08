@@ -1,0 +1,94 @@
+<% if (current_user.first_name != nil && current_user.first_name != "") %>
+	<% current_user_name=current_user.first_name+" "+current_user.last_name %>
+<% else %>
+	<% current_user_name=current_user.email %>
+<% end %>
+
+<% ownership_group_class="ownership_group_"+element_type %>
+<div class="field editable active">
+	<div class="<%= ownership_group_class %> ownership_box">
+		<input type="hidden" id="current_user_name" value="<%= current_user_name %>"/>
+		<input type="hidden" id="current_user_image" value="<%= current_user.avatar.url(:thumb) %>">
+		<% if edition_mode!=false %> 
+			<div class="dropdown_owner_selector" class="active" onclick="toggle_dropdown_owner_options();">
+				<%= image_tag("/images/arrow_down.png",:class=>"img_dropdown_owner_selector") %>	
+			</div>
+		<% end %>
+		<div class="owner">
+	    	<% if (element.owner_type=="User" or element.owner_type==nil) %>
+	    		<div class="image_ownership_group">
+	    			   <%= image_tag(current_user.avatar.url(:thumb),:class=>"img_ownership_group") %>	
+	    		</div>
+	    		<div class="ownership_bundle">
+	    			<div class="owned_by">
+	    				<%= t("owned_by") %>
+    				</div>
+		    		<div class="name_ownership_group">
+		    			<%= current_user_name %>
+	    			</div>
+    			</div>
+				<% if edition_mode==true %>
+					<div class="selection_info_box">
+						<div class="selection_info">
+							<input type="hidden" class="element_id">
+							<input type="hidden" class="element_class">
+						</div>
+					</div>
+				<% end %>
+			<% elsif (element.owner_type=="Group")%>
+				<div class="image_ownership_group">
+					<% if element.owner.element_image.url!="none" %>
+						<%= image_tag(element.owner.element_image.url(:thumb),:class=>"img_ownership_group")	%>
+					<% else %>
+						<%= image_tag("/images/group/thumb/group.png",:class=>"img_ownership_group")	%>
+					<% end %>
+	    		</div>
+	    		<div class="ownership_bundle">
+	    			<div class="owned_by">
+	    				<%= t("owned_by") %>
+    				</div>
+		    		<div class="name_ownership_group">
+						<%= element.owner.name %>				
+	    			</div>
+    			</div>
+
+				<% if edition_mode==true %>
+					<div class="selection_info_box">
+						<div class="selection_info">
+							<input type="hidden" value="<%= element.owner_id %>" class="element_id" name="<%=element_type%>[owner_id]">
+							<input type="hidden" value="Group" class="element_class" name="<%=element_type%>[owner_type]">
+						</div>
+					</div>
+				<% end %>
+			<% end %>
+		</div>		
+	    <ul>
+	    	<li onclick="assign_owner('User', <%= current_user.id %>, '<%= current_user_name%>', '<%= element_type %>', '<%= current_user.avatar.url(:thumb) %>')">
+		      	<div class="image_owner_dropdown_list">
+		      		<%= image_tag current_user.avatar.url(:thumb) %>
+		      	</div>	
+		      	<div class="name_owner_dropdown_list">
+		      		<%= current_user_name %>
+		      	</div>
+		      	<div class="clear"></div>	
+    		</li>
+	    	<% current_user.groups.each do |group|%>
+				<% if group.element_image.url!="none" %>
+					<% image_url = group.element_image.url(:thumb) %>
+				<% else %>
+					<% image_url = "/images/group/thumb/group.png"	%>
+				<% end %>
+		      <li onclick="assign_owner('Group', <%= group.id %>, '<%= group.name%>', '<%= element_type %>', '<%= image_url %>')">
+		      	<div class="image_owner_dropdown_list">
+		      		<%= image_tag(image_url) %>
+		      	</div>	
+		      	<div class="name_owner_dropdown_list">
+		      		<%= group.name %>
+		      	</div>
+		      	<div class="clear"></div>		
+	      	  </li>
+	      <% end %>
+	    </ul>			
+	</div>
+</div>
+

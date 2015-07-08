@@ -1,0 +1,6 @@
+scrape_applications = ScraperApplications.new
+application_parent_category_integrator = ApplicationParentCategoryIntegrator.new
+integrator = ApplicationFunctionalityIntegrator.new
+application_parent_category_integrator.populate_application_parent_categories
+scrape_applications.scrape_alternativeto_all
+integrator.integrate_functionalities

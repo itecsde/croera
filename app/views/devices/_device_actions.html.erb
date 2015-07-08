@@ -1,0 +1,23 @@
+<li>
+<% if @previous_action == "list" %>
+	<%=link_to  "javascript: history.back();", :class => "back_icon has_tooltip" do %>
+		 	<img src="/images/white_arrow_left.png" title="Back to home"></img>
+	<% end %>
+<% else %>
+	<%=link_to  devices_path, :class => "back_icon has_tooltip" do %>
+		 	<img src="/images/white_arrow_left.png" title="Back to home"></img>	
+	<% end %>
+<% end %>
+</li>
+<% if @device.owner == current_user %>
+	<li>	
+	<%=link_to edit_device_path(@device), :class => "has_tooltip" do %>
+		 <img src="/images/white_edit.png" title="Edit"></img>
+	<% end %>
+	</li>
+	<li>
+	<%=link_to  @device, confirm: t('Are_you_sure'), method: :delete, :class => "has_tooltip" do %>
+		<img src="/images/white_delete.png" title="Delete"></img>>
+	<% end %>	
+	</li>
+<% end %>

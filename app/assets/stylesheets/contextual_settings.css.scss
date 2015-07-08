@@ -1,0 +1,43 @@
+// Place all the styles related to the ContextualSettings controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+#content_contextual_setting{
+  background: none repeat scroll 0% 0% #FBFBFB;
+  padding:186px 26px 26px 26px;
+    overflow: hidden;
+}
+
+.contextual_setting_title{
+  color: #000000;
+  font-weight: bold;
+  font-size: 30px;
+  font-family: "PT sans";
+  width: auto;
+  float: left;
+  margin-right: 10px;
+}
+
+input#contextual_setting_name{
+  color: #000000;
+  font-weight: bold;
+  font-size: 30px;
+  font-family: "PT sans";
+  margin-right: 10px;
+  margin-bottom: 10px;
+  border: none;
+}
+
+textarea.contextual_setting_description{
+  width: 95%;
+  border: none;
+  -webkit-transition: height 0.2s;
+  -moz-transition: height 0.2s;
+  transition: height 0.2s;
+  font-family: "Trebuchet MS",Helvetica Neue,Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgb(51, 51, 51);
+  text-align: justify;
+  resize: none; 
+}

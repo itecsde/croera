@@ -1,0 +1,147 @@
+class AdministrationController < ApplicationController
+  
+  def index
+    @search_text = params[:search]    
+    @article_id = params[:article_id]   
+    
+    @disambiguation = Array.new
+                
+    if @article_id == nil && @search_text != nil && @search_text.index("#") == nil 
+      wiki = Wikipediator.new
+      begin 
+        disamb_results=wiki.search(params[:search])
+        disamb_results.each do |alternative_search|
+          title = alternative_search['title']
+          definition = wiki.getDefinition(title)
+          id = alternative_search['id']
+          @disambiguation << [title, definition, id] #[title, definition]
+        end      
+      rescue
+      end
+    end
+    
+
+    @sources = Source.all 
+          
+     
+          
+      
+    @search_text = "Alexander"
+    
+    if @search_text != nil 
+      @sites = get_search_elements('Site', @search_text,@article_id)
+      @events = get_search_elements('Event', @search_text,@article_id)
+      @lectures = get_search_elements('Lecture', @search_text,@article_id)
+      @documentaries = get_search_elements('Documentary', @search_text,@article_id)
+      @people = get_search_elements('Person', @search_text,@article_id)
+      @applications = get_search_elements('Application', @search_text,@article_id)
+      @courses = get_search_elements('Course', @search_text,@article_id)
+      @articles = get_search_elements('Article', @search_text,@article_id)
+      @lres = get_search_elements('Lre', @search_text,@article_id)
+      @posts = get_search_elements('Post', @search_text,@article_id)
+      @slideshows = get_search_elements('Slideshow', @search_text,@article_id)
+      @biographies = get_search_elements('Biography', @search_text,@article_id)
+          
+    else 
+      @sites = []
+      @events = []
+      @lectures = []
+      @documentaries = []
+      @people = []
+      @applications = []
+      @courses = []
+      @articles = []
+      @lres = []
+      @posts = []
+      @slideshows = []
+      @biographies = []
+    end
+    
+    
+    @applications = Source.all
+  end
+  
+    
+  
+  def get_search_elements(element_type,search_text,article_id)
+    if I18n.locale.to_s == "gl"
+      search_languages=["gl","es"]
+    else 
+      search_languages=[I18n.locale.to_s]
+    end
+    
+    #CASO DE BUSQUEDA DESAMBIAGUADA buscamos por ActiveRecord
+    if search_text != nil && search_text.index("#") != nil &&  search_text.index("#") == 0      
+      #Si accedemos por la URL de desambiguacion viene con article id      
+      if article_id != nil
+        tags_annotations=TaggableTagAnnotation.where(:wikipedia_article_id => article_id, :taggable_type => element_type).order("weight DESC").limit(4)
+        elements_results=element_type.constantize.find_all_by_id(tags_annotations.map{|annotation| annotation.taggable_id}).first(4)
+        if elements_results.size > 0
+           elements=Sunspot::Search::PaginatedCollection.new(elements_results,1,elements_results.size,elements_results.size)
+        else
+           search = element_type.constantize.search do 
+              fulltext "cllldsojfndjdujdsksooeinsujhdff"                
+              paginate :per_page => 4 
+           end
+           elements = search.results
+        end
+      #Si NO accedemos por la URL de desambiguacion. Puesto a saco la # en buscador                        
+      else
+        search_terms = Util.to_tag(search_text)
+        tag_search_terms = Tag.find_by_name(search_terms)
+        if tag_search_terms != nil 
+          tags_annotations=TaggableTagAnnotation.where(:tag_id => tag_search_terms.id, :taggable_type => element_type, :type_tag => "automatic").order("weight DESC").limit(4)
+          elements_results=element_type.constantize.find_all_by_id(tags_annotations.map{|annotation| annotation.taggable_id}).first(4)
+          if elements_results.size > 0
+            elements=Sunspot::Search::PaginatedCollection.new(elements_results,1,elements_results.size,elements_results.size)
+          else
+            search = element_type.constantize.search do 
+              fulltext "cllldsojfndjdujdsksooeinsujhdff"                
+              paginate :per_page => 4 
+            end
+            elements = search.results
+          end
+        else
+          search = element_type.constantize.search do 
+            fulltext "cllldsojfndjdujdsksooeinsujhdff"                
+            paginate :per_page => 4 
+          end
+          elements = search.results          
+        end                
+      end                      
+      return elements                   
+        
+    #CASO DE BUSQUEDA SIN DESAMBIGUAR (Como no pudimos poner bien el tokenizador lo separamos, si no con esto ya valdria)
+    else 
+      search_terms = search_text 
+      @search = element_type.constantize.search do |query|
+        query.fulltext search_terms do
+          boost_fields :hashtags_100 => 10.0
+          boost_fields :hashtags_95 => 9.5
+          boost_fields :hashtags_90 => 9
+          boost_fields :hashtags_85 => 8.5
+          boost_fields :hashtags_80 => 8.0
+          boost_fields :hashtags_75 => 7.5
+          boost_fields :hashtags_70 => 7.0
+          boost_fields :hashtags_65 => 6.5
+          boost_fields :hashtags_60 => 6.0
+          boost_fields :hashtags_55 => 5.5
+          boost_fields :hashtags_50 => 5.0
+          
+          boost_fields :tags => 4.0
+          #phrase_fields :tags => 10.0 
+          #query.keywords search_terms, :fields => [:categories, :tags, :name] {minimum_match 1}       
+        end
+        if @element.class == element_type.constantize
+            query.without(:id, @element.id)
+        end
+        query.with(:translations, search_languages)  
+        query.paginate :per_page => 4            
+      end
+      @result=@search.results       
+      return @result      
+    end
+   
+  end
+   
+end

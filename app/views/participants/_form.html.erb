@@ -1,0 +1,57 @@
+<!------------ Left column ------------------>
+<div id="participants_content_container" class="book_container">
+<div class="participants_left_column">
+	<div class="participants_name field_body">
+		<font color="black" size='4px'> Before proceeding with the evaluation, please fill in the fields, simply in order to make a statistical study. </font>
+		<br>
+		<br>
+		Name:
+		<%= text_field_tag(:user_name, "") %>
+		<br>
+		<br>
+		Surname:
+		<%= text_field_tag(:user_surname, "") %>
+		<br>
+		<br>
+		<div class="field_prompt"><%= t("sex") %></div>
+		<br>
+		<div class = "classification_correct2">
+			<input type="radio" name="user_sex" value="Male"> Male
+		</div>
+		<div class = "classification_correct3">
+			<input type="radio" name="user_sex" value="Female"> Female
+		</div>		
+		<br>
+		<br>
+		<div class="field_prompt"><%= t("are_you_professor") %></div>
+		<br>
+		<div class = "classification_correct2">
+			<input type="radio" name="teacher" value="Yes"> Yes
+		</div>
+		<div class = "classification_correct3">
+			<input type="radio" name="teacher" value="No"> No
+		</div>			
+		<br>
+		<br>
+		If "Yes", please select the educational level you teach
+		<%= select_tag :teacher_level, "<option></option><option>Primary</option><option>Secondary</option><option>High School</option><option>University</option>".html_safe %>
+		<br>
+		<br>
+		and please type the subject you teach: 
+		<%= text_field_tag(:subject, "") %>
+		<br>
+		<br>
+		<%= submit_tag "Send" %>
+	</div>
+	
+	
+</div>
+</div>
+
+
+
+
+
+
+
+

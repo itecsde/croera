@@ -1,0 +1,31 @@
+<!-- Tool selector window --> 
+<%= render :partial => "selectors/tool_selector", :layout => "layouts/popup", :locals => {:popup_id => "tool_requirement_selection", :popup_class => "selection simple", :callback => "select_tool_requirement()", :current_layout => "popup", :details_header_title => "tool"} %>
+<!-- Person selector window --> 
+<%= render :partial => "selectors/person_selector", :layout => "layouts/popup", :locals => {:popup_id => "person_requirement_selection", :popup_class => "selection simple", :callback => "select_person_requirement()", :current_layout => "popup", :details_header_title => "person"} %>
+<!-- Event selector window --> 
+<%= render :partial => "selectors/event_selector", :layout => "layouts/popup", :locals => {:popup_id => "event_requirement_selection", :popup_class => "selection simple", :callback => "select_event_requirement()", :current_layout => "popup", :details_header_title => "event"} %>
+<!-- Content selector window --> 
+<%= render :partial => "selectors/content_selector", :layout => "layouts/popup", :locals => {:popup_id => "content_requirement_selection", :popup_class => "selection simple", :callback => "select_content_requirement()", :current_layout => "popup", :details_header_title => "content"} %>
+<!-- Requirement type selector window -->
+<div style="display: none">
+	<div id="requirement_type_selector_box" style="padding: 26px">
+		<div id="selector_header">
+			<div class="selector_box_title">
+				<h1 id="list_title"><%= t('requirement_types') %></h1>
+			</div>
+			<div class="clear"></div>
+			<hr/>
+		</div>
+		<div class="selector">
+			<div class="content_selectable">
+				<%= render :partial => "activities/selectable_requirement_type", :locals => {:requirement_type => "tool_abstract", :icon => "icon-AbstractRequirement"} %>
+				<%= render :partial => "activities/selectable_requirement_type", :locals => {:requirement_type => "tool_concrete", :icon => "icon-AbstractRequirement"} %>
+				<%= render :partial => "activities/selectable_requirement_type", :locals => {:requirement_type => "person_abstract", :icon => "icon-ContributorRequirement"} %>
+				<%= render :partial => "activities/selectable_requirement_type", :locals => {:requirement_type => "person_concrete", :icon => "icon-ContributorRequirement"} %>
+				<%= render :partial => "activities/selectable_requirement_type", :locals => {:requirement_type => "event_abstract", :icon => "icon-EventRequirement"} %>
+				<%= render :partial => "activities/selectable_requirement_type", :locals => {:requirement_type => "event_concrete", :icon => "icon-EventRequirement"} %>
+			</div>
+		</div>	
+	</div>
+</div>
+

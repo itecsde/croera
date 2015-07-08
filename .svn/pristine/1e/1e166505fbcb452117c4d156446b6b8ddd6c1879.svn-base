@@ -1,0 +1,142 @@
+<% if @lre.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@lre.errors.count, "error") %> prohibited this lre from being saved:</h2>
+	
+	  <ul>
+	  <% @lre.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+
+
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="lre_name field_body">
+		<% if @edition_mode==true %>
+			<textarea id="lre_name" name="lre[name]" placeholder="<%= t("title") %>"><%= @lre.name %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<span><%= @lre.name %></span>
+		<% end %>
+	</div>
+	
+		
+	<div class="lre_description description field_body">
+		<% if @edition_mode==true %>
+			<textarea id="lre_description" name="lre[description]" placeholder="<%= t("description") %>"><%= @lre.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<div>
+				<% if @lre.description != nil %>			
+					<%= raw @lre.description.truncate(1000, :separator => " ", :omission => "...") %>
+				<% end %>					
+			</div>
+		<% end %>
+	</div>
+	
+	
+	<div class="lre_tags element_field_box">
+		<div class="field_prompt"><%= t("keywords") %></div>
+		<div class="field_body">			
+			<% if @edition_mode==true %>    
+		    	<textarea id="lre_tags" class="tags" name="lre[tag_list]"><% if @lre!=nil %><%= @lre.tag_list %><% end %></textarea>
+		    	<i class="icon-pencil icon-grey"></i>
+		    <% else %>
+		    	<span class="tags"><% if @lre!=nil %><%= @lre.tag_list_with_links.html_safe %><% end %></span>	
+		    <% end %>														
+		</div>
+	</div>		
+	
+	
+	<div class="lre_url element_field_box">
+		<div class="field_prompt"><%= t("url") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>    
+		    	<%= lre_form.text_field :url %>
+		    	<i class="icon-pencil icon-grey"></i>			    	
+		    <% else %>
+		    	<a href="<%= @lre.url %>" target="_blank"><%= @lre.url %></a>
+		    <% end %>
+	   </div>		
+	</div>
+
+	
+	<div class="lre_subjects element_field_box">
+		<div class="field_prompt"><%= t("subjects") %></div>
+		<div class="field_body">
+			<% @lre.lre_subject_annotations.each do |annotation| %>
+				<div class="subject_item">
+					<% if @edition_mode==true %>
+						<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name", annotation.subject.id), :prompt => "", :class => "subject" %>
+						<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+					<% else %>
+						<span><%= annotation.subject.name %></span>	
+					<% end %>
+				</div>
+			<% end %>			
+		</div>
+		<% if @edition_mode==true %>
+			<div class="add_item_to_itemize" onclick="add_subject(this);">
+				<span>+</span>
+			</div>
+		<% end %>		
+	</div>		
+	
+	
+	
+	<% if @edition_mode!=true && @lre.scraped_from!=nil && @lre.scraped_from!="" %>  
+		<div class="lre_scraped_from element_field_box">
+			<div class="field_prompt"><%= t("source") %></div>
+			<div class="field_body">
+				<a href="<%= @lre.scraped_from %>" target="_blank"><%= @lre.scraped_from %></a>
+			</div>
+		</div>
+	<% end %>
+	
+	
+</div>
+
+
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>		
+			<% if @lre.element_image.url() != "none" %>
+				<%= image_tag @lre.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_lre.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= lre_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		<% else %>
+			<% if @lre.element_image.url() != "none" %>
+				<%= image_tag @lre.element_image.url(:medium), width:'100%', :class => "image_preview_show" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_lre.png", width:'100%', :class => "image_preview_show" %>
+			<% end %>
+		<% end %>
+	</div>
+
+</div>
+
+
+
+
+
+<% if @edition_mode==true %>
+	<div id="snippets_library" style="display: none">
+		<div class="subject_item">				
+			<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name"), :prompt => "", :class => "subject" %>
+			<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+		</div>
+	</div>
+<% end %>
+
+

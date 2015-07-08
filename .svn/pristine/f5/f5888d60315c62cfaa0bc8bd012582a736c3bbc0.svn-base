@@ -1,0 +1,10 @@
+
+<% @groups.each do |group| %>
+	<%= render :partial => "elements/element_fixed", :locals => {:element => group, :current_layout => current_layout} %>
+<% end %>
+
+<div class="clear"></div>
+
+<div class= "paginate_controls active">
+	<%= paginate @groups %>
+</div>

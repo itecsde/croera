@@ -1,0 +1,15 @@
+
+<div class="clear"></div>
+<% related_same_type = @related_elements.get_related_elements(@resource_type) %>
+<% if related_same_type.size > 0 %>
+	<div class="related_element same_type">		
+		<div class="prompt"><img src="/images/black_<%= @resource_type.downcase %>_100.png" width="30px" height="30px"/><span class="related_title"><%= t(related_title) %></span><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => @resource_type,:title => related_title) %>" class="view_all"><%= t("view_all") %></a></div>
+		<div class="body">
+			<% related_same_type.each do |element| %>
+				<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 				
+			<% end %>										
+		</div>
+	</div>
+<% end %>
+<div class="clear"></div>
+

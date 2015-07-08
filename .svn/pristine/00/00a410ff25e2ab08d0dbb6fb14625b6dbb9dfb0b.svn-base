@@ -1,0 +1,152 @@
+AREAV03::Application.routes.draw do
+
+
+  root :to => "public#index"
+  
+  scope "(/:locale)", :locale => /en|es|pt|lt|no|tr|fr|nl|gl|sk|hu|fi|it/ do
+    
+    devise_for :users, :controllers => {:registrations => "registrations"}
+    match "/activities/filter/:tag_id" => "activities#filter", :as => "activities_filter"
+    match "/activities/interaction_filter/:interaction_id" => "activities#filter_by_interaction", :as => "activities_filter_by_interaction"
+    match "/activities/my_activities" => "activities#my_activities" , :as => "my_activities"
+    match "/activities/pick_it" => "activities#pick_it" , :as => "pick_it"
+    match "/activities/new/from_template/:template_id" => "activities#new", :as => "new_activity_with_template"
+    match "/activities/popup_show_activity" => "activities#popup_show_activity" , :as => "popup_show_activity"
+    match "/activities/search" => "activities#search", :as => "search"
+    resources :activities
+    
+    match "/scenarios/pick_it" => "scenarios#pick_it" , :as => "pick_it"
+    match "/scenarios/my_scenarios" => "scenarios#my_scenarios" , :as => "my_scenarios"
+    resources :scenarios
+    
+    
+    match "/bookmarks/add_bookmark" => "bookmarks#add_bookmark"
+    match "/bookmarks/remove_bookmark" => "bookmarks#remove_bookmark"
+    resources :bookmarks
+        
+    resources :created_elements
+    
+    match "/search_results/all_related_elements" => "search_results#all_related_elements" , :as => "all_related_elements"
+    resources :search_results
+    
+    resources :requirements
+    match "/activity_sequences/show_activity" => "activity_sequences#show_activity"
+    match "/activity_sequences/:activity_sequence_id/show_activity" => "activity_sequences#show_activity"
+    match "/activity_sequences/new_activity_instance" => "activity_sequences#new_activity_instance"
+    match "/activity_sequences/get_assignments_rows" => "activity_sequences#get_assignments_rows"
+    match "/activity_sequences/:activity_sequence_id/get_assignments_rows" => "activity_sequences#get_assignments_rows"
+    match "/activity_sequences/my_activity_sequences" => "activity_sequences#my_activity_sequences" , :as => "my_activity_sequences"
+    match "/activity_sequences/pick_it" => "activity_sequences#pick_it" , :as => "pick_it"
+    match "/activity_sequences/get_activity" => "activity_sequences#get_activity" , :as => "get_activity"
+    match "/activity_sequences/popup_show_activity_sequence" => "activity_sequences#popup_show_activity_sequence" , :as => "popup_show_activity_sequence"
+    resources :activity_sequences
+    
+    match "/guides/show_activity" => "activity_sequences#show_activity"
+    match "/guides/show_technological_setting" => "guides#show_technological_setting"
+    match "/guides/show_contextual_setting" => "guides#show_contextual_setting"
+    match "/guides/show_sequence" => "guides#show_sequence"
+    match "/guides/select_technological_setting" => "guides#select_technological_setting"
+    match "/guides/new_technological_setting" => "guides#new_technological_setting"
+    match "/guides/select_contextual_setting" => "guides#select_contextual_setting"
+    match "/guides/new_contextual_setting" => "guides#new_contextual_setting"
+    match "/guides/select_sequence" => "guides#select_sequence"
+    match "/guides/get_sequence" => "guides#get_sequence"
+    match "/guides/get_contextual_setting" => "guides#get_contextual_setting"
+    match "/guides/get_technological_setting" => "guides#get_technological_setting"
+    match "/guides/new_sequence" => "guides#new_sequence"
+    match "/guides/get_assignments_rows" => "activity_sequences#get_assignments_rows"
+    match "/guides/recommend_tools" => "guides#recommend_tools"
+    match "/guides/recommend_people" => "guides#recommend_people"
+    match "/guides/recommend_events" => "guides#recommend_events"
+    match "/guides/popup_show_guide" => "guides#popup_show_guide", :as => "popup_show_guide"
+    match "/guides/my_guides" => "guides#my_guides" , :as => "my_guides"
+    match "/guides/pick_it" => "guides#pick_it" , :as => "pick_it"
+    match "/guides/validate_tool_assignment" => "guides#validate_tool_assignment"
+
+    
+    match "/guides/:guide_id/show_activity" => "activity_sequences#show_activity"
+    match "/guides/:guide_id/show_technological_setting" => "guides#show_technological_setting"
+    match "/guides/:guide_id/show_contextual_setting" => "guides#show_contextual_setting"
+    match "/guides/:guide_id/show_sequence" => "guides#show_sequence"
+    match "/guides/:guide_id/select_technological_setting" => "guides#select_technological_setting"
+    match "/guides/:guide_id/new_technological_setting" => "guides#new_technological_setting"
+    match "/guides/:guide_id/select_contextual_setting" => "guides#select_contextual_setting"
+    match "/guides/:guide_id/new_contextual_setting" => "guides#new_contextual_setting"
+    match "/guides/:guide_id/select_sequence" => "guides#select_sequence"
+    match "/guides/:guide_id/get_sequence" => "guides#get_sequence"
+    match "/guides/:guide_id/get_contextual_setting" => "guides#get_contextual_setting"
+    match "/guides/:guide_id/get_technological_setting" => "guides#get_technological_setting"
+    match "/guides/:guide_id/new_sequence" => "guides#new_sequence"
+    match "/guides/:guide_id/get_assignments_rows" => "activity_sequences#get_assignments_rows"
+    match "/guides/:guide_id/recommend_tools" => "guides#recommend_tools"
+    match "/guides/:guide_id/recommend_people" => "guides#recommend_people"
+    match "/guides/:guide_id/recommend_events" => "guides#recommend_events"
+    match "/guides/:guide_id/validate_tool_assignment" => "guides#validate_tool_assignment"
+
+    
+    resources :guides
+    match "/technological_settings/popup_show_technological_setting" => "technological_settings#popup_show_technological_setting" , :as => "popup_show_technological_setting"
+    resources :technological_settings
+    match "/contextual_settings/popup_show_contextual_setting" => "contextual_settings#popup_show_contextual_setting" , :as => "popup_show_contextual_setting"
+    resources :contextual_settings
+    resources :seeds
+
+    match "/experiences/popup_show_experience" => "experiences#popup_show_experience", :as => "popup_show_experience"
+    match "/experiences/new/from_guide/:guide_id" => "experiences#new", :as => "new_experience_from_guide"
+    match "/experiences/my_experiences" => "experiences#my_experiences" , :as => "my_experiences"
+    match "/experiences/get_element_excerpt" => "experiences#get_element_excerpt"    
+    resources :experiences
+
+    
+    match "/users/popup_show_user" => "users#popup_show_user", :as => "popup_show_user"
+    resources :users    
+    match "/resources/list_devices" => "resources#list_devices" , :as => "list_devices"
+    match "/resources/list_applications" => "resources#list_applications" , :as => "list_applications"
+    match "/resources/list_people" => "resources#list_people" , :as => "list_people"
+    match "/resources/list_events" => "resources#list_events" , :as => "list_events"            
+    resources :resources
+    match "/devices/popup_show_device" => "devices#popup_show_device", :as => "popup_show_device"
+    resources :devices
+    match "/applications/popup_show_application" => "applications#popup_show_application", :as => "popup_show_application"
+    resources :applications
+    match "/people/popup_show_person" => "people#popup_show_person", :as => "popup_show_person"
+    resources :people
+    match "/events/popup_show_event" => "events#popup_show_event", :as => "popup_show_event"
+    resources :events
+    match "/lectures/popup_show_lecture" => "lectures#popup_show_lecture", :as => "popup_show_lecture"
+    resources :lectures
+    match "/sites/popup_show_site" => "sites#popup_show_site", :as => "popup_show_site"
+    resources :sites
+    match "/documentaries/popup_show_documentary" => "documentaries#popup_show_documentary", :as => "popup_show_documentary"
+    resources :documentaries
+    match "/courses/popup_show_course" => "courses#popup_show_course", :as => "popup_show_course"
+    resources :courses
+    match "/articles/popup_show_article" => "articles#popup_show_article", :as => "popup_show_article"
+    resources :articles
+    match "/lres/popup_show_lre" => "lres#popup_show_lre", :as => "popup_show_lre"
+    resources :lres
+    match "/posts/popup_show_posts" => "posts#popup_show_post", :as => "popup_show_post"
+    resources :posts
+    match "/slideshows/popup_show_slideshows" => "slideshows#popup_show_slideshow", :as => "popup_show_slideshow"
+    resources :slideshows
+    match "/biographies/popup_show_biographies" => "biographies#popup_show_biography", :as => "popup_show_biography"
+    resources :biographies
+    match "/contents/popup_show_content" => "contents#popup_show_content", :as => "popup_show_content"
+    resources :contents
+    resources :pictures
+  
+    match "/groups/popup_show_group" => "groups#popup_show_group", :as => "popup_show_group"
+    match "/groups/my_groups" => "groups#my_groups" , :as => "my_groups"
+    resources :groups    
+    
+    match "/comments/new" => "comments#new", :as => "new_comment"
+    match "/selectors/paginate_elements" => "selectors#paginate_elements"
+    
+    match 'home' => 'home#index', as: :user_root
+    
+    root :to => "public#index"
+
+  end
+
+ 
+end

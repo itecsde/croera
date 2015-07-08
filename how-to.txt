@@ -1,0 +1,76 @@
+Poner a punto el entorno de desarrollo:
+1. Lanzar server >> Run server
+2. bundle exec rake sunspot:solr:start
+3. Si haces algun cambio en cosola o en base de datos a machete:
+	bundle exec rake sunspot:solr:reindex
+4. Instalar las gemas (si cambias en gemfile o al importar el proyecto)
+	bundle install
+5. Reiniciar base da datos con el seeds
+	rake db:reset
+6. Ver rutas:
+	bundle exec rake routes
+7. Poner DB ok para inciar test
+   bundle exec rake sunspot:solr:start RAILS_ENV=test
+   bundle exec rake sunspot:solr:start // Lanzar de nuevo el solr
+   
+8. Lanzar la suite de test completa
+    bundle exec rake test test/integration/example_test.rb
+9. Lanzar la suite de test, pero sólo un módulo (test:name_module) 
+    bundle exec rake test:integration test/integration/example_test.rb
+
+
+Otros comandos
+	- rails console (Lanzar la consola de ruby para probar cosas)
+	- rake db:migrate (Ejecutar las migraciones)
+	- rails generate migration "nombre migracion" (te crea un fichero para hacer meter dentro el codigo de la migracion)
+
+	- bundle exec rails runner "eval(File.read 'archivo.rb')" (Ejecutar un script en ruby desde terminal)
+	- Para generar automáticamente un modelo con su correspondiente migración: 
+		$ rails generate model Product name:string description:text
+	- Para ejecutar un script
+		$ rails runner script/my_script.rb RAILS_ENV=development
+	- OJO PARA EJECUTAR UN SCRIPT EN PRODUCCION
+		$ sudo RAILS_ENV=production rails r script/foo.rb
+		
+	- Reindexar un solo modelo desde consola
+		Modelo.solr_reindex(:batch_size => 100)
+	
+	- rails generate sunspot_rails:install (Cunado nos cargamos directorio SOLR)
+	
+	- Lanzar admin_task
+		RAILS_ENV=production rails r script/admin_task.rb "{:task=>'force_tag',:element_type=>'Biography',:slice_size => 5000}" > log/administration/force_tag_artworks.log
+Notas:
+	1. "capybara-webkit" Para usar esto es necesario instalar en el server libqt4-dev y libqt4-webkit
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE NEW ENVIRONMENT
+
+1. Create a new environment file in config/environments/new_environment.rb
+
+2. Add a new configuration block in config/database.yml for your environment
+
+3. That's all
+
+- Now you can start the server:
+
+	rails server -e new_environment
+
+- or run the console:
+
+	rails console new_environment 
+	
+
+- Run script with specific environment:
+
+	rails runner script/my_script.rb -e new_invironment
+	
+- Run admin_task with specific environment:
+
+	RAILS_ENV=new_environment rails r script/admin_task.rb "{:task=>'force_tag',:element_type=>'Biography',:slice_size => 5000}" > log/administration/force_tag_artworks.log
+	
+------------------------------------------------------------------------------------------------------------------------------------------
+PRODUCTION
+sudo gem install passenger
+sudo apt-get install libapache2-mod-passenger
+sudo apt-get install nginx-brightbox

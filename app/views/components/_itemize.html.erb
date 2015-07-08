@@ -1,0 +1,19 @@
+<ul>
+	<% component.texts.each do |text| %>
+		<div class= "text_container editable active deleteable">
+			<div class="has_edition_controls active">
+				<div class="delete_button edition_control" onclick="delete_text_container(this);"><%= image_tag("/images/icons/delete_item.png") %></div>
+				<%= hidden_field_tag :text_id, text.id, :class => "text_id" %>
+				<li class="itemize_li"></li>
+				<%= text_area_tag "text_content", text.content, :class => "text_content", :placeholder => t("write_here") %>
+				<i class="icon-pencil icon-grey"></i>
+			</div>
+		</div>		
+	<% end %>
+</ul>
+
+<div class="has_edition_controls active">
+	<div class="add_item_to_itemize edition_control" onclick="add_item_to_itemize(this);">
+		<span style="font-size:33px; color: #828387;">+</span>
+	</div>
+</div>

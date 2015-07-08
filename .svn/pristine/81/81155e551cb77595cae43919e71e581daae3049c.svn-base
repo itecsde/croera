@@ -1,0 +1,37 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'about', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'about', :actions => nil} %>
+<% end %>
+
+<% content_for :content do %>
+
+
+
+	<div class="about_box">
+				
+		<div class="left_column_about_box">
+			<img class="logo_image_public" src="/images/index.png" alt="Index"></img>
+			<h1 class="logo_title_public">iTEC-SDE</h1>			
+		</div>
+		
+		<div class="separate_columns"> </div>
+		
+		<div class="right_column_about_box">
+			<div class="prompt"><%= t("contact")%></div>
+		
+			<div id="about_box_container" class="about_box_container">
+				<div class="contact_email">
+					<span class="logo_email">@</span>
+					<span class="email">itecsde@gmail.com</span>
+				</div>
+				<div class="logo_uvigo">
+					<%= image_tag "../images/logo_uvigo.png"%>
+				</div>					
+			</div>
+		</div>
+		
+	</div>
+
+
+
+<% end %>

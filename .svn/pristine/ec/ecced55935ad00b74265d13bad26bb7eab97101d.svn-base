@@ -1,0 +1,53 @@
+<% if @technological_setting.errors.any? %>
+<div id="error_explanation">
+  <h2><%= pluralize(@technological_setting.errors.count, "error") %> prohibited this activity from being saved:</h2>
+  <ul>
+  <% @technological_setting.errors.full_messages.each do |msg| %>
+    <li><%= msg %></li>
+  <% end %>
+  </ul>
+</div> 
+<% end %>
+
+<div class="technological_setting_id">
+	<%= f.hidden_field :id %>
+</div>
+<div class="technological_setting_status">
+	<%= f.hidden_field :status, :value => "instance" %>
+</div>
+<div class="technological_setting_name editable active">
+	<%= f.text_field :name, :class => "technological_setting_title", :placeholder => t("title")  %>
+	<i class="icon-pencil icon-grey"></i>
+</div>
+<div class="clear"></div>
+<div class="technological_setting_description editable active">
+	<textarea id="technological_setting_description" name="technological_setting[description]" placeholder="<%= t("Description") %>"><%= @technological_setting.description %></textarea>
+	<i class="icon-pencil icon-grey"></i>
+</div>
+<hr/>
+<div id="technological_setting_editable_tools" >
+	<div class="devices" >
+		<h2 class="tools_labels"><%=t :devices %></h2>
+		<a class="add_device_box" onclick="open_area_popup('#technological_setting_device_selection','/selectors/paginate_elements/?element_class=technological_setting_device_selection');">
+			<span style="font-size:33px; color: #828387;">+</span>
+		</a>
+		<% @technological_setting.devices.each do |selected_device| %>
+			<%= render :partial => "technological_settings/tool_square_box" , :locals => {:tool_type => "device", :selected_tool => selected_device} %>
+		<% end %>
+	</div>
+	<div class="applications">
+		<h2 class="tools_labels"><%=t :applications %></h2>
+		<div class="add_application_box" onclick="open_area_popup('#technological_setting_application_selection','/selectors/paginate_elements/?element_class=technological_setting_application_selection');">
+			<span style="font-size:33px; color: #828387;">+</span>
+		</div>			
+		<% @technological_setting.applications.each do |selected_application| %>
+			<%= render :partial => "technological_settings/tool_square_box" , :locals => {:tool_type => "application", :selected_tool => selected_application} %>
+		<% end %>
+	</div>		
+</div>
+
+<div class="clear"></div>
+<br/>
+
+<div id="attributes" style="display: none"></div>	
+

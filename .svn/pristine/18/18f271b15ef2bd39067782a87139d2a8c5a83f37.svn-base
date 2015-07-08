@@ -1,0 +1,1060 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl" 
+
+class ScraperSites
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+    
+
+  #############################################################################
+  #                               scrape_spainisculture                       #
+  #############################################################################
+  
+ def scrape_spainisculture(*reintentos)
+
+    require 'rubygems'
+    require 'nokogiri'
+    require 'open-uri'
+
+    url="http://www.spainisculture.com/en/"
+    source_name = __method__.to_s    
+    #Add new source, or select it if exists
+    source = Source.create_or_select_source(source_name, "Site", url)
+    
+    begin        
+      cats_seleccionadas = ['arquitectura_y_monumentos','patrimonio_natural', 'patrimonio_mundial','museos','bibliotecas','rutas','destinos']
+      i=0
+
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+
+      page = Nokogiri::HTML(open(url))
+      reintentos = 2
+      temas = page.css("div.directorio div.accordion1 div.lista1")[2]
+
+      temas.css("ul.lista_directorio2 li").each do |category|
+        category = category.css("a")[0]['href']
+        category = category.split("/")[3].strip 
+        if category.in?(cats_seleccionadas)
+          sleep 2
+          scrape_category_spainisculture("http://www.spainisculture.com/en/temas/" + category + "/ccaa.html")
+        end
+      end     
+      #Scrape was correct => fill in the source fields
+      source.correct_scrape
+    rescue  Exception => e
+      puts "Exception in scrape_spainisculture"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Reintentos scrape_spanisculture: " + reintentos.to_s
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_spainisculture(1,reintentos)
+      end
+      #Scrape was not correct => fill in the source fields
+      source.incorrect_scrape
+    end
+
+  end #scrape_spainisculture
+
+def scrape_category_spainisculture(category_url, *opcionales)
+
+    puts "category: " + category_url
+
+    begin
+
+      if opcionales[0]==1
+      reintentos = opcionales[1].to_i
+      else
+      reintentos = 2
+      end     
+      
+      if opcionales[0]!=1
+        category_page = Nokogiri::HTML(open(category_url))
+        reintentos = 2   
+        category_page.css("div#menu990 div.fila990 div.item_small_990").each do |site|  
+          scrape_site_spainisculture "http://www.spainisculture.com" + site.css("a")[0]['href']
+        end         
+        category_page.css("div#menu990 div.fila990 div.item_small990_right").each do |site|
+          scrape_site_spainisculture "http://www.spainisculture.com" + site.css("a")[0]['href']
+        end
+      end
+      
+         
+      if opcionales[0] != 1         
+        siguiente = "http://www.spainisculture.com" + category_page.css("div#menusubhome div#pager2.pager div.dd div.next a")[0]['href']
+        #siguiente = "http://www.spainisculture.com/en/temas/arquitectura_y_monumentos/ccaa.html?start=976&category_folder=&estilo=&comunidad=&fs="
+      else
+        siguiente = opcionales[2]
+      end
+      
+      
+      while siguiente != nil
+        sleep 2
+        puts "URL_SIGUIENTE --> " + siguiente
+        category_page2 =  Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+       
+        category_page2.css("div#menu990 div.fila990 div.item_small_990").each do |site|
+          scrape_site_spainisculture "http://www.spainisculture.com" + site.css("a")[0]['href']
+        end
+        category_page2.css("div#menu990 div.fila990 div.item_small990_right").each do |site|
+          scrape_site_spainisculture "http://www.spainisculture.com" + site.css("a")[0]['href']
+        end
+
+
+        if category_page2.css("div#menusubhome div#pager2.pager div.dd div.next a").empty?
+          siguiente = nil
+        else
+          siguiente = "http://www.spainisculture.com" + category_page2.css("div#menusubhome div#pager2.pager div.dd div.next a")[0]['href']
+        end
+      end
+      
+
+    rescue  Exception => e
+      puts "Exception in scrape_category_spainisculture"
+      puts "Reintentamos dos veces, sino saltamos de categoria"
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Reintentos scrape_category_spanisculture: " + reintentos.to_s
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_category_spainisculture(category_url,1,reintentos,siguiente)
+      end
+    end
+
+  end #scrape_category_spainisculture
+
+
+ def scrape_site_spainisculture(site_url,*reintentos)
+
+    begin
+      idiomas_disponibles = [:es,:fr,:en]
+      puts "  Site URL: " + site_url
+      sleep 0.2      
+      scraped_site=Site.new
+     
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+       
+      name = ""
+      description = ""
+
+      site_page = ""
+      idiomas_disponibles.each do |idioma|
+        I18n.locale = idioma
+        begin
+          site_url_locale = site_url.gsub("/en/","/" + idioma.to_s + "/")
+          #puts site_url_locale
+          puts "Obteniendo información en idioma " + idioma.to_s
+          site_page = Nokogiri::HTML(open(site_url_locale))
+          begin
+            name = site_page.css("div.bloquearriba div#detalle div.tema h2")[0].text.strip().gsub(/\n/," ").gsub(/\s+/,' ')
+            scraped_site.name = name
+            puts "Name: " + name
+          rescue
+            puts "Failed name spainisculture"
+          end       
+          begin
+            description = ""
+            if (!site_page.css("div.bloquearriba div.col660 div.text p.entradilla").empty?) && (site_page.css("div.bloquearriba div.col660 div.text p"))      
+              entradilla = strip_tags site_page.css("div.bloquearriba div.col660 div.text p.entradilla")[0].text.strip
+              description = strip_tags site_page.css("div.bloquearriba div.col660 div.text p")[1].text.strip        
+              description = entradilla + description       
+            elsif !site_page.css("div.bloquearriba div.col660 div.text p").empty?     
+              description = strip_tags site_page.css("div.bloquearriba div.col660 div.text p")[0].text.strip
+            else
+              site_page.css("div.col660 div.texttools p").each do |parrafo|
+                description = description + (strip_tags parrafo.text.strip)
+              end
+            end
+            
+            if description == "Timetables"
+              site_page.css("div.col660 div.texttools p").each do |parrafo|
+                description = description + (strip_tags parrafo.text.strip)
+              end
+            end
+            scraped_site.description = description
+            #puts "Description: " + description
+          rescue
+            puts "Failed description spainisculture"        
+          end
+          
+          scraped_site.link = site_url_locale
+          
+        rescue Exception => e
+          puts "Failed name-description idiomas spainisculture"
+          puts e.message
+          puts e.backtrace.inspect
+        end     
+      end #do |idioma|        
+      
+
+      begin
+      address = strip_tags site_page.css("div.bloque3 div.izq span")[0].text.strip.gsub(/\n/," ").gsub(/\s+/,' ')
+      #puts "Address: " + address
+      rescue
+        puts "Failed Address spainisculture"
+      end
+      
+      if address!=nil
+        begin
+          scraper=Scraper.new
+          arr_coordinates=scraper.geolocate_address(address)
+          
+          if arr_coordinates.size>1
+            latitude=arr_coordinates[0]
+            longitude=arr_coordinates[1]
+            puts latitude
+            puts longitude
+          end
+          
+          if arr_coordinates.size >= 1
+            scraped_site.scraping_status.geolocalized = true
+            if arr_coordinates.size > 1
+              scraped_site.scraping_status.geolocalized_by = arr_coordinates[2]
+            else
+              scraped_site.scraping_status.geolocalized_by = arr_coordinates[0]
+            end 
+          end
+          
+        rescue
+          puts "Failed Geolocation spainisculture"
+        end
+      end     
+     
+      begin
+        photo_url = site_page.css("div#outcarrusel ul li img")[0]['src']
+        photo_url = "http://www.spainisculture.com" + photo_url
+        #puts "Photo url: " + photo_url
+      rescue
+        photo_url=nil
+        puts "Failed Photo spainisculture"
+      end
+                  
+      begin          
+        etiquetas = ""       
+        (1..2).each do |n|
+          if !site_page.css("div.bloque" + n.to_s + " div").empty?
+                site_page.css("div.bloque" + n.to_s + " div").each do |item|
+                  if ((item.text.include? "Category") || (item.text.include? "Style"))
+                    etiquetas =  etiquetas  + "," + item.text.strip.gsub(/\n/," ").gsub(/\s+/,' ')
+                  end
+                end 
+          else if !site_page.css("div.bloque" + n.to_s).empty?
+              site_page.css("div.bloque" + n.to_s).each do |item|
+                if ((item.text.include? "Category") || (item.text.include? "Style"))
+                  etiquetas  =   etiquetas  + "," + item.text.strip.gsub(/\n/," ").gsub(/\s+/,' ')
+                end
+              end
+            end
+          end
+        end
+
+        etiquetas = etiquetas.gsub("Category",",").gsub("Date",",").gsub("Style",",").gsub("Artist",",")       
+        etiquetas = etiquetas.split(",")       
+        etiquetas.delete_if { |element| element == ""}         
+       rescue
+         puts "Failed Human Tags spainisculture"
+       end
+       
+      prosa = name + ". " + description
+      
+      scraped_from="https://www.spainisculture.com/"
+      scraped_site.url=site_url
+      scraped_site.scraped_from=scraped_from
+      scraped_site.address = address
+      scraped_site.latitude = latitude
+      scraped_site.longitude = longitude
+      
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_site.element_image=URI.parse(photo_url)
+        rescue
+          puts "spainisculture:  IMAGEN NO GUARDADA"
+        scraped_site.element_image.clear
+        end
+      end
+      
+      scraped_site.persist(idiomas_disponibles,prosa,etiquetas)
+      reintentos = 2
+      
+    rescue Exception => e
+      puts "Exception scrape_site_spainisculture"
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Reintentos scrape_site_spanisculture: " + reintentos.to_s
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_site_spainisculture(site_url,1,reintentos)
+      end
+    end
+
+  end #scrape_site_spainisculture
+
+
+  #############################################################################
+  #                               scrape_unesco                               #
+  #############################################################################
+
+ def scrape_unesco(*reintentos)
+
+    require 'rubygems'
+    require 'nokogiri'
+    require 'open-uri'
+    url = "http://whc.unesco.org/en/list/"
+    
+    source_name = __method__.to_s    
+    #Add new source, or select it if exists
+    source = Source.create_or_select_source(source_name, "Site", url)
+
+    begin
+      i=0
+
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+      page = Nokogiri::HTML(open(url))
+      reintentos = 2
+
+      page.css("div#acc.box div.list_site ul li.mixed").each do |site|
+        puts i+=1
+        scrape_site_unesco "http://whc.unesco.org" + site.css("a")[0]['href']
+      end
+      
+      page.css("div#acc.box div.list_site ul li.cultural_danger").each do |site|
+        puts i+=1
+        scrape_site_unesco "http://whc.unesco.org" + site.css("a")[0]['href']
+      end
+      
+      page.css("div#acc.box div.list_site ul li.cultural").each do |site|
+        puts i+=1
+        scrape_site_unesco "http://whc.unesco.org" + site.css("a")[0]['href']
+      end
+      
+      page.css("div#acc.box div.list_site ul li.natural").each do |site|
+        puts i+=1
+        scrape_site_unesco "http://whc.unesco.org" + site.css("a")[0]['href']
+      end
+      
+      page.css("div#acc.box div.list_site ul li.natural_danger").each do |site|
+        puts i+=1
+        scrape_site_unesco "http://whc.unesco.org" + site.css("a")[0]['href']
+      end
+
+      puts "El numero total de sites es: " + i.to_s
+      #Scrape is correct => fill in the source fields
+      source.correct_scrape
+    rescue  Exception => e
+      puts "Exception in scrape_unesco"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_unesco(1,reintentos)
+      end
+      #Scrape was no correct => fill in the source fields
+      source.incorrect_scrape
+    end
+  end #scrape_unesco
+
+
+ def scrape_site_unesco(site_url,*reintentos)
+    begin
+      puts "URL: " + site_url
+      idiomas_disponibles = [:fr,:ru,:es,:nl,:en]
+         
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end
+      
+      site_page = Nokogiri::HTML(open(site_url))
+      scraped_site=Site.new
+
+      name = ""
+      description = ""
+        
+      idiomas_disponibles.each do |idioma|
+      I18n.locale = idioma
+      begin
+        #puts event_url_locale
+        puts "Obteniendo información en idioma " + idioma.to_s
+        begin
+          name = site_page.css("div.box div#contentdes_" + idioma.to_s + ".tab-content h6")[0].text.strip().gsub(/\n/," ").gsub(/\s+/,' ')
+          scraped_site.name = name
+          puts "Name: " + name
+        rescue
+          puts "Failed name unesco"
+        end       
+        begin
+          description = strip_tags site_page.css("div.box div#contentdes_" + idioma.to_s + ".tab-content p")[0].text.strip        
+          scraped_site.description = description
+          #puts "Description: " + description
+        rescue
+          puts "Failed description unesco"        
+        end
+        
+        scraped_site.link = site_url
+        
+      rescue Exception => e
+        puts "Failed name-description idiomas unesco"
+        puts e.message
+        puts e.backtrace.inspect
+      end     
+    end #do |idioma|  
+ 
+      begin
+        photo_url = site_page.css("div.box div.icaption a img")[0]['data-src']
+        photo_url = "http://whc.unesco.org" + photo_url
+        #puts "Photo url: " + photo_url
+      rescue
+        photo_url=nil
+        puts "Failed Photo unesco"
+      end
+                   
+      begin         
+        pais = ""
+        contador=0
+        site_page.css("div.box div.relatedContent div a strong").each do |paises|
+          pais = paises.text.strip + ", " + pais
+          contador+=1
+        end
+  
+        pais[pais.length-2]=""   
+        pais = pais.strip
+        address = site_page.css("div.box div.relatedContent div")[contador].text.strip
+        address = address + ", " + pais      
+        #puts "Address: " + address
+      rescue
+        puts "Failed Address unesco"
+      end        
+      
+      begin      
+        array_numeros = ["0","1","2","3","4","5","6","7","8","9"]
+        
+        if ((address[0]=="N" || address[0]=="S") && address[1].in?(array_numeros))
+          address = pais
+          coordenadas = site_page.css("div.box div.relatedContent div")[contador].text
+        else         
+          coordenadas = site_page.css("div.box div.relatedContent div")[contador+1].text
+        end
+        
+        #puts "Coordenadas: " + coordenadas              
+        coord_lat = coordenadas.split(" ")[0] + " " + coordenadas.split(" ")[1] + " " +  coordenadas.split(" ")[2]
+        coord_long = coordenadas.split(" ")[3] + " " + coordenadas.split(" ")[4] + " " +  coordenadas.split(" ")[5]   
+        punto_card_lat = coordenadas.split(" ")[0][0]
+        punto_card_long = coordenadas.split(" ")[3][0]
+        grados_lat = coordenadas.split(" ")[0]
+        grados_long = coordenadas.split(" ")[3]      
+        grados_lat[0] = ""    
+        grados_long[0] = ""
+                                
+        latitude = (grados_lat.to_f + (coordenadas.split(" ")[1].to_f * 1/60) + (coordenadas.split(" ")[2].to_f * 1/60 * 1/60))         
+        if (punto_card_lat == 'S' || punto_card_lat =="W")
+          latitude = latitude * -1
+        end
+            
+        longitude = (grados_long.to_f + (coordenadas.split(" ")[4].to_f * 1/60) + (coordenadas.split(" ")[5].to_f * 1/60 * 1/60))        
+        if (punto_card_long == 'S' || punto_card_long =="W")
+          longitude = longitude * -1
+        end
+          
+        #puts latitude
+        #puts longitude  
+      rescue
+        puts "Failed geolocation unesco"
+      end       
+      
+      more_prosa_to_wikify = ""
+      begin
+        site_page.css("div.ym-grid div.ym-g66 div.ym-gbox-left div.box").each do |box|
+          if box.css("h5").text == "Long Description"
+            box.css("p").each do |parrafo|
+              more_prosa_to_wikify = more_prosa_to_wikify + parrafo
+            end
+          end
+        end           
+      rescue 
+        puts "Failed more_prosa_to_wikify unesco"
+      end
+             
+      prosa = name + ". " + description + ". " + more_prosa_to_wikify       
+      
+      scraped_from="http://whc.unesco.org"
+      #I18n.locale = "en"
+      scraped_site.url=site_url
+      scraped_site.scraped_from=scraped_from
+      scraped_site.latitude = latitude
+      scraped_site.longitude = longitude
+      scraped_site.address = address
+      scraped_site.scraping_status.geolocalized = true
+      scraped_site.scraping_status.geolocalized_by = "manual"        
+
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_site.element_image=URI.parse(photo_url)
+        rescue
+          puts "unesco:  IMAGEN NO GUARDADA"
+          scraped_site.element_image.clear
+        end
+
+      end
+     
+      scraped_site.persist(idiomas_disponibles,prosa,[])
+      scraped_site.scraping_status.save
+      reintentos = 2
+  
+    rescue Exception => e
+      puts "Exception scrape_site_unesco"
+      puts e.backtrace.inspect
+      puts e.message
+      puts "Reintentos scrape_site_unesco: " + reintentos.to_s
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_site_unesco(site_url,1,reintentos)
+      end
+    end
+
+  end #scrape_site_unesco
+
+
+  #############################################################################
+  #                       scrape_tripadvisor(contry)                          #
+  #############################################################################
+
+ def scrape_tripadvisor(place,*reintentos)
+
+    require 'rubygems'
+    require 'nokogiri'
+    require 'open-uri'
+      
+    case place.downcase
+    when "hungary"
+      url = "http://www.tripadvisor.co.uk/Attractions-g274881-Activities-Hungary.html"
+    when "belgium"
+      url = "http://www.tripadvisor.co.uk/Attractions-g188634-Activities-Belgium.html"
+    when "slovakia"
+      url = "http://www.tripadvisor.co.uk/Attractions-g274922-Activities-Slovakia.html"
+    when "france"
+      url = "http://www.tripadvisor.co.uk/Attractions-g187070-Activities-France.html"
+    when "norway"
+      url = "http://www.tripadvisor.co.uk/Attractions-g190455-Activities-Norway.html"
+    when "lithuania"
+      url = "http://www.tripadvisor.co.uk/Attractions-g274947-Activities-Lithuania.html"
+    when "portugal"
+      url = "http://www.tripadvisor.co.uk/Attractions-g189100-Activities-Portugal.html"
+    when "spain"
+      url = "http://www.tripadvisor.co.uk/Attractions-g187427-Activities-Spain.html"   
+    when "turkey"
+      url = "http://www.tripadvisor.co.uk/Attractions-g293969-Activities-Turkey.html"
+    when "europe"
+      url = "http://www.tripadvisor.co.uk/Attractions-g4-Activities-Europe.html"
+    when "asia"
+      url = "http://www.tripadvisor.co.uk/Attractions-g2-Activities-Asia.html"
+    when "africa"
+      url = "http://www.tripadvisor.co.uk/Attractions-g6-Activities-Africa.html"
+    when "canada"
+      url = "http://www.tripadvisor.co.uk/Attractions-g153339-Activities-Canada.html"
+    when "us"
+      url = "http://www.tripadvisor.co.uk/Attractions-g191-Activities-United_States.html"
+    when "mexico"
+      url = "http://www.tripadvisor.co.uk/Attractions-g150768-Activities-Mexico.html"
+    when "central america"
+      url = "http://www.tripadvisor.co.uk/Attractions-g291958-Activities-Central_America.html"
+    when "south america"
+      url = "http://www.tripadvisor.co.uk/Attractions-g13-Activities-South_America.html"
+    when "oceania"
+      url = "http://www.tripadvisor.co.uk/Attractions-g8-Activities-South_Pacific.html"
+    when "antarctica"
+      url = "http://www.tripadvisor.co.uk/Attractions-g12-Activities-Antarctica.html"
+    when "middle east"
+      url = "http://www.tripadvisor.co.uk/Attractions-g21-Activities-Middle_East.html"   
+    end
+    
+    puts "Escrapeando tripadvisor " + place
+
+    begin
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+
+      page = Nokogiri::HTML(open(url))
+      reintentos = 2
+
+      page.css("div.geos_grid div.geos_row div.geo_wrap div.geo_entry div.geo_info div.geo_name a").each do |city|
+         scrape_city_tripadvisor "http://www.tripadvisor.co.uk" + city['href'], url
+      end
+           
+      if !page.css("div.pagination div.pgLinks a.guiArw.sprite-pageNext").empty?      
+        siguiente = "http://www.tripadvisor.co.uk" + page.css("div.pagination div.pgLinks a.guiArw.sprite-pageNext")[0]['href']
+      else
+        siguiente = nil
+      end
+      
+      while siguiente != nil
+        sleep 2
+        puts "URL_SIGUIENTE --> " + siguiente
+        page2 =  Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+       
+        page2.css("div#LOCATION_LIST.deckB ul.geoList li").each do |site|
+          scrape_city_tripadvisor "http://www.tripadvisor.co.uk" + site.css("a")[0]['href'], url
+        end
+
+        if page2.css("div.pagination div.pgLinks a.guiArw.sprite-pageNext").empty?
+          siguiente = nil
+        else
+          siguiente = "http://www.tripadvisor.co.uk" + page2.css("div.pagination div.pgLinks a.guiArw.sprite-pageNext")[0]['href']
+        end
+      end
+          
+    rescue  Exception => e
+      puts "Exception in scrape_tripadvisor"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_tripadvisor(country,1,reintentos)
+      end
+    end
+  end #scrape_tripadvisor
+
+
+ def scrape_city_tripadvisor(city_url,url,*reintentos)
+    begin     
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+        else
+        reintentos = 2
+        end  
+              
+      puts "City_URL --> " + city_url
+
+
+      city_page = Nokogiri::HTML(open(city_url))
+      reintentos = 2
+      
+      if !city_page.css("div#category_filter_button_container div#style_button_row.filter_backdrop").empty?
+        cats_seleccionadas = ["Cultural","Museums","Landmarks","Amusement","Outdoors","Zoos & Aquariums"]
+     
+        city_page.css("div#MAIN.Attractions div#ATTRACTION_FILTER.overview div#CATEGORY_TABS.wrap div#ATTRTYPE_BOX.filterBox 
+        div#category_filter_button_container div#style_button_row.filter_backdrop table#category_filter_table.filter_table tr td").each do |categoria|
+          if !categoria.css("span").empty?
+            cat = categoria.css("span")[0].text.strip
+            puts "la categoria es: " + cat
+            if cat.in?(cats_seleccionadas)
+                scrape_category_tripadvisor "http://www.tripadvisor.co.uk" + categoria.css(".style_button_link a")[0]['href'], url
+            end
+          end 
+      end #do
+      else
+        scrape_category_tripadvisor(city_url,url)
+      end
+    
+    rescue  Exception => e
+      puts "Exception in scrape_city_tripadvisor"
+      puts "Reintentamos dos veces, sino saltamos a la siguiente ciudad"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_city_tripadvisor(city_url,url,1,reintentos)
+      end    
+    end  
+  end #scrape_city_tripadvisor
+  
+  
+  def scrape_category_tripadvisor(category_url,url, *opcionales)
+    
+   begin
+     if opcionales[0]==1
+        reintentos = opcionales[1].to_i
+        else
+        reintentos = 2
+        end  
+      tags_human = Array.new  
+      puts "Category_URL --> " + category_url
+      
+      if opcionales[0]!=1
+        category_page = Nokogiri::HTML(open(category_url))  
+        reintentos = 2    
+        category_page.css("div.listing").each do |site|
+          begin
+            if !site.css("div.sizedThumb a.photo_link img.photo_image").empty?
+              photo_url = site.css("div.sizedThumb a.photo_link img.photo_image")[0]['src']
+              photo_url = photo_url.gsub("photo-l","photo-s")
+            else
+              photo_url=nil
+            end
+          rescue
+            puts "Failed Photo Tripadvisor"
+            photo_url = nil
+          end
+     
+          if !site.css("div.wrap div.entry div.information span").empty?
+            tags = site.css("div.wrap div.entry div.information span")[0].next.text.strip
+            tags_human = tags.split(";")
+          end
+          scrape_site_tripadvisor "http://www.tripadvisor.co.uk" + site.css("div.quality a.property_title")[0]['href'], photo_url,tags_human,url
+        end
+      end
+      
+      
+      if opcionales[0] != 1                
+        if !category_page.css("div#pager_bottom.pgLinks a.guiArw.sprite-pageNext").empty?      
+          siguiente = "http://www.tripadvisor.co.uk" + category_page.css("div#pager_bottom.pgLinks a.guiArw.sprite-pageNext")[0]['href']
+        else
+          siguiente = nil
+        end
+      else
+        siguiente = opcionales[2]
+      end                
+      
+      
+      begin
+        while siguiente != nil
+          sleep 2
+          puts "URL_SIGUIENTE --> " + siguiente
+          category_page2 =  Nokogiri::HTML(open(siguiente))
+          reintentos = 2      
+          category_page2.css("div.listing").each do |site|
+             if !site.css("div.sizedThumb a.photo_link img.photo_image").empty?
+               photo_url = site.css("div.sizedThumb a.photo_link img.photo_image")[0]['src']
+               photo_url = photo_url.gsub("photo-l","photo-s")
+             else
+               photo_url = nil
+             end
+            if !site.css("div.wrap div.entry div.information span").empty?
+              tags = site.css("div.wrap div.entry div.information span")[0].next.text.strip
+              tags_human = tags.split(";")
+            end   
+            scrape_site_tripadvisor "http://www.tripadvisor.co.uk" + site.css("div.quality a.property_title")[0]['href'], photo_url,tags_human,url
+          end
+  
+          if category_page2.css("div#pager_bottom.pgLinks a.guiArw.sprite-pageNext").empty?
+            siguiente = nil
+          else
+            siguiente = "http://www.tripadvisor.co.uk" + category_page2.css("div#pager_bottom.pgLinks a.guiArw.sprite-pageNext")[0]['href']
+          end
+        end
+      rescue
+         puts "Failed Pagination Tripadvisor"
+      end
+    rescue  Exception => e
+      puts "Exception in scrape_category_tripadvisor"
+      puts "Reintentamos dos veces, sino cambiamos de categoria"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_category_tripadvisor(category_url,url,1,reintentos,siguiente)
+      end 
+    end
+  end #scrape_category_tripadvisor
+  
+  
+  def scrape_site_tripadvisor(site_url,photo_url,tags_human,url,*reintentos)  
+    begin
+      puts ""
+      puts "Site_URL --> " + site_url
+      urls_idiomas_disponibles = ["http://www.tripadvisor.es",
+        "http://www.tripadvisor.it",
+        "http://www.tripadvisor.de",
+        "http://www.tripadvisor.fr",
+        "http://www.tripadvisor.com.br",
+        "http://www.tripadvisor.se",
+        "http://www.tripadvisor.nl",
+        "http://www.tripadvisor.com.tr",
+        "http://www.tripadvisor.dk",
+        "http://www.tripadvisor.com.gr",
+        "http://no.tripadvisor.com",
+        "http://pl.tripadvisor.com",
+        "http://www.tripadvisor.ru",
+        "http://www.tripadvisor.co.uk"]
+      idiomas_disponibles = [:es,:it,:de,:fr,:pt,:sv,:nl,:tr,:da,:el,:no,:pl,:ru,:en]
+          
+      if reintentos[0]==1
+          reintentos = reintentos[1].to_i
+        else
+          reintentos = 2
+        end
+        
+      scraped_site = Site.new
+      
+      site_page = ""
+      address = ""
+      name = ""
+      description = ""
+          
+      urls_idiomas_disponibles.each do |url_idioma|
+        if url_idioma ==  "http://www.tripadvisor.es"
+          I18n.locale = "es" 
+        elsif url_idioma ==  "http://www.tripadvisor.it"
+          I18n.locale = "it"
+        elsif url_idioma ==  "http://www.tripadvisor.de"
+          I18n.locale = "de"
+        elsif url_idioma ==  "http://www.tripadvisor.fr"
+          I18n.locale = "fr"
+        elsif url_idioma ==  "http://www.tripadvisor.com.br"
+          I18n.locale = "pt"
+        elsif url_idioma ==  "http://www.tripadvisor.se"
+          I18n.locale = "sv"
+        elsif url_idioma ==  "http://www.tripadvisor.nl"
+          I18n.locale = "nl"
+        elsif url_idioma ==  "http://www.tripadvisor.com.tr"
+          I18n.locale = "tr"
+        elsif url_idioma ==  "http://www.tripadvisor.dk"
+          I18n.locale = "da"
+        elsif url_idioma ==  "http://www.tripadvisor.com.gr"
+          I18n.locale = "el"
+        elsif url_idioma ==  "http://no.tripadvisor.com"
+          I18n.locale = "no"
+        elsif url_idioma ==  "http://pl.tripadvisor.com"
+          I18n.locale = "pl"
+        elsif url_idioma ==  "http://www.tripadvisor.ru"
+          I18n.locale = "ru"
+        elsif url_idioma ==  "http://www.tripadvisor.co.uk"
+          I18n.locale = "en"
+        end
+
+        begin
+          site_url_locale = site_url.gsub("http://www.tripadvisor.co.uk",url_idioma)
+          #puts site_url_locale
+          puts "Obteniendo información en idioma " + I18n.locale.to_s
+          site_page = Nokogiri::HTML(open(site_url_locale))
+          begin
+            name = ""
+            name = site_page.css("div#headingWrapper.headerWrapPadding h1#HEADING")[0].text.strip().gsub(/\n/," ").gsub(/\s+/,' ')
+            scraped_site.name = name
+            puts "Name: " + name
+          rescue
+            puts "Failed name tripadvisor"
+          end       
+          begin
+            description = ""
+            if !site_page.css("div.listing_description div#TOGGLE_ME_1.toggle span.onShow b.info-label").empty?  
+              description = strip_tags site_page.css("div.listing_description div#TOGGLE_ME_1.toggle span.onShow b.info-label")[0].next.text.strip        
+              #puts "Description: " + description 
+            elsif !site_page.css("div.listing_details div.listing_description b").empty?       
+               description = strip_tags site_page.css("div.listing_details div.listing_description b")[0].next.text.strip
+               #puts "Description: " + description
+            end        
+            
+            if !site_page.css("div.listing_details div.listing_description a").empty?
+              if site_page.css("div.listing_details div.listing_description a")[0].text.strip.include?  "more"
+                url_description = url_idioma + site_page.css("div.listing_details div.listing_description a")[0]['href']
+                description_page = Nokogiri::HTML(open(url_description))
+                if !description_page.css("div#ARTICLE div.articleBody").empty?
+                  description = ""                
+                  description = strip_tags description_page.css("div#ARTICLE div.articleBody")[0].text
+                end                  
+              end
+            end
+    
+            scraped_site.description = description
+            #puts "Description: " + description
+          rescue
+            puts "Failed description tripadvisor"        
+          end
+          
+          scraped_site.link = site_url_locale
+          
+        rescue Exception => e
+          puts "Failed name-description idiomas tripadvisor"
+          puts e.message
+          puts e.backtrace.inspect
+        end     
+      end #do |url_idioma|
+      
+      begin
+        street = ""
+        locality_postalcode = ""
+        country = ""
+        
+        if !site_page.css("div.wrap span.street-address").empty?
+          street = site_page.css("div.wrap span.street-address")[0].text.strip
+        end
+        if !site_page.css("div.wrap span.locality span").empty?
+          site_page.css("div.wrap span.locality span").each do |locality_pc|
+            locality_postalcode = locality_postalcode + locality_pc.text.strip + ", "
+          end
+          locality_postalcode[locality_postalcode.length-1]=""
+          locality_postalcode[locality_postalcode.length-1]=""
+        end
+        if !site_page.css("div.wrap span.country-name").empty?
+          country = site_page.css("div.wrap span.country-name")[0].text.strip
+        end        
+        
+        address = street + ", " + locality_postalcode + ", " + country      
+       
+        if address[0]==","
+          address[0]=""
+        end    
+     
+        address = address.strip    
+        #puts "Address: " + address
+      rescue
+        puts "Failed Address tripadvisor"
+      end
+       
+      if address!=nil
+          begin
+            scraper=Scraper.new
+            arr_coordinates=scraper.geolocate_address(address)
+            if arr_coordinates.size>1
+              latitude=arr_coordinates[0]
+              longitude=arr_coordinates[1]
+              puts latitude
+              puts longitude
+            end
+            if arr_coordinates.size >= 1
+              scraped_site.scraping_status.geolocalized = true
+              if arr_coordinates.size > 1
+                scraped_site.scraping_status.geolocalized_by = arr_coordinates[2]
+              else
+                scraped_site.scraping_status.geolocalized_by = arr_coordinates[0]
+              end 
+            end
+          rescue
+            puts "Failed geolocation tripadvisor"
+          end
+        end
+        
+      prosa=""
+      begin
+        reviews=0
+        if !site_page.css("div.full_wrap div.col2of2 div.rs a.more span").empty?
+          reviews = site_page.css("div.full_wrap div.col2of2 div.rs a.more span")[0].text.gsub(",","")
+        end
+        puts "  El numero de reviews es: " + reviews.to_s
+              
+        if reviews.to_i >= 5     
+          reviews_url = "http://www.tripadvisor.co.uk" + site_page.css(".reviewSelector")[0].css("div.review div.col2of2 div.quote a")[0]['href']
+          puts "  reviews URL: " + reviews_url
+          reviews_page = Nokogiri::HTML(open(reviews_url))
+          reviews_text = ""
+          reviews_page.css(".reviewSelector").each do |review|
+            if !review.css("div.review div.col2of2 div.entry").empty?       
+              reviews_text = reviews_text + " " + review.css("div.review div.col2of2 div.entry")[0].text.strip
+            end          
+          end
+          if reviews.to_i > 5 # => hay más de una pagina
+            puts "hay mas de una pagina de reviews"
+            reviews_url = "http://www.tripadvisor.co.uk" + reviews_page.css("div.pagination div.pgLinks a.guiArw").last['href']
+            reviews_page = Nokogiri::HTML(open(reviews_url))
+            reviews_page.css(".reviewSelector").each do |review|
+              if !review.css("div.review div.col2of2 div.entry").empty?       
+                reviews_text = reviews_text + " " + review.css("div.review div.col2of2 div.entry")[0].text.strip
+              end          
+            end
+          end  
+          #puts "la prosa para el wikify es: "
+          prosa = name + ". " + description + " " + reviews_text
+          prosa = prosa.truncate(63000)
+          #puts prosa           
+        end #if reviews > 5         
+      rescue Exception => e
+        puts "Exception tags_automatictripadvisor"
+        puts e.message
+        puts e.backtrace.inspect 
+      end
+          
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_site.element_image=URI.parse(photo_url)
+        rescue
+          puts "tripadvisor:  IMAGEN NO GUARDADA"
+          scraped_site.element_image.clear
+        end
+      end   
+      
+      scraped_from=url
+      #I18n.locale = "en"
+      scraped_site.address = address
+      scraped_site.url=site_url
+      scraped_site.scraped_from=scraped_from
+      scraped_site.latitude = latitude
+      scraped_site.longitude = longitude
+              
+      scraped_site.persist(idiomas_disponibles,prosa,tags_human)
+      reintentos = 2
+          
+    rescue  Exception => e
+      puts "Exception in scrape_site_tripadvisor"
+      puts "Reintentamos dos veces, sino saltamos al siguiente site"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_site_tripadvisor(site_url,photo_url,tags_human,url,1,reintentos)
+      end     
+    end  
+  end #scrape_site_tripadvisor
+  
+  
+ 
+  
+  
+  def geolocalize_sites_again
+      Site.where("scraped_from != ?", "http://whc.unesco.org").each do |site|
+        sleep 0.2
+        if site.address!=nil && site.address!=""      
+          begin
+            scraper=Scraper.new            
+            arr_coordinates=scraper.geolocate_address(site.address)            
+            if arr_coordinates.size>1
+                latitude=arr_coordinates[0]
+                longitude=arr_coordinates[1]
+                site.latitude = latitude
+                site.longitude = longitude
+            if arr_coordinates.size >= 1
+                scraped_site.scraping_status.geolocalized = true
+                if arr_coordinates.size > 1
+                  scraped_site.scraping_status.geolocalized_by = arr_coordinates[2]
+                else
+                  scraped_site.scraping_status.geolocalized_by = arr_coordinates[0]
+                end 
+            end               
+            else
+                site.latitude=""
+                site.longitude =""
+            end
+            site.save!
+          rescue
+              puts "¡¡¡¡¡FAILED GEOLOCATION!!!!!"
+          end
+        end
+     end
+  end
+  
+end

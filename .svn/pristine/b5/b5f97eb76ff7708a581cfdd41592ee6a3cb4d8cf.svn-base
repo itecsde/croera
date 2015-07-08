@@ -1,0 +1,17 @@
+<div class="filters">
+    	<div><%= submit_tag 'Save'%></div>
+		<div class="filter_column">
+			<ul>
+				<li>
+					<%= t('Sort_by') %>
+				</li>
+				<li>	
+					<%= radio_button_tag 'sort', 'name', true %>Name<br/>
+				</li>
+				<li>	
+					<%= radio_button_tag 'sort', 'date' %>Date
+				</li>	
+			</ul>
+		</div>
+	
+</div>

@@ -1,0 +1,35 @@
+class Util
+  
+  
+  def self.to_hashtag(tag_text)
+    if tag_text != nil && tag_text != ""
+      return "#" + tag_text.strip().gsub(" ","_")
+    else 
+      return ""
+    end    
+  end
+  
+  
+  def self.to_hashtag_with_language(tag_text)
+    if tag_text != nil && tag_text != ""
+      case I18n.locale
+        when :en
+          return "#" + tag_text.strip().gsub(" ","_")
+        else
+          return "#" + tag_text.strip().gsub(" ","_") + "@"+I18n.locale.to_s      
+        end
+    else 
+      return ""
+    end    
+  end  
+  
+  
+  def self.to_tag(hashtag_text)
+    if hashtag_text != nil && hashtag_text != ""      
+      return hashtag_text.strip().gsub("_"," ").gsub("#","")
+    else 
+      return ""
+    end    
+  end
+  
+end 

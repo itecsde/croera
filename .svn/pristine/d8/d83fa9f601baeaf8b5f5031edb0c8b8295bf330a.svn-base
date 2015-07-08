@@ -1,0 +1,79 @@
+class Person < ActiveRecord::Base
+  include Taggable
+  include Ownable
+  include Aggregable
+  include Categorizable
+  include Scrapeable  
+  
+  translates :description
+  geocoded_by :address
+  after_validation :geocode    
+  
+  searchable do
+    integer :id    
+    text :name
+    latlon(:location) { Sunspot::Util::Coordinates.new(latitude, longitude) }
+    text :tags do |p|
+      p.tags.map(&:name)
+    end
+    text :categories do |p|
+      p.categories.map(&:name)
+    end
+    text :subjects do |p|
+      p.subjects.map(&:name)
+    end
+    string :translations, :multiple => true do
+      translations.map{|translation| translation.locale}
+    end  
+    string :itec_id      
+    I18n.available_locales.each do |locale|
+      text "description_" + locale.to_s do
+        read_attribute(:description, :locale => locale.to_s)
+      end
+    end
+    
+    integer :owner_id
+    time :updated_at
+  end
+  
+  has_many :comments, :as => :commentable, :dependent => :destroy
+  
+  has_many :person_concrete_requirement_person_annotations
+  has_many :person_concrete_requirement_person_assignments
+  has_many :contributor_requirement_person_assignments
+  
+  has_many :person_subject_annotations, :dependent => :destroy
+  has_many :subjects, :through => :person_subject_annotations
+  accepts_nested_attributes_for :person_subject_annotations, :allow_destroy => :true
+  
+  # Relationship with bookmarked_by users
+  has_many :bookmark_user_element_annotations, :as => :element, :dependent => :destroy
+  has_many :bookmarked_by, :through => :bookmark_user_element_annotations, :source =>:user
+  
+  
+  has_many :person_language_annotations, :dependent => :destroy
+  has_many :contextual_languages, :through => :person_language_annotations
+  accepts_nested_attributes_for :person_language_annotations, :allow_destroy => :true
+  
+  belongs_to :mother_tongue, :class_name => "ContextualLanguage", :foreign_key => "mother_tongue_id"
+ 
+  attr_accessible :element_image, :name, :description, :url, :person_subject_annotations_attributes, :person_language_annotations_attributes, :mother_tongue_id, :address, :latitude, :longitude, :owner_type, :owner_id, :tag_list
+  has_attached_file :element_image, :styles => { :original => "300x300>", :medium => "200x200>", :thumb => "30x30>" }, :default_url => "none"
+  
+  def persist(prosa,array_tags)
+    self.info_to_wikify = prosa
+    self.create_semantic_annotations(array_tags)
+    automatic_tags_ids = self.create_automatic_semantic_annotations(prosa)
+    #self.categorize(automatic_tags_ids)
+  end
+  
+  def tag_list
+    self.tags.map { |t| t.name }.join(", ")
+  end
+
+  def tag_list=(new_value)
+    tag_names = new_value.split(/,\s+/)
+    self.tags = tag_names.map { |name| Tag.where('name = ?', name).first or Tag.create(:name => name.strip) }
+  end
+  
+end

@@ -1,0 +1,426 @@
+.container_home {
+	width: 1268px;
+	margin: 0 auto;
+	margin-top:50px;
+	font-family:"Arial";
+}
+.container_home_logged {
+	width: 1268px;
+	margin: 0 auto;
+	margin-top:20px;
+	font-family:"Arial";
+}
+
+.home_search {
+	width: 1268px;
+	margin: 0 auto;
+	margin-top:20px;
+	height:45px;
+}
+
+.home_search_bar {
+	width: 1268px;
+	margin: 0 auto;
+}
+.home_search_bar input[type="text"] {
+	height:35px;
+	border:2px solid #aca5b7;
+	width:1184px;
+	font-size:18px;
+	-webkit-border-radius: 1px;
+	-moz-border-radius: 1px;
+	border-radius: 1px;
+	box-shadow: 0 0px 0px rgba(0, 0, 0, 0) inset;
+	padding:4px 6px;
+}
+
+.home_search_bar_public{
+	width: 1268px;
+	margin: 0 auto;
+}
+
+.home_search_bar_public input[type="text"] {
+	height:35px;
+	border:1px solid #aca5b7;
+	width:1188px;
+	font-size:18px;
+	-webkit-border-radius: 1px;
+	-moz-border-radius: 1px;
+	border-radius: 1px;
+	box-shadow: 0 0px 0px rgba(0, 0, 0, 0) inset;
+	position:relative;
+	top:-16px;	
+	padding:4px 6px;
+}
+
+.submit_search_bar{	
+	background-color: #534A5F;
+	width: 65px;
+	height: 45px;
+}
+
+.first_row, .second_row {
+	width: inherit;
+}
+
+.first_row {
+	height: 170px;
+	width: 1238px;
+	background: #F0E7F8;
+	padding: 15px;
+	overflow: hidden;
+}
+
+.first_row .first_text_box {
+	float: left;
+	width: 634px;
+	height: inherit;
+}
+
+.first_row .second_text_box, .first_row .third_text_box {
+	float: left;
+	width: 274px;
+	height: inherit;
+	margin-left: 28px;
+}
+
+.first_row h3 {
+	color: #4FA1EA;
+	line-height: 25px;
+	font-size: 24.5px;	
+}
+
+.first_row p {
+	text-align: justify;
+	margin-top: 10px;
+	font-weight:bold;
+}
+
+.second_row {
+	height: 414px;
+	margin-top: 25px; 
+}
+
+.second_row .first_column, .second_row .second_column, .second_row .third_column {
+	float: left;
+	width: 414px;
+	height: 414px;
+}
+
+.second_row .first_column, .second_row .second_column {
+	
+}
+
+.second_row .third_column {
+	background: red;
+}
+
+.second_row .first_column, .second_row .second_column {
+	margin-right: 13px;
+}
+
+.second_row .second_column {
+	
+}
+
+.second_row .first_column .discover_row, .second_row .second_column .create_row{
+	height: 200px;
+	background: #393045;
+	color: white;
+	border: 1px solid #42A7FF;
+}
+
+.second_row .first_column .discover_row:hover, .second_row .second_column .create_row:hover{
+	
+	/*background: #1786e2; /* Old browsers */
+	/*background: -moz-linear-gradient(top,  #1786e2 0%, #0574ce 100%); /* FF3.6+ */
+	/*background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1786e2), color-stop(100%,#0574ce)); /* Chrome,Safari4+ */
+	/*background: -webkit-linear-gradient(top,  #1786e2 0%,#0574ce 100%); /* Chrome10+,Safari5.1+ */
+	/*background: -o-linear-gradient(top,  #1786e2 0%,#0574ce 100%); /* Opera 11.10+ */
+	/*background: -ms-linear-gradient(top,  #1786e2 0%,#0574ce 100%); /* IE10+ */
+	/*background: linear-gradient(to bottom,  #1786e2 0%,#0574ce 100%); /* W3C */
+	/*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1786e2', endColorstr='#0574ce',GradientType=0 ); /* IE6-9 */
+}
+
+.second_row .first_column .discover_row h3, .second_row .second_column .create_row h3 {
+	padding: 20px;
+}
+
+
+.discover_row, .create_row {
+	position:relative;
+	cursor:pointer;	
+}
+
+.discover_row h3, .create_row h3{
+	color:#695E77;
+	font-size: 24.5px;
+}
+.discover_row.active h3, .create_row.active h3{
+	color:#FFFFFF;
+}
+
+
+
+.discover_row img, .create_row img{
+	position:absolute;
+	right:0px;
+	bottom:0px;
+	width:400px;
+	height:200px;
+	-moz-opacity: 0.15;
+	opacity: 0.15;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=15);	
+}
+
+.discover_row.active img, .create_row.active img{	
+	-moz-opacity: 1;
+	opacity: 1;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=100);	
+}
+
+.second_row .first_column .relevant_resources_row,.second_row .second_column .relevant_resources_row {
+	height: 200px;
+	margin-top: 13px;
+}
+
+.relevant_resource_box {
+	float: left;
+	height: 200px;
+	width: 200px;
+	background: #FFFFFF;
+} 
+
+.relevant_resource_box:first-child {
+	margin-right: 13px;
+}
+
+.mini_extract {
+	position: relative;
+	height: inherit;	
+	background-repeat: no-repeat;
+	background-size: 100%;
+	-webkit-background-size: cover;
+  	-moz-background-size: cover;
+  	-o-background-size: cover;
+  	background-size: cover;
+  	cursor:pointer;
+}
+
+.mini_extract.mini_extract_create {
+	display:none;
+}
+
+.mini_extract .mini_extract_header, .mini_extract .mini_extract_footer {
+	background: #463D52;
+	-moz-opacity: 0.70;
+	opacity: 0.70;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=70);	
+}
+
+.mini_extract .mini_extract_header {
+	height: 30px;	
+}
+
+.mini_extract .mini_extract_header p, .mini_extract .mini_extract_footer p {
+	color: white; 
+	font-weight: bold;
+}
+
+.mini_extract .mini_extract_header p {
+	padding: 5px;
+}
+
+.mini_extract .mini_extract_footer {
+	position: absolute;
+	width: 200px;
+	bottom: 0px;
+	height: 40px;	
+}
+
+.mini_extract .mini_extract_footer p {
+	padding-right: 5px;
+	text-align: right;
+	font-size: 11px;
+	padding-left:5px;		
+}
+
+.mini_extract .mini_extract_footer p:first-child {
+	padding-top: 3px;
+}
+
+
+
+/********************** ESTOS ESTILOS SON PARA EL CAROUSEL DEL BOOTSTRAP ***************************/
+.clearfix {
+  	*zoom: 1;
+}
+.clearfix:before, .clearfix:after {
+  	display: table;
+  	content: "";
+  	line-height: 0;
+}
+.clearfix:after {
+  	clear: both;
+}
+.hide-text {
+	  font: 0/0 a;
+	  color: transparent;
+	  text-shadow: none;
+	  background-color: transparent;
+	  border: 0;
+}
+.input-block-level {
+  	display: block;
+  	width: 100%;
+  	min-height: 30px;
+  	-webkit-box-sizing: border-box;
+  	-moz-box-sizing: border-box;
+  	box-sizing: border-box;
+}
+.carousel {
+  	position: relative;
+  	margin-bottom: 20px;
+  	line-height: 1;
+}
+.carousel-inner {
+  	overflow: hidden;
+  	width: 100%;
+  	position: relative;
+}
+.carousel-inner > .item {
+ 	display: none;
+  	position: relative;
+  	-webkit-transition: 0.6s ease-in-out left;
+  	-moz-transition: 0.6s ease-in-out left;
+  	-o-transition: 0.6s ease-in-out left;
+  	transition: 0.6s ease-in-out left;
+}
+.carousel-inner > .item > img, .carousel-inner > .item > a > img {
+  	display: block;
+  	line-height: 1;
+}
+.carousel-inner > .active, .carousel-inner > .next, .carousel-inner > .prev {
+  	display: block;
+}
+.carousel-inner > .active {
+  	left: 0;
+}
+.carousel-inner > .next, .carousel-inner > .prev {
+  	position: absolute;
+  	top: 0;
+  	width: 100%;
+}
+.carousel-inner > .next {
+  	left: 100%;
+}
+.carousel-inner > .prev {
+  	left: -100%;
+}
+.carousel-inner > .next.left,.carousel-inner > .prev.right {
+  	left: 0;
+}
+.carousel-inner > .active.left {
+  	left: -100%;
+}
+.carousel-inner > .active.right {
+  	left: 100%;
+}
+.carousel-control {
+  	position: absolute;
+  	top: 40%;
+  	left: 15px;
+  	width: 40px;
+  	height: 40px;
+  	margin-top: -20px;
+  	font-size: 60px;
+  	font-weight: 100;
+  	line-height: 30px;
+  	color: #ffffff;
+  	text-align: center;
+  	background: #222222;
+  	border: 3px solid #ffffff;
+  	-webkit-border-radius: 23px;
+  	-moz-border-radius: 23px;
+  	border-radius: 23px;
+  	opacity: 0.5;
+  	filter: alpha(opacity=50);
+}
+.carousel-control.right {
+  	left: auto;
+  	right: 15px;
+}
+.carousel-control:hover, .carousel-control:focus {
+  	color: #ffffff;
+  	text-decoration: none;
+  	opacity: 0.9;
+  	filter: alpha(opacity=90);
+}
+.carousel-indicators {
+  	position: absolute;
+  	top: 15px;
+  	right: 15px;
+  	z-index: 5;
+  	margin: 0;
+  	list-style: none;
+}
+.carousel-indicators li {
+  	display: block;
+  	float: left;
+  	width: 10px;
+  	height: 10px;
+  	margin-left: 5px;
+  	text-indent: -999px;
+  	background-color: #ccc;
+  	background-color: rgba(255, 255, 255, 0.25);
+  	border-radius: 5px;
+}
+.carousel-indicators .active {
+  	background-color: #fff;
+}
+.carousel-caption {
+  	position: absolute;
+  	left: 0;
+  	right: 0;
+  	bottom: 0;
+  	padding: 15px;
+  	background: #463D52;
+  	-moz-opacity: 0.70;
+  	opacity: 0.70;
+  	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=70);
+}
+.carousel-caption h4, .carousel-caption p {
+  	color: #ffffff;
+  	line-height: 20px;
+}
+.carousel-caption h4 {
+  	margin: 0 0 5px;
+}
+.carousel-caption p {
+	margin-bottom: 0;
+	font-size:12px;
+	font-weight:bold;
+}
+/********************** FIN ESTILOS PARA EL CAROUSEL DEL BOOTSTRAP *********************************/
+
+
+.recommended_resources{
+	width: 1168px;
+	margin: 0 auto;
+	margin-top:20px;
+	font-family:"Arial";
+}
+.recommended_resources_type {
+	margin-bottom:20px;
+}
+
+.recommended_resources_type .prompt{
+	margin-bottom:10px;
+	font-weight:bold;
+	color: #433A4A;
+	font-size:16px;	
+}
+.recommended_resources_type .body {
+	margin-left:50px;
+}
+

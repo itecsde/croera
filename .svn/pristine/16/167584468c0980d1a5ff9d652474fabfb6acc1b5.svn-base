@@ -1,0 +1,173 @@
+<%
+	@no = Object.new
+	class << @no
+		attr_accessor :id
+		attr_accessor :name
+	end
+	@no.id = 0
+	@no.name = "no"
+	@yes = Object.new
+	
+	class << @yes
+		attr_accessor :id
+		attr_accessor :name
+	end
+	@yes.id = 1
+	@yes.name = "yes"
+	@has_internet = Array.new
+	@has_internet << @no
+	@has_internet << @yes
+
+	@has_interactive_whiteboard = Array.new
+	@has_interactive_whiteboard << @no
+	@has_interactive_whiteboard << @yes
+%>
+<div class="circumstance_page">
+	<div class="circumstance_header">
+		<div class="circumstance_icon">
+			<img src="/images/white_circumstance_60.png"></img>
+		</div>
+		<div class="circumstance_name_box">
+			<div class="name_prompt"><%= t("context") %></div>
+			<% if edition_on %>
+				<textarea class="circumstance_name" name="circumstance[name]"><% if @circumstance!=nil %><%= @circumstance.name %> <% end %></textarea>
+			<% else %>
+				<span class="circumstance_name"><% if @circumstance!=nil %><%= @circumstance.name %> <% end %></span>
+			<% end %>
+		</div>
+	</div>
+	<div class="circumstance_body">
+		<div class="school">
+			<div class="school_icon">
+				<img src="/images/black_school_100.png"></img>
+			</div>
+			<div class="address_prompt"><%= t("school_address") %></div>
+			<div class="field editable active">
+				<% if @circumstance!=nil && @circumstance.latitude!=nil && @circumstance.longitude!=nil%>
+					<input id="circumstance_latitude" class="latitude" name="circumstance[latitude]" type="hidden" value="<%= @circumstance.latitude %>"></input>
+					<input id="circumstance_longitude" class="longitude" name="circumstance[longitude]" type="hidden" value="<%= @circumstance.longitude %>"></input>
+				<% else %>
+					<input id="circumstance_latitude" class="latitude" name="circumstance[latitude]" type="hidden"></input>
+					<input id="circumstance_longitude" class="longitude" name="circumstance[longitude]" type="hidden"></input>
+				<% end %>
+				<% if edition_on %>
+					<textarea id="circumstance_address" class="address" name="circumstance[address]" onChange="change_location_written();" onkeypress="return press_key(event)"><% if @circumstance!=nil %><%= @circumstance.address %> <% end %></textarea>
+				<% else %>
+					<span class="address"><% if @circumstance!=nil %><%= @circumstance.address %> <% end %></span>	
+				<% end %>
+			</div>
+			<div id="map-canvas"></div>
+		</div>
+		<div class="classroom">
+			<div class="classroom_icon">
+				<img src="/images/black_classroom_100.png"></img>
+			</div>
+			<ul>
+				<li>
+					<span class="prompt"><%= t("has_internet") %></span>
+					<% if edition_on %>
+						<% if @circumstance!=nil && @circumstance.has_internet!=nil%>						
+							<%= select_tag "circumstance[has_internet]", options_from_collection_for_select(@has_internet, "id", "name",(@circumstance.has_internet ? 1 : 0)), :class => "has_internet" %>
+						<% else %>
+							<%= select_tag "circumstance[has_internet]", options_from_collection_for_select(@has_internet, "id", "name"), :class => "has_internet" %>
+						<% end %>
+					<% else %>
+						<span class="has_internet"><% if @circumstance!=nil %><%= @circumstance.has_internet %><% end %></span>	
+					<% end %>
+				</li>	
+				<li>
+					<span class="prompt"><%= t("operating_system") %></span>
+					<% if edition_on %>
+						<% if @circumstance!=nil && @circumstance.operating_system!=nil%>
+							<%= select_tag "circumstance[operating_system_id]", options_from_collection_for_select(@operating_systems, "id", "name",@circumstance.operating_system.id), :class => "operating_system" %>
+						<% else %>
+							<%= select_tag "circumstance[operating_system_id]", options_from_collection_for_select(@operating_systems, "id", "name"), :class => "operating_system" %>
+						<% end %>
+					<% else %>
+						<span class="operating_system"><% if @circumstance!=nil %><%= @circumstance.operating_system.name %><% end %></span>	
+					<% end %>
+				</li>	
+				<li>
+					<span class="prompt"><%= t("has_interactive_whiteboard") %></span>
+					<% if edition_on %>
+						<% if @circumstance!=nil && @circumstance.has_interactive_whiteboard!=nil%>
+							<%= select_tag "circumstance[has_interactive_whiteboard]", options_from_collection_for_select(@has_interactive_whiteboard, "id", "name",(@circumstance.has_interactive_whiteboard ? 1 : 0)), :class => "has_interactive_whiteboard" %>
+						<% else %>
+							<%= select_tag "circumstance[has_interactive_whiteboard]", options_from_collection_for_select(@has_interactive_whiteboard, "id", "name"), :class => "has_interactive_whiteboard" %>
+						<% end %>
+					<% else %>					
+						<span class="has_interactive_whiteboard"><% if @circumstance!=nil %><%= @circumstance.has_interactive_whiteboard %><% end %></span>	
+					<% end %>
+				</li>	
+			</ul>	
+		</div>
+		<div class="class">
+			<div class="class_icon">
+				<img src="/images/black_class_100.png"></img>
+			</div>
+			<ul>
+				<li>
+					<span class="prompt"><%= t("educational_level") %></span>
+					<% if edition_on %>
+						<% if @circumstance!=nil && @circumstance.educational_level!=nil%>
+							<%= select_tag "circumstance[educational_level_id]", options_from_collection_for_select(@educational_levels, "id", "name",@circumstance.educational_level.id), :class => "educational_level" %>
+						<% else %>
+							<%= select_tag "circumstance[educational_level_id]", options_from_collection_for_select(@educational_levels, "id", "name"), :class => "educational_level" %>
+						<% end %>
+					<% else %>
+						<span class="educational_level"><% if @circumstance!=nil %><%= @circumstance.educational_level.name %><% end %></span>	
+					<% end %>
+				</li>	
+				<li>
+					<span class="prompt"><%= t("language") %></span>
+					<% if edition_on %>
+						<% if @circumstance!=nil && @circumstance.locale!=nil%>
+							<%= select_tag "circumstance[locale_id]", options_from_collection_for_select(@locales, "id", "name",@circumstance.locale.id), :class => "locale" %>
+						<% else %>
+							<%= select_tag "circumstance[locale_id]", options_from_collection_for_select(@locales, "id", "name"), :class => "locale" %>
+						<% end %>
+					<% else %>
+						<span class="locale"><% if @circumstance!=nil %><%= @circumstance.locale.name %><% end %></span>	
+					<% end %>
+				</li>	
+			</ul>	
+		</div>
+		<div class="subject_box">
+			<div class="subject_icon">
+				<img src="/images/black_subject_100.png"></img>
+			</div>
+			<ul>
+				<li>
+					<span class="prompt"><%= t("subject") %></span>
+					<% if edition_on %>
+						<% if @circumstance!=nil && @circumstance.subject!=nil%>
+							<%= select_tag "circumstance[subject_id]", options_from_collection_for_select(@subjects, "id", "name",@circumstance.subject.id), :class => "subject" %>
+						<% else %>
+							<%= select_tag "circumstance[subject_id]", options_from_collection_for_select(@subjects, "id", "name"), :class => "subject" %>
+						<% end %>
+					<% else %>
+						<span class="subject"><% if @circumstance!=nil %><%= @circumstance.subject.name %><% end %></span>	
+					<% end %>
+				</li>	
+				<li>
+					<div class="prompt"><%= t("tags_comma_separated") %></div>
+					<% if edition_on %>
+						<textarea class="tags" name="circumstance[tag_list]"><% if @circumstance!=nil %><%= @circumstance.tag_list %><% end %></textarea>
+					<% else %>
+						<div class="tags"><% if @circumstance!=nil %><%= @circumstance.tag_list %><% end %></div>	
+					<% end %>
+				</li>
+				<li>
+					<div class="prompt"><%= t("narrative_description") %></div>
+					<% if edition_on %>
+						<textarea class="description" name="circumstance[description]"><% if @circumstance!=nil %><%= @circumstance.description %><% end %></textarea>
+					<% else %>
+						<div class="description"><% if @circumstance!=nil %><%= @circumstance.description %><% end %></div>	
+					<% end %>
+				</li>		
+			</ul>	
+		</div>			
+	</div>
+</div>
+
+<script src="/javascript/circumstance_form.js"></script>

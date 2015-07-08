@@ -1,0 +1,219 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+
+class ScraperBiographies
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+  
+  #############################################################
+  ####### SCRAPE_BIOGRAPHY
+  ###########################################################
+  def scrape_biography (*siguiente)
+    begin
+      if siguiente[1]==1
+        reintentos = siguiente[2]
+      else
+        reintentos = 2
+      end
+      
+      url = "http://www.biography.com/people/all?view=gallery&sort=last-name&page=1"
+
+      if siguiente[1]!=1
+        page = Nokogiri::HTML(open(url))
+        reintentos = 2
+      
+        page.css(".center-second-column-content ul.gallery-list li a.dot").each do |biography|
+          biography_url = "http://www.biography.com" + biography['href']
+          puts biography_url
+          scrape_biography_biography biography_url
+        end
+      end
+
+      if siguiente[1]!=1
+        page.css("div.pagination ul li a.red-underline span").each do |pagina|
+          if pagina.text.strip == "Next Page"
+            siguiente = "http://www.biography.com" + pagina.parent['href']
+            break
+          else
+            siguiente = nil
+          end
+        end
+      else
+        siguiente = siguiente[0]
+      end
+
+      while siguiente != nil
+        sleep 2
+        puts "URL_SIGUIENTE --> " + siguiente
+        page2 =  Nokogiri::HTML(open(siguiente))
+        reintentos = 2
+
+        page2.css("div.center-second-column-content ul.gallery-list li a").each do |biography|
+          biography_url = "http://www.biography.com" + biography['href']
+          puts biography_url
+          scrape_biography_biography biography_url
+        end
+
+        page2.css("div.pagination ul li a.red-underline span").each do |pagina|
+          if pagina.text.strip == "Next Page"
+            siguiente = "http://www.biography.com" + pagina.parent['href']
+            break
+          else
+            siguiente = nil
+          end
+        end
+      end
+
+    rescue  Exception => e
+      puts "Exception in scrape_biography"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.backtrace.inspect
+      puts e.message
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_biography(siguiente,1,reintentos)
+      end
+    end
+  end #scrape_biography
+  
+  def scrape_biography_biography(biography_url, *reintentos)
+    begin
+      name = ""
+      description = ""
+
+      puts "biography---" + biography_url
+      idiomas_disponibles = ["en"]
+      human_tags = Array.new
+
+      if reintentos[0]==1
+        reintentos = reintentos[1].to_i
+      else
+        reintentos = 2
+      end              
+      biography_page = Nokogiri::HTML(open(biography_url))
+      scraped_biography = Biography.new      
+
+      begin
+        name = biography_page.css("span#name-of-profile-title.dot")[0].text.strip
+        puts "Name: " + name 
+      rescue
+        puts "Exception name biography"
+      end
+      
+      begin       
+        wikipediator = Wikipediator.new      
+        urls_translations = wikipediator.translations_urls(name.gsub(" ","%20"))
+        urls_translations.each do |url_translations|
+          begin
+          puts url_translations[:url]
+          puts "Obteniendo informacion en idioma: " + url_translations[:lang]
+          I18n.locale = url_translations[:lang]
+          wikipedia_page = Nokogiri::HTML(open(url_translations[:url].gsub(" ","%20")))
+          description = ""
+          wikipedia_page.css("div#mw-content-text p").each_with_index do |parrafo, index|
+            if index < 3
+              description = description + parrafo.text
+            end
+          end        
+          idiomas_disponibles << url_translations[:lang]
+          scraped_biography.description = description.gsub(/\[.\]/, "") #eliminamos los corchetes de este tipo [x], con x € [0,9]
+          scraped_biography.name = name
+          scraped_biography.link = biography_url
+          rescue
+            puts "Exceptions translation language => " + url_translations[:lang]
+          end
+        end
+      rescue Exception => e
+        puts "Exception translations biography"
+        puts e.message
+        puts e.backtrace.inspect
+      end   
+      
+      description = ""
+      begin
+        biography_page.css("div.center-column div#profile-biography h3").each do |h3|
+          if h3.text.strip != "Contents"
+            puts "H3 --> " + h3.text        
+            if !h3.next_element.css("p").empty?
+              h3.next_element.css("p").each do |parrafo|
+                puts "Texto --> " + (strip_tags parrafo.text.strip)
+                description = description + (strip_tags parrafo.text.strip)
+              end
+            else
+              puts "Texto --> " + h3.next_element.text
+              description = description + h3.next_element.text
+            end
+          end
+        end
+        #puts "Description: " + description
+      rescue Exception => e
+        puts "Exception description biography"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+       
+      begin
+        biography_page.css("div#quick-facts-module.module ul li span a").each do |human_tag|
+          if human_tag.parent.previous_element.text.strip == "OCCUPATION:"
+            human_tags << human_tag.text.strip     
+          end 
+        end
+        puts human_tags      
+      rescue Exception => e
+        puts "Failed Human Tags biography"
+        puts e.message
+        puts e.backtrace.inspect
+      end
+      
+      begin
+        photo_url = "http://www.biography.com" + biography_page.css("div#profile-photo-container img")[0]['src']
+      rescue
+        puts "Failed Photo biography"
+      end
+      
+      prosa = name + ". " + description
+             
+      scraped_from = "http://biography.com/"
+      I18n.locale = "en"
+      scraped_biography.name = name
+      scraped_biography.description = description
+      scraped_biography.url = biography_url
+      scraped_biography.link = biography_url
+      scraped_biography.scraped_from = scraped_from
+
+      if photo_url!=nil
+        begin
+          a = URI.parse(photo_url)
+          scraped_biography.element_image=URI.parse(photo_url)
+        rescue
+          puts "biography  IMAGEN NO GUARDADA"
+          scraped_biography.element_image.clear
+        end
+      end
+      
+      scraped_biography.persist(idiomas_disponibles,prosa,human_tags) 
+      reintentos = 2
+
+    rescue Exception => e
+      puts "Exception scrape_biography_biography"
+      puts e.backtrace.inspect
+      puts e.message
+      puts reintentos
+      if reintentos > 0
+        reintentos-=1
+        sleep 2
+        scrape_biography_biography(biography_url,photo_url,1,reintentos)
+      end
+    end
+    
+  end #scrape_biography_biography
+  
+  
+  
+
+end

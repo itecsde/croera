@@ -1,0 +1,119 @@
+<% if @article.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@article.errors.count, "error") %> prohibited this article from being saved:</h2>
+	
+	  <ul>
+	  <% @article.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+
+
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="article_name field_body">
+		<% if @edition_mode==true %>
+			<textarea id="article_name" name="article[name]" placeholder="<%= t("title") %>"><%= @article.name %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<span><%= @article.name %></span>
+		<% end %>
+	</div>
+	
+		
+	<div class="article_description description field_body">
+		<% if @edition_mode==true %>
+			<textarea id="article_description" name="article[description]" placeholder="<%= t("description") %>"><%= @article.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<div>
+				<% if @article.description != nil %>			
+					<%= raw @article.description.truncate(1000, :separator => " ", :omission => "...") %>
+				<% end %>
+				
+			</div>
+		<% end %>
+	</div>
+	
+	
+	<div class="article_tags element_field_box">
+		<div class="field_prompt"><%= t("keywords") %></div>
+		<div class="field_body">			
+			<% if @edition_mode==true %>    
+		    	<textarea id="article_tags" class="tags" name="article[tag_list]"><% if @article!=nil %><%= @article.tag_list %><% end %></textarea>
+		    	<i class="icon-pencil icon-grey"></i>
+		    <% else %>
+		    	<span class="tags"><% if @article!=nil %><%= @article.tag_list_with_links.html_safe %><% end %></span>	
+		    <% end %>														
+		</div>
+	</div>		
+	
+	
+	<div class="article_url element_field_box">
+		<div class="field_prompt"><%= t("url") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>    
+		    	<%= article_form.text_field :url %>
+		    	<i class="icon-pencil icon-grey"></i>			    	
+		    <% else %>
+		    	<a href="<%= @article.url %>" target="_blank"><%= @article.url %></a>
+		    <% end %>
+	   </div>		
+	</div>
+	
+	<% if @edition_mode!=true && @article.scraped_from!=nil && @article.scraped_from!="" %>  
+		<div class="article_scraped_from element_field_box">
+			<div class="field_prompt"><%= t("source") %></div>
+			<div class="field_body">
+				<a href="<%= @article.scraped_from %>" target="_blank"><%= @article.scraped_from %></a>
+			</div>
+		</div>
+	<% end %>
+	
+	
+</div>
+
+
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>		
+			<% if @article.element_image.url() != "none" %>
+				<%= image_tag @article.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_article.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= article_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		<% else %>
+			<% if @article.element_image.url() != "none" %>
+				<%= image_tag @article.element_image.url(:medium), width:'100%', :class => "image_preview_show" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_article.png", width:'100%', :class => "image_preview_show" %>
+			<% end %>
+		<% end %>
+	</div>
+
+</div>
+
+
+
+
+
+<% if @edition_mode==true %>
+	<div id="snippets_library" style="display: none">
+		<div class="subject_item">				
+			<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name"), :prompt => "", :class => "subject" %>
+			<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+		</div>
+	</div>
+<% end %>
+
+

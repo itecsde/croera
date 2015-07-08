@@ -1,0 +1,169 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+require 'feedzirra'
+
+class ScraperSlideshows
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+  
+  
+  def scrape_slideshare(*siguiente)
+    begin
+      if siguiente[1] == 1
+        reintentos = siguiente[1].to_i
+      else
+        reintentos = 2
+      end
+      
+      languages = ["en","es","pt","tr","sk","no","fi","lt","nl","hu"]
+      
+      languages.each do |language|
+        scrape_idioma_slideshare language
+      end
+      
+    rescue Exception => e
+      puts "Exception scrape_slideshare"
+      puts e.message
+      puts e.backtrace.inspect      
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_slideshare(1,reintentos)
+      end
+    end
+  end
+  
+  
+  def scrape_idioma_slideshare(language, *siguiente)
+    begin
+            
+      if siguiente[1] == 1
+        reintentos = siguiente[1].to_i
+      else
+        reintentos = 2
+      end
+              
+      if siguiente[1] != 1   
+        pagina_actual = 0
+      else
+        pagina_actual = siguiente[0]
+      end
+    
+                 
+      for i in pagina_actual..5264
+        I18n.locale = language
+        sleep 0.5
+        pagina_actual = i 
+        url_json = "http://www.slideshare.net/popular/language/" + language.to_s + "/year?format=json&page_offset=" + i.to_s
+   
+        opened_json = open(url_json).read
+        parsed_json = JSON.parse opened_json
+        page_html = parsed_json['html']
+
+        page = Nokogiri::HTML(page_html)
+        reintentos = 2
+      
+        page.css("div.grid_thumbnail_content").each do |slideshow|
+          slideshow_url =  "http://www.slideshare.net" + slideshow.css("div.details a.title")[0]['href']
+          photo_url =  slideshow.css("a.iso_slideshow_link")[0]['data-imageurl']
+          photo_url[0] = ""
+          photo_url[0] = ""
+          photo_url = "http://" + photo_url
+          scrape_slideshow_slideshare slideshow_url, photo_url, language
+        end  
+      end
+      
+    rescue Exception => e
+      puts "Exception scrape_idioma_slideshare"
+      puts "Reintentamos dos veces, sino abortamos"
+      puts e.message
+      puts e.backtrace.inspect
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        puts "antes de reintento, pag actual = " + pagina_actual.to_s
+        scrape_idioma_slideshare(language,pagina_actual.to_i + 1,1,reintentos)
+      end
+    end
+  end
+
+
+ def scrape_slideshow_slideshare(slideshow_url, photo_url, language, *reintentos)
+    begin
+      puts
+      puts "SLIDESHOW URL: " + slideshow_url
+      puts "PHOTO_URL: " + photo_url
+      idiomas_disponibles = Array.new
+      idiomas_disponibles << language
+      info_to_wikify = ""
+
+      if reintentos[0]==1
+      reintentos = reintentos[1].to_i
+      else
+      reintentos = 2
+      end
+
+      sleep 0.1
+
+      scraped_slideshow = Slideshow.new
+      slideshow_page = Nokogiri::HTML(open(slideshow_url))
+      reintentos = 2
+      begin
+        name = slideshow_page.css("div.title h1.h-slideshow-title")[0].text.strip
+        puts "Name: " + name
+      rescue
+        puts "Failed Name slideshare"
+      end
+
+      begin
+        description = slideshow_page.css("div.articleCore p.description")[0].text.strip
+        puts "Description: " + description
+      rescue
+        puts "Failed Description slideshare"
+      end
+
+      if photo_url!=nil
+        begin
+          scraped_slideshow.element_image = URI.parse(photo_url)
+        rescue
+          puts "slideshare:  IMAGEN NO GUARDADA"
+          scraped_slideshow.element_image.clear
+        end
+      end
+
+      begin
+        info_to_wikify = slideshow_page.css("div.notranslate ul.transcripts")[0].text.gsub(/\n/," ").gsub(/\s+/,' ').gsub("&"," ").gsub("%"," ").truncate(63000)
+      rescue
+        "Failed Info to wikify slideshare"
+      end
+
+      scraped_from = "http://www.slideshare.net"
+
+      scraped_slideshow.name = name
+      scraped_slideshow.description = description
+      scraped_slideshow.url = slideshow_url
+      scraped_slideshow.link = slideshow_url
+      scraped_slideshow.scraped_from = scraped_from
+      scraped_slideshow.persist(idiomas_disponibles,info_to_wikify,[])
+
+    rescue Exception => e
+      puts "Exception scrape_slideshow_slideshare"
+      puts "Reintentamos dos veces, sino saltamos de slideshow"
+      puts e.message
+      puts e.backtrace.inspect
+      if reintentos > 0
+        puts reintentos
+        reintentos-=1
+        sleep 2
+        scrape_slideshow_slideshare(slideshow_url, photo_url, language, 1,reintentos)
+      end
+    end
+  end
+
+
+end

@@ -1,0 +1,11 @@
+class Picture < ActiveRecord::Base
+  include Taggable
+  include Ownable
+  
+  has_one :experience_step_contribution_annotation, :as => :contribution
+  
+  has_many :comments, :as => :commentable, :dependent => :destroy
+  
+  has_many :boxes, :dependent => :destroy, :as => :document
+  accepts_nested_attributes_for :boxes, :allow_destroy => :true
+end

@@ -1,0 +1,16 @@
+<% if @num_results == 0 %>
+	<div class="no_results"><%= t('no_results')%></div>			
+<% end %>
+
+<% @applications.each do |application| %>
+	<%= render :partial => "elements/element_fixed", :locals => {:element => application, :current_layout => current_layout} %>
+<% end %>
+
+<div class="clear"></div>
+
+<div class= "paginate_controls active">
+	<%= paginate @applications %>
+</div>
+
+
+

@@ -1,0 +1,45 @@
+<%= render :partial => "header", :locals => {:section_title => (t :new_sequence), :actions => "form_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'activity_sequences', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'new_sequence', :actions => "activity_sequences/form_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<%= form_for(@activity_sequence,:html => { :class => "sequence_form"}) do |f_sequence| %>
+	
+		<%if @is_in_guide!=nil && @is_in_guide==false%>
+			<div id="element_header">
+				<%= render :partial => "generic_partials/ownership_group_small" , :locals => {:edition_mode => @edition_mode,:element => @activity_sequence,:element_type=>"activity_sequence"} %> 
+				<hr />
+				<div class="clear"></div>
+			</div>
+		<% end %>
+		<div id="content_container" class="sequence_container">			
+			<%= render :partial => "form" , :locals => {:f => f_sequence} %>
+			<%= render :partial => "submit", :locals => {:f => f_sequence} %>			
+			<input type="hidden" id="edition_mode" value="on"/>
+			<div id="elements_library">
+				<%= render :partial => "activities/adding_elements" %>
+			</div>
+			<div id="popups">
+				<%= render :partial => "activities/adding_popups" %>
+				<%= render :partial => "activity_sequences/adding_popups" %>
+			</div>
+			<div class="clear"></div>
+		</div>
+	<% end %>
+	
+	<script src="/javascript/jquery.colorbox-min.js"></script>
+	<script src="/javascript/jquery.ui.widget.js"></script>
+	<script src="/javascript/jquery.ui.core.min.js"></script>
+	<script src="/javascript/jquery.ui.mouse.min.js"></script>
+	<script src="/javascript/jquery.ui.accordion.min.js"></script>
+	<script src="/javascript/jquery.ui.draggable.min.js"></script>
+	<script src="/javascript/jquery.ui.droppable.min.js"></script>
+	<script src="/javascript/jquery.ui.sortable.min.js"></script>
+	
+	<script src="/javascript/activities_form.js"></script>
+	<script src="/javascript/activity_sequences_form.js"></script>
+	<script src="/javascript/activity_sequence_paginations.js"></script>
+<% end %>

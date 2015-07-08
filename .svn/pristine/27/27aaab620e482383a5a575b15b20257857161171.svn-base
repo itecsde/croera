@@ -1,0 +1,12 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'scenarios', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'scenario', :actions => "scenarios/scenario_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<div id="content_container" class="scenario_container">	
+		<%= render "scenario" %>
+	</div> <!-- CONTENT -->
+	<script src="/javascript/bootstrap_tooltip.js"></script>
+	<script src="/javascript/scenarios_form.js"></script>
+<% end %>

@@ -1,0 +1,1 @@
+var element_excerpt = ("<div><%=j  render :partial => 'elements/excerpt', :locals => {:element => @element, :current_layout => 'Application'} %></div>");

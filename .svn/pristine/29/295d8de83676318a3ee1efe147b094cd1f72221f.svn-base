@@ -1,0 +1,298 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'created_by_me', :current_layout => "created_by_me"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => t('created_by_me'), :actions => "list_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	
+	<div class="created_elements_page">
+		
+		<div class="created_by_me_scenarios list_elements_container">
+			<div class="prompt"><img src="/images/black_scenario_100.png"/><%= t("scenarios") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_scenarios.length %></span></span></div>
+			<% @created_scenarios.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= scenario_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_scenario.png')" onclick="window.location.href ='<%= scenario_path(element) %>';return false;">
+				<% end %>
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>	
+				</div>
+			<% end %>			
+		</div>
+		
+		<hr>		
+		
+		<div class="created_by_me_activities list_elements_container">
+			<div class="prompt"><img src="/images/black_activity_100.png"/><%= t("learning_activities") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_activities.length %></span></span></div>
+			<% @created_activities.each do |element| %>				
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= activity_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_activity.png')" onclick="window.location.href ='<%= activity_path(element) %>';return false;">
+				<% end %>
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>	
+				</div>
+			<% end %>			
+		</div>
+		
+		<hr>
+		<div class="created_by_me_activity_sequences list_elements_container">
+			<div class="prompt"><img src="/images/black_story_100.png"/><%= t("learning_stories") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_experiences.length %></span></span></div>
+			<% @created_experiences.each do |element| %>				
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= experience_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_story.png')" onclick="window.location.href ='<%= experience_path(element) %>';return false;">
+				<% end %>
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>	
+				</div>
+			<% end %>			
+		</div>
+		
+		<hr>
+		
+		<div class="created_by_me_applications list_elements_container">
+			<div class="prompt"><img src="/images/black_application_100.png"/><%= t("applications") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_applications.length %></span></span></div>
+			<% @created_applications.each do |element| %>					
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= application_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_application.png')" onclick="window.location.href ='<%= application_path(element) %>';return false;">
+				<% end %>
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>	
+				</div>
+			<% end %>			
+		</div>
+		
+		<hr>
+		
+		<div class="created_by_me_events list_elements_container">
+			<div class="prompt"><img src="/images/black_event_100.png"/><%= t("events") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_events.length %></span></span></div>
+			<% @created_events.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= event_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_event.png')" onclick="window.location.href ='<%= event_path(element) %>';return false;">
+				<% end %>						
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>
+			<% end %>
+		</div>
+		
+		<hr>
+		
+		<div class="created_by_me_biographies list_elements_container"> 
+			<div class="prompt"><img src="/images/black_biography_100.png"/><%= t("biographies") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_biographies.length %></span></span></div>
+			<% @created_biographies.each do |element| %>								
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= biography_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_biography.png')" onclick="window.location.href ='<%= biography_path(element) %>';return false;">
+				<% end %>						
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>	
+		
+		<hr>
+		
+		<div class="created_by_me_lectures list_elements_container"> 
+			<div class="prompt"><img src="/images/black_lecture_100.png"/><%= t("lectures") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_lectures.length %></span></span></div>
+			<% @created_lectures.each do |element| %>								
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= lecture_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_lecture.png')" onclick="window.location.href ='<%= lecture_path(element) %>';return false;">
+				<% end %>						
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>	
+		
+		<hr>
+		
+		<div class="created_by_me_sites list_elements_container"> 
+			<div class="prompt"><img src="/images/black_site_100.png"/><%= t("sites") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_sites.length %></span></span></div>
+			<% @created_sites.each do |element| %>								
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= site_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_site.png')" onclick="window.location.href ='<%= site_path(element) %>';return false;">
+				<% end %>						
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>
+		
+		
+		<hr>
+		
+		<div class="created_by_me_documentaries list_elements_container"> 
+			<div class="prompt"><img src="/images/black_documentary_100.png"/><%= t("documentaries") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_documentaries.length %></span></span></div>
+			<% @created_documentaries.each do |element| %>								
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= documentary_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_documentary.png')" onclick="window.location.href ='<%= documentary_path(element) %>';return false;">
+				<% end %>						
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>
+				
+		<hr>
+		
+		<div class="created_by_me_courses list_elements_container">
+			<div class="prompt"><img src="/images/black_course_100.png"/><%= t("courses") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_courses.length %></span></span></div>
+			<% @created_courses.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= course_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_course.png')" onclick="window.location.href ='<%= course_path(element) %>';return false;">
+				<% end %>						
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>
+			<% end %>
+		</div>
+		
+		
+		<hr>
+		
+		<div class="created_by_me_articles list_elements_container">
+			<div class="prompt"><img src="/images/black_article_100.png"/><%= t("articles") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_articles.length %></span></span></div>
+			<% @created_articles.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= article_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_article.png')" onclick="window.location.href ='<%= article_path(element) %>';return false;">
+				<% end %>						
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>
+			<% end %>
+		</div>
+		
+	
+		<hr>
+		
+		<div class="created_by_me_posts list_elements_container">
+			<div class="prompt"><img src="/images/black_post_100.png"/><%= t("posts") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_posts.length %></span></span></div>
+			<% @created_posts.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= post_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_post.png')" onclick="window.location.href ='<%= post_path(element) %>';return false;">
+				<% end %>						
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>
+			<% end %>
+		</div>
+
+
+		<hr>
+		
+		<div class="created_by_me_slideshows list_elements_container">
+			<div class="prompt"><img src="/images/black_slideshow_100.png"/><%= t("slideshows") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_slideshows.length %></span></span></div>
+			<% @created_slideshows.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= slideshow_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_slideshow.png')" onclick="window.location.href ='<%= slideshow_path(element) %>';return false;">
+				<% end %>						
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>
+			<% end %>
+		</div>
+		
+		
+		
+		<hr>
+		
+		<div class="created_by_me_reports list_elements_container">
+			<div class="prompt"><img src="/images/black_report_100.png"/><%= t("reports") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_reports.length %></span></span></div>
+			<% @created_reports.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= report_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_report.png')" onclick="window.location.href ='<%= report_path(element) %>';return false;">
+				<% end %>						
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>
+			<% end %>
+		</div>
+
+
+		<hr>
+		
+		<div class="created_by_me_lres list_elements_container">
+			<div class="prompt"><img src="/images/black_lre_100.png"/><%= t("lres") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_lres.length %></span></span></div>
+			<% @created_lres.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= lre_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_lre.png')" onclick="window.location.href ='<%= lre_path(element) %>';return false;">
+				<% end %>						
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>
+			<% end %>
+		</div>
+		
+		<hr>
+		
+		<div class="created_by_me_widgets list_elements_container">
+			<div class="prompt"><img src="/images/black_widget_100.png"/><%= t("widgets") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @created_widgets.length %></span></span></div>
+			<% @created_widgets.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="created_by_me_box" style="background-image:url(<%= element.element_image.url %>)" onclick="window.location.href ='<%= widget_path(element) %>';return false;">
+				<% else %>
+					<div class="created_by_me_box" style="background-image:url('/images/watermarks/b_watermark_widget.png')" onclick="window.location.href ='<%= widget_path(element) %>';return false;">
+				<% end %>						
+						<div class="created_by_me_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>
+			<% end %>
+		</div>
+			
+			
+			
+			
+			
+			
+			
+	</div>	
+
+	<div id="popups" class="popup_created_by_me_page">
+		<%= render :partial => "adding_popups" %> 
+	</div>
+
+<% end %>

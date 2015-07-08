@@ -1,0 +1,30 @@
+class Tag < ActiveRecord::Base
+  translates :name
+  
+  Globalize.fallbacks = {:en => [:en, :fi, :pt, :es], :pt => [:pt, :en, :es, :fi]}
+  
+  searchable do
+    text :name
+    integer :id
+  end
+  
+  has_many :taggable_tag_annotations
+  has_many :activities, :through => :taggable_tag_annotations, :source => :taggable, :source_type => 'Activity'
+  has_many :people,:through => :taggable_tag_annotations, :source => :taggable, :source_type => 'Person'  
+  has_many :event,:through => :taggable_tag_annotations, :source => :taggable, :source_type => 'Event'
+  has_many :application,:through => :taggable_tag_annotations, :source => :taggable, :source_type => 'Application'
+  has_many :circumstances,:through => :taggable_tag_annotations, :source => :taggable, :source_type => 'Circumstance'
+  
+    
+    
+  
+  def hashtag
+    if self.name != ""
+      return "#"+self.name.strip().gsub(" ","_")
+    else 
+      return ""
+    end    
+  end
+    
+  
+end

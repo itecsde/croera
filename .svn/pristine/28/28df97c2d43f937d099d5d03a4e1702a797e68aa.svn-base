@@ -1,0 +1,518 @@
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl" 
+  
+class ScraperPeople
+  
+  include Capybara::DSL
+
+  ##########################
+  #Function that check if de resource if whe need to insert new resource, 
+  #update existing one or do nothing because the resource is already updated
+  #########################
+  def check_resource_storage_state(type_resource,url,recent_hash)
+     result="do_nothing"
+     case type_resource
+        when "event"
+            event=Event.where(:url=> url)                  
+            if event.size > 0   
+              puts event[0].hash_resource           
+              if event[0].hash_resource != recent_hash
+                result="update"              
+              end
+            else
+              result="insert"              
+            end
+        when "application"
+            application=Application.where(:url=> url)
+            if application.size > 0
+              if application[0].hash_resource != recent_hash
+                result="update"            
+              end
+            else
+              result="insert"                 
+            end
+        when "person"
+            person=Person.where(:url=> url)
+            if person.size > 0
+              if person[0].hash_resource != recent_hash
+                result="update"            
+              end
+            else
+              result="insert"                
+            end
+     end
+     return result
+  end
+  
+  
+  
+  ############################################################################################
+  #############################################################################################  
+  
+  def scrape_scholar
+    base_url="http://scholar.google.es/citations?hl=en&view_op=search_authors&mauthors=label%3A"
+    Subject.all.each do |expertise|
+      url=base_url+expertise.name.gsub(/ /,"_")
+      scrape_category_scholar(url, 1)
+      puts expertise.name
+    end 
+  end
+  
+  
+  def scrape_category_scholar(category_url, input_number)
+    puts input_number
+    begin
+        puts "check 1"
+        if (input_number <= 20)
+          puts "check 2"
+          number = input_number + 1
+          puts "check scrape_category_scholar"
+          category_page = Nokogiri::HTML(open(category_url))
+          puts "check3"
+          category_page.css('div.g-unit').each do |person_block|
+            puts person_block.css('a.cit-dark-large-link')[0]['href']
+            scrape_person_scholar("http://scholar.google.es"+person_block.css('a.cit-dark-large-link')[0]['href'])
+            puts "check 10"
+          end
+          puts "check 11"
+          next_page = nil
+          if category_page.css('div.cit-dgb') != nil
+            puts "check 11.1"
+            if category_page.css('div.cit-dgb').css('a.cit-dark-link').size >= 2
+              next_page = category_page.css('div.cit-dgb').css('a.cit-dark-link')[1]['href']
+            end
+            puts "check 11.2"
+          end
+          puts "check 12"
+          if (next_page != nil && next_page != "")
+            puts "check 13"
+            scrape_category_scholar("http://scholar.google.es"+category_page.css('div.cit-dgb').css('a.cit-dark-link')[1]['href'], number)
+            puts "check 14"
+          end
+        end
+    rescue
+       puts "Fail scrape_category_scholar"
+       scrape_category_scholar(category_url, input_number)
+    end
+  end
+  
+  def scrape_person_scholar(url)
+    puts url
+    name = ""
+    description = ""
+    scraped_from="http://scholar.google.es"
+    puts "check scrape_person_scholar"  
+        begin
+          scraped_person=Person.new         
+          person_page = Nokogiri::HTML(open(url))
+          name=person_page.css('span#cit-name-display').text
+          description=person_page.css('span#cit-affiliation-display').text          
+          photo_url="http://scholar.google.es"+person_page.css('div.cit-user-info')[0].css('img')[0]['src']
+          tags=Array.new
+          person_page.css('span#cit-int-read').css('a').each do |key|
+            tags.push(key.text)
+          end
+          
+          puts name
+          #puts description
+          #puts photo_url
+          #puts keywords          
+          
+          hash_person=Digest::MD5.hexdigest(name+description)
+          check_result=check_resource_storage_state("person",url,hash_person)
+                    
+          if check_result=="insert"
+            begin                
+              scraper=Scraper.new
+              arr_coordinates=scraper.geolocate_address(description)
+              if arr_coordinates.size>1
+                latitude=arr_coordinates[0]
+                longitude=arr_coordinates[1]
+              end
+              if arr_coordinates.size >= 1
+                scraped_person.scraping_status.geolocalized = true
+                if arr_coordinates.size > 1
+                  scraped_person.scraping_status.geolocalized_by = arr_coordinates[2]
+                else
+                  scraped_person.scraping_status.geolocalized_by = arr_coordinates[0]
+                end 
+              end
+                          
+            rescue
+            end   
+            I18n.locale = "en"        
+            scraped_person.name=name
+            scraped_person.description=description          
+            scraped_person.url=url
+            if photo_url!=nil
+              scraped_person.element_image=URI.parse(photo_url)
+            end
+            scraped_person.latitude=latitude
+            scraped_person.longitude=longitude
+            scraped_person.scraped_from=scraped_from 
+            scraped_person.hash_resource=hash_person        
+            prosa = name + ". " + description
+            puts "la prosa es: " + prosa
+            scraped_person.persist(prosa,tags)    
+            scraped_person.save
+            scraped_person.reload
+            Sunspot.index scraped_person
+            Sunspot.commit
+            
+          elsif check_result == "update"
+             scraped_person=Person.where(:url=> url)[0]
+             puts "ACTUALIZAMOS la persona"
+             begin                
+              scraper=Scraper.new
+              arr_coordinates=scraper.geolocate_address(description)
+              if arr_coordinates.size>1
+                latitude=arr_coordinates[0]
+                longitude=arr_coordinates[1]
+              end
+              if arr_coordinates.size >= 1
+                scraped_person.scraping_status.geolocalized = true
+                if arr_coordinates.size > 1
+                  scraped_person.scraping_status.geolocalized_by = arr_coordinates[2]
+                else
+                  scraped_person.scraping_status.geolocalized_by = arr_coordinates[0]
+                end 
+              end            
+            rescue
+            end   
+            I18n.locale = "en"        
+            
+            scraped_person.name=name
+            scraped_person.description=description          
+            scraped_person.url=url
+            if photo_url!=nil
+              scraped_person.element_image=URI.parse(photo_url)
+            end
+            scraped_person.latitude=latitude
+            scraped_person.longitude=longitude
+            scraped_person.scraped_from=scraped_from 
+            scraped_person.hash_resource=hash_person  
+            scraped_person.save 
+            scraped_person.reload
+            Sunspot.index scraped_person
+            Sunspot.commit
+          else
+             puts "NO INSERTAMOS NI ACTULIZAMOS LA PERSONA"
+          end               
+        rescue Exception => e
+          puts "Fail scrape_person_scholar"
+          puts e.message
+          scrape_person_scholar(url)
+        end
+  end
+  
+  
+  ##################################################################################################
+  ##################################################################################################
+  def scrape_linkedin
+    require 'open-uri'
+    require 'nokogiri'
+
+    Subject.all.each do |subject|
+      begin
+        #doc = Nokogiri::HTML(open('https://www.google.es/search?num=100&q=site%3Alinkedin.com%2Fin%2F+allintext%3A+'+subject.name))
+
+        doc = Nokogiri::HTML(open('https://www.google.es/search?num=100&q=site%3Alinkedin.com%2Fin%2F+'+subject.name))
+        
+        doc.css('h3.r a').each do |link|
+          url=link['href']
+          url=url[url.index("http")..(url.index("&")-1)]                  
+          scrape_linkedin_person(url);
+          #break;           
+        end
+      rescue
+        puts "ERROR NOKOGIRI"
+      end 
+      #break 
+    end   
+  end
+  
+  
+  
+  def scrape_linkedin_person(url_person)
+    scraped_from="http://www.linkedin.com"
+      begin
+        scraped_person=Person.new
+        name = ""
+        description = ""
+        puts url_person
+        page = Nokogiri::HTML(open(url_person))    
+           
+        name=page.css("span.full-name")[0].text    
+        description=page.css("p.headline-title")[0].text.strip().gsub(/\n/," ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ')
+        photo_url=page.css("#profile-picture").css("img")[0]['src']  
+            
+        begin
+            address=page.css("span.locality")[0].text.strip().gsub(/\n/," ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ')
+        rescue
+          puts "Failed Address linkedin"
+        end
+                            
+        #begin
+        #    address=page.css("span.locality")[0].text.strip().gsub(/\n/," ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ')
+        #    coordinates=Geocoder.coordinates(address)
+        #    latitude=coordinates[0]
+        #    longitude=coordinates[1]
+        #rescue
+        #end
+        
+        tags=Array.new  
+        tags.push(page.css('.industry')[0].text.strip().gsub(/\n/," ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '))      
+        
+        #puts tags
+        puts name
+        #puts description
+        #puts photo_url
+        #puts address
+        
+        #Guardamos en la base de datos
+        
+        if (address!=nil)
+          hash_person=Digest::MD5.hexdigest(name+description+address)
+        else
+          hash_person=Digest::MD5.hexdigest(name+description)
+        end
+        check_result=check_resource_storage_state("person",url_person,hash_person)
+          
+        
+        if check_result=="insert"
+          if address!=nil
+            begin
+              scraper=Scraper.new
+              arr_coordinates=scraper.geolocate_address(address)
+              if arr_coordinates.size>1
+                latitude=arr_coordinates[0]
+                longitude=arr_coordinates[1]
+              end
+              if arr_coordinates.size >= 1
+                scraped_person.scraping_status.geolocalized = true
+                if arr_coordinates.size > 1
+                  scraped_person.scraping_status.geolocalized_by = arr_coordinates[2]
+                else
+                  scraped_person.scraping_status.geolocalized_by = arr_coordinates[0]
+                end 
+              end
+            rescue
+              puts "Failed geolocation linkedin"
+            end
+          end               
+          I18n.locale = "en"        
+          scraped_person.name=name
+          scraped_person.description=description          
+          scraped_person.url=url_person
+          scraped_person.scraped_from=scraped_from
+          scraped_person.hash_resource = hash_person
+          if photo_url!=nil
+            scraped_person.element_image=URI.parse(photo_url)
+          end
+          scraped_person.latitude=latitude
+          scraped_person.longitude=longitude       
+          prosa = name + ". " + description
+          puts "la prosa es: " + prosa 
+          scraped_person.persist(prosa,tags)
+          scraped_person.save
+          scraped_person.reload
+          Sunspot.index scraped_person
+          Sunspot.commit          
+        elsif check_result == "update"
+          scraped_person=Person.where(:url=> url_person)[0]
+          puts "ACTUALIZAMOS LA PERSONA"
+          if address!=nil
+            begin
+              scraper=Scraper.new
+              arr_coordinates=scraper.geolocate_address(address)
+              if arr_coordinates.size > 1
+                latitude=arr_coordinates[0]
+                longitude=arr_coordinates[1]
+              end
+              if arr_coordinates.size >= 1
+                scraped_person.scraping_status.geolocalized = true
+                if arr_coordinates.size > 1
+                  scraped_person.scraping_status.geolocalized_by = arr_coordinates[2]
+                else
+                  scraped_person.scraping_status.geolocalized_by = arr_coordinates[0]
+                end 
+              end
+            rescue
+              puts "Failed geolocation linkedin"
+            end
+          end  
+          I18n.locale = "en"        
+          scraped_person.name=name
+          scraped_person.description=description          
+          scraped_person.url=url_person
+          scraped_person.scraped_from=scraped_from
+          scraped_person.hash_resource = hash_person
+          if photo_url!=nil
+            scraped_person.element_image=URI.parse(photo_url)
+          end
+          scraped_person.latitude=latitude
+          scraped_person.longitude=longitude        
+          scraped_person.save
+          scraped_person.reload
+          Sunspot.index scraped_person
+          Sunspot.commit 
+        else
+          puts "NO HACE FALTA INSERTAR NI ACTUALIZAR A LA PERSONA"
+          
+        end     
+        
+        #annotation = PersonSubjectAnnotation.new             
+        #annotation.person = scraped_person             
+        #annotation.subject = subject             
+        #annotation.level = 5             
+        #annotation.save                      
+      rescue
+      end    
+  end
+  
+  
+
+  def scrape_linkedin_person2(url_person)
+    begin
+      page = Nokogiri::HTML(open(url_person))    
+    
+    
+      name=page.css("span.full-name")[0].text    
+      description=page.css("p.headline-title")[0].text.strip().gsub(/\n/," ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ')
+      photo_url=page.css("#profile-picture").css("img")[0]['src']      
+      begin
+          cm = CloudMade::Client.from_parameters('a19d1d45661e468697514deaf502669f')
+          address=page.css("span.locality")[0].text.strip().gsub(/\n/," ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ')
+          #coordinates=Geocoder.coordinates(address)
+          coordinates = cm.geocoding.find(URI::encode(address.gsub(/[^a-z,A-Z,0-9,\s]+/,"")))
+          if coordinates.results != nil
+            latitude=coordinates.results[0].centroid.lat
+            longitude=coordinates.results[0].centroid.lon
+          end  
+          puts "GEOLOCATED ******************************************"
+      rescue
+        puts "RESCUEEE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+      end
+      
+      tags=Array.new  
+      tags.push(page.css('.industry')[0].text.strip().gsub(/\n/," ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' '))      
+      
+      puts tags
+      puts name
+      puts description
+      puts photo_url
+      puts address
+      
+      #Guardamos en la base de datos
+      I18n.locale = "en"        
+      scraped_person=Person.new
+      scraped_person.name=name
+      scraped_person.description=description          
+      scraped_person.url=url_person
+      if photo_url!=nil
+        scraped_person.element_image=URI.parse(photo_url)
+      end
+      scraped_person.latitude=latitude
+      scraped_person.longitude=longitude
+      
+      tags.each do |tag|
+        puts tag
+        puts Tag.find_by_name(tag)
+        if Tag.find_by_name(tag)!=nil
+          puts "ya existe tag lo asocio"
+          scraped_person.tags << Tag.find_by_name(tag)
+        else
+          puts "No existe tag, lo creo"
+          new_tag=Tag.new
+          new_tag.name=tag
+          new_tag.save
+          scraped_person.tags << new_tag
+        end
+      end                    
+      scraped_person.save                    
+    rescue
+    end
+  end
+    
+  
+  
+  #####################################################
+  ### PRUEBA PARA EL PANEL DE ADMIN
+  #####################################################
+  
+  def scrape_source (source_name)
+    puts __method__.to_s
+    if Source.find_by_name(source_name) != nil
+      source = Source.find_by_name(source_name)
+      source.number_of_resources = Site.where(:scraped_from => "http://www.unesco.org").size
+      source.last_scraping = Time.now
+      source.last_tagged = Time.now
+      source.last_categorize = Time.now
+      source.last_geolocalize =  Time.now
+      source.save
+    else
+      source = Source.new
+      source.name = source_name
+      source.source_type = "Site"
+      source.number_of_resources = Site.where(:scraped_from => "http://www.unesco.org").size
+      source.last_scraping = Time.now
+      source.last_tagged = Time.now
+      source.last_categorize = Time.now
+      source.last_geolocalize =  Time.now
+      source.save
+    end
+  end
+  
+  #####################################################
+  ### FIN PRUEBA PARA EL PANEL DE ADMIN
+  #####################################################
+  
+  
+  
+  ############################################################################
+  #### ESTO NO SE UTILIZA --- ES UN EJEMPLO DE UTILIZACION DE CAPY BARA CON WEBKIT
+  def scrape_linkedin_person_capybara(url_person)
+    require "capybara"
+    require "capybara/dsl"
+    require "capybara-webkit"
+    
+    Capybara.configure do |config|
+      config.run_server = false
+      config.current_driver = :webkit
+      config.app_host   = url_person
+    end
+    
+    visit('/')
+    
+    #page=all(:xpath, "//span[@class='full-name']")[0]
+    #page=all(:css, "span.full-name")[0].text
+    #output = File.new("out.txt", "w")
+    #output << page.html
+    #output.close 
+    
+    name=page.find(:css, "span.full-name").text    
+    photo_url=page.find(:css,"#profile-picture").find(:css,"img")['src']
+    address=page.find(:css,"span.locality").text.strip().gsub(/\n/," ").gsub(/<br\s*\/?>/, '').gsub(/\s+/,' ')
+    begin
+        address=page.find(:css,"span.locality").text
+        coordinates=Geocoder.coordinates(address)
+        latitude=coordinates[0]
+        longitude=coordinates[1]
+    rescue
+    end
+        
+    puts name
+    puts photo_url
+    puts address
+       
+  end 
+
+  
+  
+  
+  
+  
+
+  
+end 

@@ -1,0 +1,59 @@
+class SearchResultsController < ApplicationController
+  
+  def index
+    @search_text = params[:search]    
+    @article_id = params[:article_id]   
+    if @article_id == nil
+      @disambiguation = Search.disambiguation(@search_text)
+    else
+      @disambiguation= Array.new
+    end                    
+    
+    if @search_text != nil 
+      @sites = Search.search_elements_by_type('Site', @search_text,@article_id,4)[:results]
+      @events = Search.search_elements_by_type('Event', @search_text,@article_id,4)[:results]
+      @lectures = Search.search_elements_by_type('Lecture', @search_text,@article_id,4)[:results]
+      @documentaries = Search.search_elements_by_type('Documentary', @search_text,@article_id,4)[:results]
+      @people = Search.search_elements_by_type('Person', @search_text,@article_id,4)[:results]
+      @applications = Search.search_elements_by_type('Application', @search_text,@article_id,4)[:results]
+      @courses = Search.search_elements_by_type('Course', @search_text,@article_id,4)[:results]
+      @articles = Search.search_elements_by_type('Article', @search_text,@article_id,4)[:results]
+      @lres = Search.search_elements_by_type('Lre', @search_text,@article_id,4)[:results]
+      @posts = Search.search_elements_by_type('Post', @search_text,@article_id,4)[:results]
+      @slideshows = Search.search_elements_by_type('Slideshow', @search_text,@article_id,4)[:results]
+      @biographies = Search.search_elements_by_type('Biography', @search_text,@article_id,4)[:results]
+          
+    else 
+      @sites = []
+      @events = []
+      @lectures = []
+      @documentaries = []
+      @people = []
+      @applications = []
+      @courses = []
+      @articles = []
+      @lres = []
+      @posts = []
+      @slideshows = []
+      @biographies = []
+    end
+    
+  end
+    
+    
+  
+  def all_related_elements
+    @edition_mode=false
+    @element_id = params[:element_id]
+    @element_type = params[:element_type]
+    @related_type = params[:related_type]
+    @title = params[:title] 
+    @element = @element_type.constantize.find(@element_id)
+    if @element != nil
+      @related_elements=RelatedElement.new(@element)
+      @elements=@related_elements.get_all_related_elements(@related_type,params[:page])
+    end
+  end
+  
+    
+end

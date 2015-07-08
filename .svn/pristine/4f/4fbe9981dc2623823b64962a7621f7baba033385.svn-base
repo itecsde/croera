@@ -1,0 +1,269 @@
+<%
+	element_type = element.class.name.underscore
+	element_path = element_type + "_path(element)"
+	popup_show_element_path = "popup_show_" + element_type + "_path"
+%>
+
+<div class="extract_box_fixed">
+	
+	<div class="selection_info_box">
+		<div class="selection_info">
+			<input type="hidden" class="element_id" value="<%= element.id %>">
+			<% if element_type!="user"%>
+				<input type="hidden" class="element_name" value="<%= element.name %>">
+			<% else %>
+				<input type="hidden" class="element_name" value="<%= element.email%>">			
+			<% end %>
+			<input type="hidden" class="element_class" value="<%= element_type %>">
+			<% case element_type %>
+			<% when 'device', 'application' %>
+			<input type="hidden" class="itec_id" value="<%= element.itec_id %>">
+			<input type="hidden" class="ld_id" value="<%= element.ld_id %>">
+			<% end %>
+		</div>
+	</div>
+	
+	<% if current_layout == "popup"%>
+	<div class="extract_box_button" onclick="popup_show_element('<%= element_type %>', '<%= element.id %>', '<%= eval(popup_show_element_path) %>'); ">
+	<% else %>
+	<div class="extract_box_button" onclick="window.location.href ='<%= eval(element_path) %>';return false;">
+	<% end %>
+	
+		<% if current_user != nil && current_layout != "popup" && (element_type=="event" or element_type=="application" or element_type=="person" or element_type=="lecture" or element_type=="site" or element_type=="documentary" or element_type=="course" or element_type=="article" or element_type=="lre" or element_type=="post" or element_type=="slideshow" or element_type=="biography" or element_type=="report" or element_type=="widget" or element_type=="klascement") %>
+			<% if element.bookmarked_by.find_by_id(current_user.id)!=nil %>
+				<div class="bookmark bookmarked" onclick="change_element_bookmark_state_in_extract_fixed(this);event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();"></div>
+			<% else %>
+				<div class="bookmark add_bookmark" onclick="change_element_bookmark_state_in_extract_fixed(this);event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();"></div>
+			<% end %>						
+		<% end %>
+		
+		<% case element_type %>
+			<% when 'activity', 'activity_sequence', 'guide', 'experience', 'content', 'device', 'application', 'person', 'event', 'lecture','site', 'documentary' ,'course', 'article','lre', 'post', 'slideshow', 'biography', 'report','widget', 'klascement', 'group','scenario' %>
+				<% if element.element_image.url() != "none" %>
+					<div class="extract_box_fixed_image" style="background-image: url('<%= element.element_image.url(:medium) %>')"></div>					
+					<div class="clear"></div>
+				<% else %>
+					<div class="extract_box_fixed_image" style="background-image: url('/images/no_photo.png')"></div>
+				<% end %>
+			<% when 'user'%>
+				<% if element.avatar.url() != "none" %>
+					<div class="extract_box_fixed_image" style="background-image: url('/images/no_photo.png')"></div>					
+					<div class="clear"></div>
+				<% else %>
+					<div class="extract_box_fixed_image"></div>
+				<% end %>
+			<% else %>
+			<div class="extract_box_fixed_image"></div>
+			
+		<% end %>
+		
+		<div class= "watermark_container">
+			<div class="watermark <%= element_type %>_watermark"></div>
+		</div>
+		<% if element_type!="user"%>
+    		<span class="extract_name"><% if element.name!= nil %><%= raw element.name.truncate(70, :separator => " ", :omission => "...") %><% end %></span>
+    		<% if element.description != nil %>
+	    		<div class= "extract_description"><%= raw element.description.truncate(175, :separator => " ", :omission => "...") %></div>
+	    	<% else %>
+	    		<div class= "extract_description"></div>
+	    	<% end %>
+	    	<br />
+	    	
+	    	
+	    	</div>
+			<div class="clear"></div>
+			<div class="extract_box_fixed_bottom">
+				<hr />
+				<div class= "user_bar">
+					<% if (element.owner != nil)%>
+						<% if (element.owner_type ==nil or element.owner_type =="User") %>
+							<% if current_layout == "popup"%>
+								<%= link_to image_tag(element.owner.avatar.url(:thumb)), user_path(element.owner.id), target: "_blank"	%>
+							<% else %>
+								<%= link_to image_tag(element.owner.avatar.url(:thumb)), user_path(element.owner.id) %>
+							<% end %>
+							<% if (element.owner.first_name != nil && element.owner.first_name != "") %>
+								<span><%= element.owner.first_name %>&nbsp;<%= element.owner.last_name %></span>
+							<% else %>
+								<span><%= element.owner.email %></span>
+							<% end %>	
+						<% else %>
+							<% if element.owner.element_image.url() != "none" %>
+								<% if current_layout == "popup"%>
+									<%= link_to image_tag(element.owner.element_image.url(:thumb)), group_path(element.owner.id), target: "_blank"	%>
+								<% else %>
+									<%= link_to image_tag(element.owner.element_image.url(:thumb)), group_path(element.owner.id) %>
+								<% end %>
+							<% end %>
+							<span><%= element.owner.name %></span>	
+						<% end %>
+					<% else %> 
+						<% if element.respond_to?('scraped_from') && element.scraped_from != nil && element.scraped_from != "" %>							
+							<% if element.scraped_from == "https://www.spainisculture.com/" %>
+								<%= image_tag "../images/logos/spain_is_culture.jpeg" %>
+							<% elsif  element.scraped_from.include? "tripadvisor" %>
+								<%= image_tag "../images/logos/trip_advisor.jpeg" %>
+							<% elsif  element.scraped_from.include? "unesco" %>
+								<%= image_tag "../images/logos/unesco.jpeg" %>
+							<% elsif  element.scraped_from.include? "linkedin.com" %>
+								<%= image_tag "../images/logos/linkedin.png" %>
+							<% elsif  element.scraped_from.include? "scholar.google" %>
+								<%= image_tag "../images/logos/google_scholar.jpg" %>
+							<% elsif  element.scraped_from.include? "allconferences.com" %>
+								<%= image_tag "../images/logos/allconferences.png" %>
+							<% elsif  element.scraped_from.include? "spainisculture.com" %>
+								<%= image_tag "../images/logos/spain_is_culture.jpeg" %>
+							<% elsif  element.scraped_from.include? "spainisculture.com" %>
+								<%= image_tag "../images/logos/spain_is_culture.jpeg" %>
+							<% elsif  element.scraped_from.include? "globaleventslist" %>
+								<%= image_tag "../images/logos/globaleventslist.jpg" %>
+							<% elsif  element.scraped_from.include? "worldconferencecalendar.com" %>
+								<%= image_tag "../images/logos/worldconferencecalendar.jpg" %>	
+							<% elsif  element.scraped_from.include? "visit-hungary.com" %>
+								<%= image_tag "../images/logos/visithungary.jpg" %>
+							<% elsif  element.scraped_from.include? "visitportugal.com" %>
+								<%= image_tag "../images/logos/visitportugal.png" %>
+							<% elsif  element.scraped_from.include? "ulisboa.pt" %>
+								<%= image_tag "../images/logos/ulisboa.png" %>
+							<% elsif  element.scraped_from.include? "uio.no" %>
+								<%= image_tag "../images/logos/uoslo.png" %>
+							<% elsif  element.scraped_from.include? "google.com/calendar" %>
+								<%= image_tag "../images/logos/google_calendar.png" %>
+							<% elsif  element.scraped_from.include? "visitbudapest.travel" %>
+								<%= image_tag "../images/logos/visitbudapest.jpg" %>
+							<% elsif  element.scraped_from.include? "visitbrussels.be" %>
+								<%= image_tag "../images/logos/visitbrussels.jpeg" %>
+							<% elsif  element.scraped_from.include? "belgica-turismo.es" %>
+								<%= image_tag "../images/logos/belgicaturismo.png" %>	
+							<% elsif  element.scraped_from.include? "ualg.pt" %>
+								<%= image_tag "../images/logos/ualgarve.png" %>
+							<% elsif  element.scraped_from.include? "noticias.up.pt" %>
+								<%= image_tag "../images/logos/uporto.gif" %>
+							<% elsif  element.scraped_from.include? "conferencealerts.com" %>
+								<%= image_tag "../images/logos/conferencealerts.gif" %>			
+							<% elsif  element.scraped_from.include? "best.eu.org" %>
+								<%= image_tag "../images/logos/best.png" %>		
+							<% elsif  element.scraped_from.include? "discoveringfinland.com" %>
+								<%= image_tag "../images/logos/discoveringfinland.gif" %>		
+							<% elsif  element.scraped_from.include? "finnbay.com" %>
+								<%= image_tag "../images/logos/finnbay.png" %>
+							<% elsif  element.scraped_from.include? "openeducationeuropa.eu" %>
+								<%= image_tag "../images/logos/openeducationeuropa.jpeg" %>																																																																																																																																																																																																																							
+							<% elsif  element.scraped_from.include? "videolectures" %>
+								<%= image_tag "../images/logos/video_lectures.png" %>
+							<% elsif  element.scraped_from.include? "khanacademy" %>
+								<%= image_tag "../images/logos/kahn_academy.jpeg" %>
+							<% elsif  element.scraped_from.include? "ted.com" %>
+								<%= image_tag "../images/logos/ted.png" %>
+							<% elsif  element.scraped_from.include? "topdocumentaryfilms.com" %>
+								<%= image_tag "../images/logos/top_documentary_films.jpeg" %>	
+							<% elsif  element.scraped_from.include? "documentariosvarios.wordpress.com" %>
+								<%= image_tag "../images/logos/documentariosvarios.jpg" %>
+							<% elsif  element.scraped_from.include? "ciberdocumentales.com" %>
+								<%= image_tag "../images/logos/ciberdocumentales.png" %>
+							<% elsif  element.scraped_from.include? "documentaryaddict.com" %>
+								<%= image_tag "../images/logos/documentary_addict.gif" %>		
+							<% elsif  element.scraped_from.include? "documentaryheaven.com" %>
+								<%= image_tag "../images/logos/documentary_heaven.png" %>	
+							<% elsif  element.scraped_from.include? "docunet.nl" %>
+								<%= image_tag "../images/logos/docunet.png" %>
+							<% elsif  element.scraped_from.include? "belgesell.com" %>
+								<%= image_tag "../images/logos/belgesel.png" %>
+							<% elsif  element.scraped_from.include? "dokumentarne.sk" %>
+								<%= image_tag "../images/logos/dokumentarne.png" %>
+							<% elsif  element.scraped_from.include? "magyarvagyok.com" %>
+								<%= image_tag "../images/logos/magyarvagyok.jpg" %>
+							<% elsif  element.scraped_from.include? "lrt.lt" %>
+								<%= image_tag "../images/logos/lrt.png" %>		
+							<% elsif  element.scraped_from.include? "nrk.no" %>
+								<%= image_tag "../images/logos/nrkskole.png" %>		
+							<% elsif  element.scraped_from.include? "docverdade.blogspot.com" %>
+								<%= image_tag "../images/logos/docverdade.jpg" %>		
+							<% elsif  element.scraped_from.include? "documentairenet.nl" %>
+								<%= image_tag "../images/logos/documentairenet.png" %>																																																																																																				
+							<% elsif  element.scraped_from.include? "coursera.org" %>
+								<%= image_tag "../images/logos/coursera.jpeg" %>																														
+							<% elsif  element.scraped_from.include? "mit.edu" %>
+								<%= image_tag "../images/logos/mit.png" %>
+							<% elsif  element.scraped_from.include? "edx.org" %>
+								<%= image_tag "../images/logos/edx.png" %>	
+							<% elsif  element.scraped_from.include? "sciencedaily.com" %>
+								<%= image_tag "../images/logos/sciencedaily.png" %>
+							<% elsif  element.scraped_from.include? "lreforschools.eun.org" %>
+								<%= image_tag "../images/logos/lre.png" %>
+							<% elsif  element.scraped_from.include? "slideshare.net" %>
+								<%= image_tag "../images/logos/slideshare.png" %>		
+							<% elsif  element.scraped_from.include? "biography.com" %>
+								<%= image_tag "../images/logos/biography.png" %>
+							<% elsif  element.scraped_from.include? "klascement.be" %>
+								<%= image_tag "../images/logos/klascement.png" %>																																														
+							<% elsif  element_type == "report" %>
+								<% sources = Source.all %>
+								<% sources.each do |source| %>
+									<% if element.scraped_from == source.url && source.element_image.url() != "none" %>
+										<%= image_tag source.element_image.url(:medium), width:'50%', :class => "image_preview" %>
+									<% end %>
+								<% end %>																																								
+							<% elsif  element_type == "post" %>
+								<% sources = Source.all %>
+								<% sources.each do |source| %>
+									<% if element.scraped_from == source.url && source.element_image.url() != "none" %>
+										<%= image_tag source.element_image.url(:medium), width:'50%', :class => "image_preview" %>
+									<% end %>
+								<% end %>
+							<% elsif  element_type == "article" %>
+								<% sources = Source.all %>
+								<% sources.each do |source| %>
+									<% if element.scraped_from == source.url && source.element_image.url() != "none" %>
+										<%= image_tag source.element_image.url(:medium), width:'50%', :class => "image_preview" %>
+									<% end %>
+								<% end %>																																										
+							<% elsif  element_type == "application"  && element.respond_to?('icon') && element.icon.url() != "none" %>
+								<%= image_tag element.icon.url(:medium), :class => "image_preview" %>																																																
+							<% end %>
+							
+						<% end %>															
+					<% end %>
+					
+				</div>
+				
+				
+				<div class= "social_icons">
+					<div class= "icon_background">
+						<span class="social_icon icon_comments"></span> <!-- onclick="open_comments(this)"></span>-->
+						<span class="social_counter comments_counter">
+							<% if element.comments.count != 0 %>
+								<%= element.comments.count %>
+							<% end %>
+						</span>
+					</div>
+					<div class= "icon_background">
+						<span class="social_icon icon_share"></span>
+					</div>
+				</div> 
+			</div>
+			<div class="social_content">
+				<% if current_user != nil %>
+					<%= render :partial => "comments/index", :locals => {:comments => element.comments, :commentable_id => element.id, :commentable_type => element.class } %>
+				<% end %>
+				<div class="shares">					
+				</div>
+			</div>
+			<div class="clear"></div>
+    	<% else %>
+    		<span class="extract_name"><%= element.email %></span>
+    	</div>
+    	<% end %>
+    	
+    	
+    <% if current_layout == "popup"%>
+		<div class="selection_button active" onclick="select_element(this);">
+			<span class="selection_icon"></span>
+		</div>
+		<div class="deselection_button" onclick="deselect_element(this);">
+			<span class="selection_icon">-</span>
+		</div>
+	<% end %>
+    	
+		
+</div>

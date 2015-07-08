@@ -1,0 +1,9 @@
+<!-- Activity selector window --> 
+
+<% if @current_tab=="activity_sequences"%>
+	<%= render :partial => "selectors/activity_selector", :layout => "layouts/popup", :locals => {:popup_id => "activities", :popup_class => "selection simple", :callback => "select_activity_from_sequence()", :current_layout => "popup", :details_header_title => "activity"} %>
+	<!-- Show -->
+	<%= render :partial => "guides/popup_show", :layout => "layouts/popup", :locals => {:popup_id => "popup_show", :popup_class => "details", :callback => "", :details_header_title => "activity"} %>
+<% else %>
+	<%= render :partial => "selectors/activity_selector", :layout => "layouts/popup", :locals => {:popup_id => "activities", :popup_class => "selection simple", :callback => "select_activity_from_guide()", :current_layout => "popup", :details_header_title => "activity"} %>
+<% end %>

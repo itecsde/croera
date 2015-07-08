@@ -1,0 +1,18 @@
+<%= render :partial => "header", :locals => {:section_title => (t :Editing_technological_setting), :actions => "form_actions"} %>
+
+<div id="content_container" class="technological_setting_container">
+	<%= form_for(@technological_setting, :html => { :class => "technological_setting_form" }) do |fo| %>
+		<%= render :partial => "form" , :locals => {:f => fo} %>
+		<%= render :partial => "submit", :locals => {:f => fo} %>
+	<% end %>
+	<input type="hidden" id="edition_mode" value="on"/>
+	<div id="elements_library">
+		<%= render :partial => "adding_elements" %>
+	</div>
+	<div id="popups">
+		<%= render :partial => "adding_popups" %>
+	</div>
+</div>	
+
+<script src="/javascript/technological_setting_form.js"></script>
+<script src="/javascript/technological_setting_paginations.js"></script>

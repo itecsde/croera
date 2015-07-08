@@ -1,0 +1,4 @@
+var contextual_setting = $("<%=j render :partial => 'contextual_setting' %>");
+new_contextual_setting_callback(contextual_setting);
+
+

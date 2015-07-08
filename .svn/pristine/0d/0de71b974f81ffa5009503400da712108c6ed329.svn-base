@@ -1,0 +1,37 @@
+<%
+	element_type = "user"
+	element_path = element_type + "_path(element)"
+	popup_show_element_path = "popup_show_" + element_type + "_path"
+%>
+
+<div class="extract_box">	
+	<div class="selection_info_box">
+		<div class="selection_info">
+			<input type="hidden" class="element_id" value="<%= element.id %>">			
+			<input type="hidden" class="element_name" value="<%= element.email%>">						
+			<input type="hidden" class="element_class" value="<%= element_type %>">		
+		</div>
+	</div>
+	
+	<% if edition_mode==true%>
+		<div class="deselection_button_always_visible" onclick="remove_user_from_group_form(this);">
+			<span class="selection_icon_always_visible">-</span>
+		</div>		
+	<% end %>
+	
+	<div class="extract_box_button"><!-- </div>onclick="popup_show_element('<%= element_type %>', '<%= element.id %>', '<%= eval(popup_show_element_path) %>'); "> -->	
+	<!-- <div class="extract_box_button" onclick="window.location.href ='<%= eval(element_path) %>';return false;"> -->
+		
+		<% if element.avatar.url() != "none" %>
+			<%= image_tag element.avatar.url(:medium), width:'100%', :class => "image_preview" %>
+			<div class="clear"></div>		
+		<% end %>			
+			
+		<div class= "watermark_container">
+			<span class="watermark <%= element_type %>_watermark"></span>
+		</div>
+	
+		<span class="extract_name"><%= element.email %></span>
+	</div>  
+						
+</div>

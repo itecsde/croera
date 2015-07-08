@@ -1,0 +1,3 @@
+<% @events.each do |event| %>
+	<%= render :partial => "elements/element", :locals => {:element => event, :current_layout => current_layout} %>
+<% end %>

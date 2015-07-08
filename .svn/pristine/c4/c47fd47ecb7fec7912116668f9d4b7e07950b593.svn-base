@@ -1,0 +1,1 @@
+$(".related_element.related_<%= @related_type.downcase %>").html("<%=j render :partial => 'search_results/partial_related_elements', locals: { related_elements: @related_elements, element_type: @element_type, element_id: @id, related_type: @related_type } %>");

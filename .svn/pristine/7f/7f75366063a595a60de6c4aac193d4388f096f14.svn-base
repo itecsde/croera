@@ -1,0 +1,15 @@
+<div class= "my_activities_filter disabled" onclick="all_users_popup_filter(this);"><%= t("courses") %></div>
+<div class= "my_activities_filter" onclick="current_user_popup_filter(this);"><%= t("my_courses") %></div>
+<div class= "my_activities_filter" onclick="bookmarks_current_user_popup_filter(this)"><%= t("bookmarked_courses") %></div>
+<div class="current_user_input_copy_container">
+	<%= hidden_field_tag :user_id, current_user.id , :class => 'current_user_id' %>	
+</div>
+<div class="bookmarks_input_copy_container" >
+	<%= hidden_field_tag :display_bookmarks, "true", :class => 'display_bookmarks' %>
+</div>
+
+<%= form_tag({:action => 'paginate_elements', :controller => 'selectors', :element_class => popup_id, :refresh_popup => 'true'}, :class => "search_form", :method => :get, remote: true) do %>
+	<%= text_field_tag :search, params[:search], placeholder: t('enter_search_term') %>
+	<div class="search_button" onclick='$("#<%= popup_id %> .search_form").submit()'></div>
+	<div class="current_user_input_container"></div>
+<% end %>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>readability</title>
+</head>
+<body>
+<div><div>
+<p>Ruby on Rails, often simply Rails, is an open source web application framework which runs on the Ruby programming language. It is a full-s
+tack framework: it allows creating pages and applications that gather information from the web server, talk to or query the database, and ren
+der templates out of the box. As a result, Rails features a routing system that is independent of the web server. It encourages beautiful cod
+e by favoring convention over configuration.</p>
+<p>Ruby on Rails emphasizes the use of well-known software engineering patterns and principles, such as active record pattern, convention ove
+r configuration (CoC), don't repeat yourself (DRY), and model–view–controller (MVC).</p>
+ History[edit] 
+<p>David Heinemeier Hansson extracted Ruby on Rails from his work on Basecamp, a project management tool by 37signals (now a web application 
+company).[3] Hansson first released Rails as open source in July 2004, but did not share commit rights to the project until February 2005.[4]
+ In August 2006, the framework reached a milestone when Apple announced that it would ship Ruby on Rails with Mac OS X v10.5 "Leopard",[5] wh
+ich was released in October 2007.</p>
+<p>Rails version 2.3 was released on March 15, 2009 with major new developments in templates, engines, Rack and nested model forms. Templates
+ enable the developer to generate a skeleton application with custom gems and configurations. Engines give developers the ability to reuse ap
+plication pieces complete with routes, view paths and models. The Rack web server interface and Metal allow one to write optimized pieces of 
+code that route around ActionController.[6]</p>
+<p>On December 23, 2008, Merb, another web application framework, was launched, and Ruby on Rails announced it would work with the Merb proje
+ct to bring "the best ideas of Merb" into Rails 3, ending the "unnecessary duplication" across both communities.[7] Merb was merged with Rail
+s as part of the Rails 3.0 release.[8][9]</p>
+<p>Rails 3.1 was released on August 31, 2011, featuring Reversible Database Migrations, Asset Pipeline, Streaming, jQuery as default JavaScri
+pt library and newly introduced CoffeeScript and Sass into the stack.[10]</p>
+<p>Rails 3.2 was released on January 20, 2012 with a faster development mode and routing engine (also known as Journey engine), Automatic Que
+ry Explain and Tagged Logging.[11] Rails 3.2.x is the last version that supports Ruby 1.8.7.[12]</p>
+Version history
+Version
+Date
+1.0[13]
+02005-12-13December 13, 2005
+1.2[14]
+02007-01-19January 19, 2007
+2.0[15]
+02007-12-07December 7, 2007
+2.1[16]
+02008-06-01June 1, 2008
+2.2[17]
+02008-11-21November 21, 2008
+2.3[18]
+02009-03-16March 16, 2009
+3.0[19]
+02010-08-29August 29, 2010
+3.1[20]
+02011-08-31August 31, 2011
+3.2[21]
+02012-01-20January 20, 2012
+4.0[22]
+02013-06-25June 25, 2013
+ Technical overview[edit] 
+<p>Like many web frameworks, Ruby on Rails uses the model–view–controller (MVC) pattern to organize application programming.</p>
+<p>In a default configuration, a model in the Ruby on Rails framework maps to a table in a database, and a Ruby file. For example, a model cl
+ass User will usually be defined in the file user.rb in the app/models directory, and is linked to the table users in the database. Developer
+s can choose any model name, file name or database table name. But this is not common practice and usually discouraged according to the "conv
+ention over configuration" philosophy.</p>
+<p>A controller is a component of Rails that responds to external requests from the web server to the application by determining which view f
+ile to render. The controller may also have to query one or more models directly for information and pass these on to the view. A controller 
+may provide one or more actions. In Ruby on Rails, an action is typically a basic unit that describes how to respond to a specific external w
+eb-browser request. Also note that the controller/action will be accessible for external web requests only if a corresponding route is mapped
+ to it. Rails encourages developers to use RESTful routes, which include actions such as: create, new, edit, update, destroy, show, and index
+. These mappings of incoming requests/routes to controller actions can be easily set up in the routes configuration file.</p>
+<p>A view in the default configuration of Rails is an erb file, which is converted to HTML at run-time. Many other templating systems can be 
+used for views.</p>
+<p>Ruby on Rails includes tools that make common development tasks easier "out of the box", such as scaffolding that can automatically constr
+uct some of the models and views needed for a basic website.[23] Also included are WEBrick, a simple Ruby web server that is distributed with
+ Ruby, and Rake, a build system, distributed as a gem. Together with Ruby on Rails, these tools provide a basic development environment.</p>
+<p>Ruby on Rails is most commonly not connected to the Internet directly, but through some front-end web server. Mongrel was generally prefer
+red over WEBrick in the early days,[citation needed] but it can also run on Lighttpd, Apache, Cherokee, Hiawatha, nginx (either as a module —
+ Phusion Passenger for example — or via CGI, FastCGI or mod_ruby), and many others. From 2008 onwards, the Passenger web server replaced Mong
+rel as the most-used web server for Ruby on Rails.[24]</p>
+<p>Ruby on Rails is also noteworthy for its extensive use of the JavaScript libraries Prototype and Script.aculo.us for Ajax.[25] Ruby on Rai
+ls initially utilized lightweight SOAP for web services; this was later replaced by RESTful web services. Ruby on Rails 3.0 uses a technique 
+called Unobtrusive JavaScript to separate the functionality (or logic) from the structure of the web page. jQuery is fully supported as a rep
+lacement for Prototype and is the default JavaScript library in Rails 3.1, reflecting an industry-wide move towards jQuery. Additionally, Cof
+feeScript was introduced in Rails 3.1 as the default Javascript language.</p>
+<p>Since version 2.0, Ruby on Rails offers both HTML and XML as standard output formats. The latter is the facility for RESTful web services.
+</p>
+<p>Rails 3.1 introduced Sass as standard CSS templating.</p>
+<p>By default, the server uses Embedded Ruby in the HTML views, with files having an html.erb extension. Rails supports swapping-in alternati
+ve templating languages, such as HAML and Mustache.</p>
+<p>Ruby on Rails 3.0 has been designed to work with Ruby 1.8.7, Ruby 1.9.2, and JRuby 1.5.2+; earlier versions are not supported.[26]</p>
+<p>Rails 3.2 series is the last series to support Ruby 1.8.7.</p>
+ Framework structure[edit] 
+<p>Ruby on Rails is separated into various packages, namely ActiveRecord (an object-relational mapping system for database access), ActiveRes
+ource (provides web services), ActionPack, ActiveSupport and ActionMailer. Prior to version 2.0, Ruby on Rails also included the Action Web S
+ervice package that is now replaced by Active Resource. Apart from standard packages, developers can make plugins to extend existing packages
+. Rails 3.2 deprecates the old plugins Rails 2-3-stable style in which plugins are to be placed under vendor/plugins, in favor of packaged ge
+ms.[27]</p>
+ Deployment[edit] 
+<p>Ruby on Rails is often installed using RubyGems, a package manager[28] which is included with current versions of Ruby. Many free Unix-lik
+e systems also support installation of Ruby on Rails and its dependencies through their native package management system.</p>
+<p>Ruby on Rails is typically deployed with a database server such as MySQL or PostgreSQL, and a web server such as Apache running the Phusio
+n Passenger module.</p>
+<p>There are many Ruby on Rails web hosting services such as Heroku, Engine Yard and TextDrive.</p>
+ Philosophy and design[edit] 
+<p>Ruby on Rails is intended to emphasize Convention over Configuration (CoC), and the rapid development principle of Don't Repeat Yourself (
+DRY).</p>
+<p>"Convention over Configuration" means a developer only needs to specify unconventional aspects of the application. For example, if there i
+s a class Sale in the model, the corresponding table in the database is called sales by default. It is only if one deviates from this convent
+ion, such as calling the table "products sold", that the developer needs to write code regarding these names. Generally, Ruby on Rails conven
+tions lead to less code and less repetition.[citation needed]</p>
+<p>"Don't repeat yourself" means that information is located in a single, unambiguous place. For example, using the ActiveRecord module of Ra
+ils, the developer does not need to specify database column names in class definitions. Instead, Ruby on Rails can retrieve this information 
+from the database based on the class name.</p>
+<p>"Fat models, skinny controllers" means that most of the application logic should be placed within the model while leaving the controller a
+s light as possible.</p>
+ Trademarks[edit] 
+<p>In March 2007, David Heinemeier Hansson filed three Ruby on Rails related trademark applications to the USPTO. These applications regard t
+he phrase "RUBY ON RAILS",[29] the word "RAILS",[30] and the official Rails logo.[31] As a consequence, in the summer of 2007, Hansson denied
+ permission to Apress to use the Ruby on Rails logo on the cover of a new Ruby on Rails book written by some authoritative community members.
+ The episode gave rise to a polite protest in the Ruby on Rails community. In response to this criticism, Hansson replied:</p>
+ 
+I only grant promotional use [of the Rails logo] for products I'm directly involved with. Such as books that I've been part of the developmen
+t process for or conferences where I have a say in the execution. I would most definitely seek to enforce all the trademarks of Rails.
+ 
+ Reception[edit] 
+<p>Rails running on Matz's Ruby Interpreter (the de facto reference interpreter for Ruby) had been criticized for issues with scalability.[34
+] These critics often mentioned various Twitter outages in 2007 and 2008, which spurred Twitter's partial transition to Scala (which runs on 
+the Java Virtual Machine) for their queueing system and other middleware.[35][36] The user interface aspects of the site continue to run Ruby
+ on Rails.[37]</p>
+<p>In 2011, Gartner Research noted that despite criticisms and comparisons to Java, many high-profile consumer web firms are using Ruby on Ra
+ils to build agile, scalable web applications. Some of the largest sites running Ruby on Rails include Github, Yammer, Scribd, Groupon, Shopi
+fy, and Basecamp.[38] As of March 2013, it is estimated that about 211,295 web sites are running Ruby on Rails.[39]</p>
+ See also[edit] 
+ References[edit] 
+<div>
+ ^ Rails 4.0: Final version released!
+^ Rails 4.0: Release Candidate 2 released!
+^ Grimmer, Lenz (February 2006). "Interview with David Heinemeier Hansson from Ruby on Rails". MySQL AB. Retrieved 2008-06-08. 
+^ "Rails core team profiles.". Retrieved 2008-07-15. 
+^ Hansson, David (August 7, 2006). "Ruby on Rails will ship with OS X 10.5 (Leopard)". Retrieved 2008-06-08. 
+^ Hansson, David (March 16, 2009). "Rails 2.3: Templates, Engines, Rack, Metal, much more!". 
+^ "The day Merb joined Rails". 2008-12-27. 
+^ Ruby on Rails 3.0 Release Notes
+^ "Ruby on Rails 3.0 goes modular". sdtimes.com. 2010-02-10. Retrieved 2010-08-06. 
+^ "Ruby on Rails 3.1 Release Notes". 2012-09-01. 
+^ "Ruby on Rails 3.2 Release Notes". 2012-09-01. 
+^ "Rails/master is now 4.0.0.beta". 2012-09-01. 
+^ "Rails 1.0: Party like it's one oh oh!". Riding Rails. Retrieved June 9, 2010.
+^ "Rails 1.2: REST admiration, HTTP lovefest, and UTF-8 celebrations". Riding Rails. Retrieved June 9, 2010.
+^ "Rails 2.0: It's done!". Riding Rails. Retrieved June 9, 2010.
+^ Rails 2.1: Time zones, dirty, caching, gem dependencies, caching, etc. Riding Rails. Retrieved June 9, 2010.
+^ "Rails 2.2: i18n, HTTP validators, thread safety, JRuby/1.9 compatibility, docs". Riding Rails. Retrieved June 9, 2010.
+^ "Rails 2.3: Templates, Engines, Rack, Metal, much more!". Riding Rails. Retrieved June 9, 2010.
+^ "Rails 3.0: It's ready!". Riding Rails. Retrieved August 30, 2010.
+^ [1] www.github.com
+^ [2] www.github.com
+^ [3] blog.wyeworks.com
+^ There were quite a few changes in the 2.0 release, including the way that Ruby on Rails generates scaffolding code.
+^ Official deployment instructions suggests use of Passenger
+^ Ruby on Rails includes the Prototype JavaScript framework and the Scriptaculous JavaScript controls and visual effects library.
+^ "Rails 3.0: It's ready!". rubyonrails.org. Retrieved 2010-08-30. "Rails 3.0 has been designed to work with Ruby 1.8.7, Ruby 1.9.2, and JRub
+y 1.5.2+." 
+^ "Rails 3.2.0.rc2 has been released!". 2012-09-01. 
+^ "Ruby on Rails: Download". RubyonRails.org. 
+^ ""Ruby on Rails" Trademark Status". USPTO. Retrieved 2007-08-01. 
+^ ""Rails" Trademark Status". USPTO. Retrieved 2007-08-01. 
+^ "Rails Logo Trademark Status". USPTO. Retrieved 2007-08-01. 
+^ "5 Question Interview with Twitter Developer Alex Payne". radicalbehavior.com. 2007-03-29. Retrieved 2009-07-18. "By various metrics Twitte
+r is the biggest Rails site on the net right now. Running on Rails has forced us to deal with scaling issues - issues that any growing site e
+ventually contends with – far sooner than I think we would on another framework." 
+^ Steve Jenson, Alex Payne, and Robey Pointer interview (2009-04-03). "Twitter on Scala". artima.com. Retrieved 2009-07-18. "We had a Ruby-ba
+sed queuing system that we used for communicating between the Rails front ends and the daemons, and we ended up replacing that with one writt
+en in Scala. The Ruby one actually worked pretty decently in a normal steady state, but the startup time and the crash behavior were undesira
+ble." 
+^ "Twitter jilts Ruby for Scala". theregister.co.uk. 2009-04-01. Retrieved 2009-07-18. "By the end of this year, Payne said, Twitter hopes to
+ have its entire middleware infrastructure and its APIs ported to the new language. Ruby will remain, but only on the front end. "We're still
+ happy with Rails for building user facing features... performance-wise, it's fine for people clicking around web pages. It's the heavy lifti
+ng, asynchronous processing type of stuff that we've moved away from."" 
+^ ryan king (2009-09-25). "Twitter on Ruby". evan weaver. Retrieved 2009-09-29. "We use Scala for a few things at Twitter, but the majority o
+f the site is Ruby." 
+^ "Here's Why Ruby On Rails Is Hot". Business Insider. Retrieved February 10, 2012. 
+^ "Ruby on Rails Usage Trends". BuiltWith Trends. Retrieved February 10, 2012. 
+ </div>
+ Bibliography[edit] 
+<div>
+ Ruby, Sam; Thomas, Dave; Hansson, David (March 28, 2009). Agile Web Development with Rails (Third ed.). Pragmatic Bookshelf. p. 850. ISBN 1-
+934356-16-6 
+Laurent, Simon St.; Dumbill, Edd (November 28, 2008). Learning Rails (First ed.). O'Reilly Media. p. 442. ISBN 0-596-51877-3 
+Lenz, Patrick (May 1, 2008). Simply Rails 2 (Second ed.). SitePoint. p. 450. ISBN 0-9804552-0-0 
+Tate, Bruce; Hibbs, Curt (August 22, 2006). Ruby on Rails: Up and Running (First ed.). O'Reilly Media. p. 182. ISBN 0-596-10132-5 
+Holzner Ph.D., Steve (November 29, 2006). Beginning Ruby on Rails (First ed.). Wrox. p. 380. ISBN 0-470-06915-5 
+Allan Hardy, Jeffrey; Carneiro Jr, Cloves; Catlin, Hampton (July 20, 2007). Beginning Ruby on Rails E-Commerce: From Novice to Professional (
+First ed.). Wrox. p. 361. ISBN 1-59059-686-2 
+Clark, Mike (May 15, 2008). Advanced Rails Recipes (First ed.). Pragmatic Bookshelf. p. 464. ISBN 0-9787392-2-1 
+ </div>
+ External links[edit] 
+</div></div>
+</body>
+</html>

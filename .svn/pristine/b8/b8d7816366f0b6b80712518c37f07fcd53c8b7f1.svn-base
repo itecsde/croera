@@ -1,0 +1,58 @@
+<%
+	element_type = element.class.name.underscore
+	element_path = element_type + "_path(element)"
+	popup_show_element_path = "popup_show_" + element_type + "_path"
+%>
+
+<div class="excerpt">
+	<div class="selection_info_box">
+		<div class="selection_info">
+			<input type="hidden" class="element_id" value="<%= element.id %>">
+			<% if element_type!="user"%>
+				<input type="hidden" class="element_name" value="<%= element.name %>">
+			<% else %>
+				<input type="hidden" class="element_name" value="<%= element.email%>">			
+			<% end %>
+			<input type="hidden" class="element_class" value="<%= element_type %>">
+			<% case element_type %>
+			<% when 'device', 'application' %>
+			<input type="hidden" class="itec_id" value="<%= element.itec_id %>">
+			<input type="hidden" class="ld_id" value="<%= element.ld_id %>">
+			<% end %>
+		</div>
+	</div>
+	
+	<div class="excerpt_button" onclick="show_element_in_popup('<%= element_type %>', '<%= element.id %>', '<%= eval popup_show_element_path %>');">
+		<% if current_user != nil && element_type != "activity" %>
+			<% if element.bookmarked_by.find_by_id(current_user.id)!=nil %>
+				<div class="bookmark bookmarked" onclick="change_element_bookmark_state_in_excerpt(this);event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();"></div>
+			<% else %>
+				<div class="bookmark add_bookmark" onclick="change_element_bookmark_state_in_excerpt(this);event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();"></div>
+			<% end %>
+		<% end %>		
+		<div class= "watermark_container_excerpt">
+			<div class="watermark <%= element_type %>_watermark"></div>
+		</div>
+			
+		<div class="excerpt_left">
+			<% if element.element_image.url() != "none" %>
+				<div class="excerpt_image_box" style="background-image:url(<%= element.element_image.url %>)">
+			<% else %>	
+				<div class="excerpt_image_box" style="background-image:url('images/watermarks/b_watermark_application.png')">
+			<% end %>		
+			</div>
+		</div>
+		<div class="excerpt_right">
+			<div class="excerpt_name"><%= element.name %></div>
+			<% if element.description != nil %>
+				<div class="excerpt_description"><%= raw element.description.truncate(270, :separator => " ", :omission => "...") %></div>
+			<% end %>
+			<% if element_type != "activity" %>
+				<div class="excerpt_tags_prompt"><%= t('keywords') %>:&nbsp; <span class="excerpt_tags"><%= element.tag_list %></span></div>
+			<% end %>
+			<% if current_user != nil %>			
+			<div class="alternatives" title="Display alternatives" onclick="display_alternatives(this,'<%= element_type %>','<%= element.id %>');event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();"></div>
+			<% end %>
+		</div>		
+	</div>
+</div>	

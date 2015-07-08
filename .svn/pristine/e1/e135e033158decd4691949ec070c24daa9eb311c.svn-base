@@ -1,0 +1,57 @@
+<% 
+related_sites = @related_elements.get_related_elements('Site') 
+related_events = @related_elements.get_related_elements('Event')
+related_biographies = @related_elements.get_related_elements('Biography')
+related_lectures = @related_elements.get_related_elements('Lecture')
+related_documentaries = @related_elements.get_related_elements('Documentary')
+related_courses = @related_elements.get_related_elements('Course')
+related_articles = @related_elements.get_related_elements('Article')
+related_posts = @related_elements.get_related_elements('Post')
+related_reports = @related_elements.get_related_elements('Report')
+related_slideshows = @related_elements.get_related_elements('Slideshow')
+related_applications = @related_elements.get_related_elements('Application')
+related_lres = @related_elements.get_related_elements('Lre')
+related_klascements = @related_elements.get_related_elements('Klascement')
+related_widgets = @related_elements.get_related_elements('Widget')
+related_artworks = @related_elements.get_related_elements('Artwork')
+related_books = @related_elements.get_related_elements('Book')
+best_related = @related_elements.get_best_related_elements
+
+array_resources = [{"name"=>"Site","related"=>"related_sites"},{"name"=>"Artwork","related"=>"related_artworks"}, {"name"=>"Event","related"=>"related_events"},{"name"=>"Biography","related"=>"related_biographies"},{"name"=>"Lecture","related"=>"related_lectures"},{"name"=>"Documentary","related"=>"related_documentaries"},{"name"=>"Course","related"=>"related_courses"},{"name"=>"Article","related"=>"related_articles"},{"name"=>"Post","related"=>"related_posts"},{"name"=>"Slideshow","related"=>"related_slideshows"},{"name"=>"Report","related"=>"related_reports"},{"name"=>"Book","related"=>"related_books"},{"name"=>"Application","related"=>"related_applications"},{"name"=>"Lre","related"=>"related_lres"},{"name"=>"Klascement","related"=>"related_klascements"},{"name"=>"Widget","related"=>"related_widgets"}]
+index = array_resources.index {|v| v['name'] == @resource_type}
+value = array_resources.delete_at(index)
+#array_resources.unshift(value)
+puts array_resources
+
+
+%>
+
+<div class="related_elements_container">
+
+	<% if best_related.size > 0 %>
+		<div class="related_element best_related_elements">		
+			<div class="prompt"><img src="/images/black_best_results_100.png" width="30px" height="30px"/><span class="related_title"><%= t('best_related') %></span></div>
+			<div class="body">
+				<% best_related.each do |element| %>
+					<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 				
+				<% end %>										
+			</div>
+		</div>
+	<% end %>
+	
+	<% array_resources.each do |resource| %>	
+		<% if eval("#{resource['related']}").size > 0 %>
+			<div class="related_element">		
+				<div class="prompt"><img src="/images/black_<%= resource['name'].downcase %>_100.png" width="30px" height="30px"/><span class="related_title"><%= t(resource['related']) %></span><a href="<%= all_related_elements_path(:element_id => params[:id],:element_type => @resource_type,:related_type => resource['name'],:title => resource['related']) %>" class="view_all"><%= t("view_all") %></a></div>
+				<div class="body">
+					<% eval("#{resource['related']}").each do |element| %>
+						<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 				
+					<% end %>										
+				</div>
+			</div>
+		<% end %>
+	
+	<% end %>
+								
+</div>
+

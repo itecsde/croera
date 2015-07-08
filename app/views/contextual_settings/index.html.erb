@@ -1,0 +1,7 @@
+<%= render :partial => "header", :locals => {:section_title => (t :contextual_settings), :actions => "list_actions"} %>
+
+<div id="content_index">
+	<%= render :partial => "list", :locals => { :current_layout => "application" }%>
+</div>
+
+<script src="/javascript/contextual_setting_index.js"></script>

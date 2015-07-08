@@ -1,0 +1,13 @@
+<%= render :partial => "header", :locals => {:section_title => (t :device), :actions => "device_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'device', :actions => "devices/device_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<div id="content_container" class="device_container">
+		<%= render "device" %>
+	</div> <!-- CONTENT -->
+	<script src="/javascript/devices_form.js"></script>
+<% end %>

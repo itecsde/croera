@@ -1,0 +1,27 @@
+<% content_for :meta do %>
+	<%= render :partial => "/generic_partials/meta", :locals => {:element => @post}%>
+<% end %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'post', :actions => "posts/post_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+
+	<% if current_user != nil%>
+		<%= render :partial => "generic_partials/header_show_resource", :locals => {:element => @post} %>	
+	<% end %>
+
+	<div id="content_container" class="documentary_container">
+		<%= render "post" %>
+		<%= render :partial => "generic_partials/related_elements_same_type",:locals => {:related_title =>'related_posts'} %>				
+	</div> <!-- CONTENT -->
+	<%= render :partial => "generic_partials/related_elements", :locals => {:element_type =>'Course'} %>
+
+	
+	<span style="display:none" id="is_edition" data-value="false"></span>	
+	
+	
+	<script src="/javascript/posts_form.js"></script>
+<% end %>

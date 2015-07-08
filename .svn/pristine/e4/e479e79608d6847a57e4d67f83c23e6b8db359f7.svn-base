@@ -1,0 +1,2 @@
+module TechnologicalSettingsHelper
+end

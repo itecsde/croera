@@ -1,0 +1,19 @@
+<% resources.each do |resource| %>
+	<div class="selectable_box">
+		<div class="selectable_controls">
+			<% case resource_type %>
+			<% when "device", "application" %>
+				<button class="select_resource" onclick="select_tool('<%= resource.id %>', '<%= resource.name %>', '<%=resource.class %>');"><%= t("select") %> </button>
+			<% when "person" %>
+				<button class="select_resource" onclick="select_person('<%= resource.id %>', '<%= resource.name %>');"><%= t("select") %> </button>
+			<% when "event" %>
+				<button class="select_resource" onclick="select_event('<%= resource.id %>', '<%= resource.name %>');"><%= t("select") %> </button>
+			<% end %>
+			<button class="resource_details_button" onclick="tool_details('<%=resource.ld_id%>',this)"><%=t :Details %></button>
+		</div>	
+		<div class="selectable_name"><%=resource.name%></div>
+		<div class="selectable_description"><%=raw resource.description %></div>
+		<input class="selectable_type" type="hidden" value="<%=resource.class%>">
+		<input type="hidden" class="selectable_device_itec_id" value="<%= resource.itec_id %>" />
+	</div>
+<% end %>

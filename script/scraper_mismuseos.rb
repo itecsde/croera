@@ -1,0 +1,2 @@
+scraper_artworks = ScraperArtworks.new
+scraper_artworks.scrape_mismuseos

@@ -1,0 +1,89 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'reports', :actions => "resources/list_actions"} %>
+<% end %>
+
+<% content_for :advanced_search do %>	
+	<%= render :partial =>"advanced_search" %>
+<% end %>
+
+<% content_for :content do %>
+	<div class="container_navbar_sections">
+		<% section = {@section => "active"}%>
+		<ul class="nav_report_section">
+			<li class="<%= section["all"] %>">
+				<%= link_to t('all'), reports_path(:section => "all") %>
+			</li>
+			<li class="<%= section["art"] %>">
+				<%= link_to t('art'), reports_path(:section => "art") %>
+			</li>		
+			<li class="<%= section["business"] %>">
+				<%= link_to t('business'), reports_path(:section => "business") %>
+i			</li>		
+			<li class="<%= section["culture"] %>">
+				<%= link_to t('culture'), reports_path(:section => "culture") %>
+			</li>
+-->					
+			<li class="<%= section["economy"] %>">
+				<%= link_to t('economy'), reports_path(:section => "economy") %>
+			</li>		
+<!--				
+			<li class="<%= section["education"] %>">
+				<%= link_to t('education'), reports_path(:section => "education") %>
+			</li>	
+				
+			<li class="<%= section["fashion"] %>">
+				<%= link_to t('fashion'), reports_path(:section => "fashion") %>
+			</li>	
+-->				
+			<li class="<%= section["health"] %>">
+				<%= link_to t('health'), reports_path(:section => "health") %>
+			</li>
+			<li class="<%= section["politics"] %>">
+				<%= link_to t('politics'), reports_path(:section => "politics") %>
+			</li>
+			<li class="<%= section["science"] %>">
+				<%= link_to t('science'), reports_path(:section => "science") %>
+			</li>		
+			<li class="<%= section["sport"] %>">
+				<%= link_to t('sport'), reports_path(:section => "sport") %>
+			</li>
+			<li class="<%= section["technology"] %>">
+				<%= link_to t('technology'), reports_path(:section => "technology") %>
+			</li>									
+		</ul>
+		<div class="clear"></div>
+	</div>
+	
+	<div class="content_disambiguation">
+		<%= render :partial => "generic_partials/resource_disambiguation" %>
+	</div>
+	
+	<div id="content_index">			
+		<% if @reports_day.size > 0 %>
+			<div class="search_elements_type_box list_last_day">		
+				<%= render :partial => "list_date_range", :locals => { :elements => @reports_day, :section => @section ,:date_range => "last_day", :current_layout => "application" }%>
+			</div>
+		<% end %>
+		<% if @reports_week.size > 0 %>
+			<div class="search_elements_type_box list_last_week">		
+				<%= render :partial => "list_date_range", :locals => {:elements => @reports_week, :section => @section, :date_range => "last_week",:current_layout => "application" }%>
+			</div>
+		<% end %>
+		<% if @reports_month.size > 0 %>
+			<div class="search_elements_type_box list_last_month">		
+				<%= render :partial => "list_date_range", :locals => {:elements => @reports_month, :section => @section, :date_range => "last_month",:current_layout => "application" }%>
+			</div>
+		<% end %>
+		<% if @reports.size > 0 %>
+			<div class="search_elements_type_box list_all_time">		
+				<%= render :partial => "list_date_range", :locals => { :elements => @reports, :section => @section, :date_range => "all_time",:current_layout => "application" }%>
+			</div>
+		<% else %>
+			<div class="no_results"><%= t('no_results')%></div>	
+		<% end %>		
+	</div> <!-- CONTENT -->
+	
+	<script src="/javascript/resource_index.js"></script>
+	<script src="/javascript/reports_index.js"></script>
+<% end %>

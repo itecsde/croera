@@ -1,0 +1,10 @@
+
+<% @experiences.each do |experience| %>
+	<%= render :partial => "elements/element_fixed", :locals => {:element => experience, :current_layout => current_layout} %>
+<% end %>
+
+<div class="clear"></div>
+
+<div class= "paginate_controls active">
+	<%= paginate @experiences %>
+</div>

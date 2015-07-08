@@ -1,0 +1,10 @@
+rails destroy scaffold Activity
+rails destroy scaffold Requirement
+rails generate scaffold Activity title:string description:text icon:string guidelines:text time_to_complete:string 
+interaction:string
+rails generate scaffold Requirement name:string description:text
+rails generate migration activities_requirements activity_id: integer requirement_id: integer
+#Edit the migration file , :id => false do ...
+rake db:migrate
+rake db:reset
+

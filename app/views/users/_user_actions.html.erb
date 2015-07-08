@@ -1,0 +1,12 @@
+<li>
+<a class="back_icon has_tooltip" href="javascript: history.back();">
+	<img src="/images/white_arrow_left.png" title="<%= t('back_to_home') %>"></img>
+</a>
+</li>
+<li>
+<% if @user == current_user %>
+<%=link_to edit_user_path(@user), :class => "has_tooltip" do %>
+	<img src="/images/white_edit.png" title="Edit"></img>
+<% end %>
+<% end %>
+</li>

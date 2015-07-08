@@ -1,0 +1,11 @@
+wikipedia_first_law_of_motion:
+  name: 'Wikipedia 1st Law of Motion page'
+  description: 'Wikipedia page for the first law of motion'
+
+wikipedia_second_law_of_motion:
+  name: 'Wikipedia 2nd Law of Motion page'
+  description: 'Wikipedia page for the second law of motion'
+  
+wikipedia_third_law_of_motion:
+  name: 'Wikipedia 3rd Law of Motion page'
+  description: 'Wikipedia page for the third law of motion'  

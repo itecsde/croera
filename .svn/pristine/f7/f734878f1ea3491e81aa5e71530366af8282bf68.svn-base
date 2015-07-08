@@ -1,0 +1,118 @@
+<% if @course.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@course.errors.count, "error") %> prohibited this course from being saved:</h2>
+	
+	  <ul>
+	  <% @course.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+
+
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="course_name field_body">
+		<% if @edition_mode==true %>
+			<textarea id="course_name" name="course[name]" placeholder="<%= t("title") %>"><%= @course.name %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<span><%= @course.name %></span>
+		<% end %>
+	</div>
+	
+		
+	<div class="course_description description field_body">
+		<% if @edition_mode==true %>
+			<textarea id="course_description" name="course[description]" placeholder="<%= t("description") %>"><%= @course.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<div>
+				<% if @course.description != nil %>			
+					<%= raw @course.description.truncate(1000, :separator => " ", :omission => "...") %>
+				<% end %>				
+			</div>
+		<% end %>
+	</div>
+	
+	
+	<div class="course_tags element_field_box">
+		<div class="field_prompt"><%= t("keywords") %></div>
+		<div class="field_body">			
+			<% if @edition_mode==true %>    
+		    	<textarea id="course_tags" class="tags" name="course[tag_list]"><% if @course!=nil %><%= @course.tag_list %><% end %></textarea>
+		    	<i class="icon-pencil icon-grey"></i>
+		    <% else %>
+		    	<span class="tags"><% if @course!=nil %><%= @course.tag_list_with_links.html_safe %><% end %></span>	
+		    <% end %>														
+		</div>
+	</div>		
+	
+	
+	<div class="course_url element_field_box">
+		<div class="field_prompt"><%= t("url") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>    
+		    	<%= course_form.text_field :url %>
+		    	<i class="icon-pencil icon-grey"></i>			    	
+		    <% else %>
+		    	<a href="<%= @course.url %>" target="_blank"><%= @course.url %></a>
+		    <% end %>
+	   </div>		
+	</div>
+	
+	<% if @edition_mode!=true && @course.scraped_from!=nil && @course.scraped_from!="" %>  
+		<div class="course_scraped_from element_field_box">
+			<div class="field_prompt"><%= t("source") %></div>
+			<div class="field_body">
+				<a href="<%= @course.scraped_from %>" target="_blank"><%= @course.scraped_from %></a>
+			</div>
+		</div>
+	<% end %>
+	
+	
+</div>
+
+
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>		
+			<% if @course.element_image.url() != "none" %>
+				<%= image_tag @course.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_course.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= course_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		<% else %>
+			<% if @course.element_image.url() != "none" %>
+				<%= image_tag @course.element_image.url(:medium), width:'100%', :class => "image_preview_show" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_course.png", width:'100%', :class => "image_preview_show" %>
+			<% end %>
+		<% end %>
+	</div>
+
+</div>
+
+
+
+
+
+<% if @edition_mode==true %>
+	<div id="snippets_library" style="display: none">
+		<div class="subject_item">				
+			<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name"), :prompt => "", :class => "subject" %>
+			<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+		</div>
+	</div>
+<% end %>
+
+

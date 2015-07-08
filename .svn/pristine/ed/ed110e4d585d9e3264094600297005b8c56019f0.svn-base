@@ -1,0 +1,9 @@
+class DropTranslationsNewsAddTranslationsReports < ActiveRecord::Migration
+  def up
+    drop_table :news_translations
+    Report.create_translation_table! :name => :string, :description => :text, :link => :string  
+  end
+
+  def down
+  end
+end

@@ -1,0 +1,3 @@
+var sequence= $("<%=j render :partial => 'activity_sequence' %>");
+sequence.find("#activity_sequence_status").val("instance");
+new_sequence_callback(sequence);

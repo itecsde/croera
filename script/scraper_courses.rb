@@ -1,0 +1,4 @@
+scrape_courses = ScraperCourses.new
+scrape_courses.scrape_coursera
+scrape_courses.scrape_mit
+scrape_courses.scrape_edx

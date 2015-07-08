@@ -1,0 +1,27 @@
+<% content_for :meta do %>
+	<%= render :partial => "/generic_partials/meta", :locals => {:element => @artwork}%>
+<% end %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'artwork', :actions => "artworks/artwork_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+
+	<% if current_user != nil%>
+		<%= render :partial => "generic_partials/header_show_resource", :locals => {:element => @artwork} %>	
+	<% end %>
+
+	<div id="content_container" class="artwork_container">
+		<%= render "artwork" %>
+		<%= render :partial => "generic_partials/related_elements_same_type",:locals => {:related_title =>'related_artworks'} %>				
+	</div> <!-- CONTENT -->
+	<%= render :partial => "generic_partials/related_elements", :locals => {:element_type =>'artwork'} %>
+	
+	<span style="display:none" id="is_edition" data-value="false"></span>	
+	
+	
+	<script src="/javascript/artworks_form.js"></script>
+<% end %>
+

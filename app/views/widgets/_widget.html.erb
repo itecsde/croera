@@ -1,0 +1,4 @@
+<%= form_for(@widget, :html => { :class => "widget_form" }) do |fo| %>
+	<%= render :partial => "widgets/form" , :locals => {:widget_form => fo} %>
+<% end %>
+<input type="hidden" id="edition_mode" value="off"/>

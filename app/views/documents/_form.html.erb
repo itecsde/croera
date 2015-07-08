@@ -1,0 +1,194 @@
+<% if @document.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@document.errors.count, "error") %> prohibited this document from being saved:</h2>
+	
+	  <ul>
+	  <% @document.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+
+
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="book_name field_body">
+		<% if @edition_mode==true %>
+			<textarea id="document_name" name="document[name]" placeholder="<%= t("title") %>"><%= @document.name %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<span><%= @document.name %></span>
+		<% end %>
+	</div>
+	
+		
+	<div class="book_description description field_body">
+		<% if @edition_mode==true %>
+			<textarea id="document_description" name="document[description]" placeholder="<%= t("description") %>"><%= @document.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<div>
+				<% if @document.description != nil %>			
+					<%= raw @document.description.truncate(1000, :separator => " ", :omission => "...") %>
+				<% end %>					
+			</div>
+		<% end %>
+	</div>
+	
+	
+	<div class="book_tags element_field_box">
+		<div class="field_prompt"><%= "Keywords" %></div>
+		<div class="documents_tags_field_body">			
+			<% if @edition_mode==true %>    
+		    	<textarea id="document_tags" class="tags" name="document[tag_list]"><% if @document!=nil %><%= @document.document_tag_list %><% end %></textarea>
+		    	<i class="icon-pencil icon-grey"></i>
+		    <% else %>
+		    	<span class="tags"><% if @document!=nil %><%= @document.document_tag_list_with_links.html_safe %><% end %></span>	
+		    <% end %>														
+		</div>
+	</div>			
+	
+	
+	<div class="book_tags element_field_box">
+		<div class="field_prompt"><%= t("classified_in_category") %></div>
+		<div class="field_body">			
+		<% if @edition_mode==true %>
+			<textarea id="document_name" name="document[name]" placeholder="<%= t("Classified in Category") %>"><%= @document.classified_in_category %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else 
+		      if params[:repository] == "oercommons"
+				 classified_in_category =  @document.classified_in_category_oercommons
+		      elsif params[:repository] == "merlot"
+		         classified_in_category =  @document.classified_in_category_merlot
+		      elsif params[:repository] == "cnx"
+		         classified_in_category =  @document.classified_in_category_cnx   
+		      elsif params[:repository] == "wikipedia"
+		         classified_in_category =  @document.classified_in_category_wikipedia
+		      end   %>	 	
+			<span><%= classified_in_category %></span>
+			<% classified_in_category_size = classified_in_category.split(",").size %>
+		<% end %>
+		</div>
+	</div>	
+	
+	<div class="book_url element_field_box">
+		<div class="field_prompt"><%= t("url") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>    
+		    	<%= book_form.text_field :url %>
+		    	<i class="icon-pencil icon-grey"></i>			    	
+		    <% else %>
+		    <% if @document.url.include? "oercommons" 
+		    	  corpus_resource = "oercommons"
+	    	   elsif @document.url.include? "merlot"
+	    		  corpus_resource = "merlot"
+			   elsif @document.url.include? "cnx"
+	    		  corpus_resource = "cnx"    	  
+		       end %>
+		    	<a href="<%= @document.url %>" target="_blank"><%= @document.url %></a>
+		    <% end %>
+	   </div>		
+	</div>
+	
+<% if params[:user_id] != nil %>
+	
+	<hr size="4px" color="black" />
+	
+	<div class="book_url element_field_box">
+		(<b>Categories available are:</b>
+		<i>
+		<%= if params[:repository] == "oercommons"
+				@categories_available = "Arts, Education, Business, Humanities, Mathematics and Statistics, Physics, Geoscience, Computing and Information, Ecology, Engineering, Science and Technology, Forestry and Agriculture, Space Science, Mathematics, Life Science, Politics, Law, Technology, Social Sciences, Chemistry, History"
+			elsif params[:repository] == "merlot"
+				@categories_available = "Academic Support Services, Arts, Business, Education, Humanities, Mathematics and Statistics, Science and Technology, Social Sciences, Workforce Development"
+			elsif params[:repository] == "cnx"
+				@categories_available = "Arts, Business, Humanities, Mathematics and Statistics, Science and Technology, Social Sciences"	
+			end %>
+		)</i>
+		<hr>
+		<br>
+		<br>
+		<div class = "classification_correct">
+			<%= form_tag do %>
+				<% for i in 0..classified_in_category_size - 1 do %>
+				<div class="field_prompt"><%= t("classification_correct") %><br><mark><i> "<%= classified_in_category.split(",")[i] %>"</i></mark>?</div>
+				<div class = "classification_correct2">
+					<input type="radio" name=<%="evaluation" + i.to_s%> value=<%="Yes---" + classified_in_category.split(",")[i].gsub(" ","_")%>> Yes
+				</div>
+				<div class = "classification_correct3">
+					<input type="radio" name=<%="evaluation" + i.to_s%> value=<%="No---" + classified_in_category.split(",")[i].gsub(" ","_")%>> No
+				</div>				
+				<div class = "classification_correct3">
+					<input type="radio" name=<%="evaluation" + i.to_s%> value=<%="N/A---" + classified_in_category.split(",")[i].gsub(" ","_")%>> N/A
+				</div>
+				<br>
+				<hr>
+				<% end %>
+				<div class="clear"></div>
+				<div class = "classification_correct2">
+					<%= hidden_field_tag :corpus_taxonomy, params[:repository] %>
+					<%= hidden_field_tag :corpus_resource, corpus_resource %>
+					<% if params[:user_id] == nil
+					   url = "/documents?page=" + params[:page] + "&repository=" + params[:repository] + "&section=" + params[:section]
+					else 
+					   url = "/documents?page=" + params[:page] + "&repository=" + params[:repository] + "&section=" + params[:section] + "&user_id=" + params[:user_id]
+					end
+					puts url
+					   url = URI.encode(url) %> 
+					<%= hidden_field_tag :url, url %>					
+					<%= submit_tag "Send Evaluation" %>
+				</div>
+			<% end %>					
+		</div>	
+	</div>		
+	<% end %>
+</div>
+
+
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<% if @edition_mode == false && @popup == nil %>	
+		<div class="watermark_container_show">
+			<div class="watermark_show <%=@resource_type.downcase%>_watermark"></div>
+		</div>
+	<% end %>
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>		
+			<% if @document.image_url != "" and @document.image_url != nil  %>
+				<%= image_tag @document.image_url, width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_document.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= document_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		<% else %>
+			<% if @document.image_url != "" and @document.image_url != nil  %>
+				<%= image_tag @document.image_url, width:'100%', :class => "image_preview_show" %>
+			<% else %>
+				<%= image_tag "/images/no_photo.png", width:'100%', :class => "image_preview_show" %>
+			<% end %>
+		<% end %>
+	</div>
+
+</div>
+
+
+
+
+
+<% if @edition_mode==true %>
+	<div id="snippets_library" style="display: none">
+		<div class="subject_item">				
+			<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name"), :prompt => "", :class => "subject" %>
+			<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+		</div>
+	</div>
+<% end %>
+
+

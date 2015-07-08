@@ -1,0 +1,14 @@
+<%= render :partial => "selectors/user_selector", :layout => "layouts/popup", :locals => {:popup_id => "group_user_selection", :popup_class => "selection multiple", :callback => "select_group_user()", :deselect_callback => "deselect_group_user()", :details_header_title => "group"} %>
+
+<div style="display: none">
+	<div id="tool_view_box" class="tool_view_box" style="padding: 26px">
+		<div id="selector_header">
+			<div class="selector_box_title">
+				<h1 id="list_title"><%=t :Tool %></h1>
+			</div>
+			<div class="clear"></div>
+			<hr/>
+		</div>
+		<div class="details"><iframe class="details_iframe" seamless></iframe></div>
+	</div>
+</div>

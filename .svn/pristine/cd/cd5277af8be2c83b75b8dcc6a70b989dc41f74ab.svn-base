@@ -1,0 +1,215 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'bookmarks', :current_layout => "bookmarks"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => t('bookmarked_items'), :actions => "list_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	<div class="bookmarks_page">
+		<div class="bookmarked_applications list_elements_container">
+			<div class="prompt"><img src="/images/black_application_100.png"/><%= t("applications") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @bookmarked_applications.length %></span></span></div>
+			<% @bookmarked_applications.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="bookmarked_box" style="background-image:url(<%= element.element_image.url %>)" onclick="remove_popup_body();show_element_in_popup('application', '<%= element.id %>', '<%= popup_show_application_path %>');">
+				<% else %>
+					<div class="bookmarked_box" style="background-image:url('/images/watermarks/b_watermark_application.png')" onclick="onclick="remove_popup_body();show_element_in_popup('application', '<%= element.id %>', '<%= popup_show_application_path %>');">
+				<% end %>
+						<div class="remove_bookmark" onclick="remove_bookmarked_element(this,<%= element.id %>,'application');event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();">
+						</div>
+						<div class="bookmarked_box_footer">
+							<p><%= element.name %></p>
+						</div>	
+				</div>
+			<% end %>
+			
+		</div>
+		<hr>
+		<div class="bookmarked_events list_elements_container">
+			<div class="prompt"><img src="/images/black_event_100.png"/><%= t("events") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @bookmarked_events.length %></span></span></div>
+			<% @bookmarked_events.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="bookmarked_box" style="background-image:url(<%= element.element_image.url %>)" onclick="remove_popup_body();show_element_in_popup('event', '<%= element.id %>', '<%= popup_show_event_path %>');">
+				<% else %>
+					<div class="bookmarked_box" style="background-image:url('/images/watermarks/b_watermark_event.png')" onclick="remove_popup_body();show_element_in_popup('event', '<%= element.id %>', '<%= popup_show_event_path %>');">
+				<% end %>
+						<div class="remove_bookmark" onclick="remove_bookmarked_element(this,<%= element.id %>,'event');event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();">
+						</div>
+						<div class="bookmarked_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>
+			<% end %>
+		</div>
+		<hr>
+		<div class="bookmarked_people list_elements_container"> 
+			<div class="prompt"><img src="/images/black_person_100.png"/><%= t("people") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @bookmarked_people.length %></span></span></div>
+			<% @bookmarked_people.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="bookmarked_box" style="background-image:url(<%= element.element_image.url %>)" onclick="remove_popup_body();show_element_in_popup('person', '<%= element.id %>', '<%= popup_show_person_path %>');">
+				<% else %>
+					<div class="bookmarked_box" style="background-image:url('/images/watermarks/b_watermark_expert.png')" onclick="remove_popup_body();show_element_in_popup('person', '<%= element.id %>', '<%= popup_show_person_path %>');">
+				<% end %>
+						<div class="remove_bookmark" onclick="remove_bookmarked_element(this,<%= element.id %>,'person');event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();">
+						</div>
+						<div class="bookmarked_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>
+		
+		<hr>
+		<div class="bookmarked_lectures list_elements_container"> 
+			<div class="prompt"><img src="/images/black_lecture_100.png"/><%= t("lectures") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @bookmarked_lectures.length %></span></span></div>
+			<% @bookmarked_lectures.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="bookmarked_box" style="background-image:url(<%= element.element_image.url %>)" onclick="remove_popup_body();show_element_in_popup('lecture', '<%= element.id %>', '<%= popup_show_lecture_path %>');">
+				<% else %>
+					<div class="bookmarked_box" style="background-image:url('/images/watermarks/b_watermark_lecture.png')" onclick="remove_popup_body();show_element_in_popup('lecture', '<%= element.id %>', '<%= popup_show_lecture_path %>');">
+				<% end %>
+						<div class="remove_bookmark" onclick="remove_bookmarked_element(this,<%= element.id %>,'lecture');event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();">
+						</div>
+						<div class="bookmarked_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>	
+		
+		<hr>
+		<div class="bookmarked_sites list_elements_container"> 
+			<div class="prompt"><img src="/images/black_site_100.png"/><%= t("sites") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @bookmarked_sites.length %></span></span></div>
+			<% @bookmarked_sites.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="bookmarked_box" style="background-image:url(<%= element.element_image.url %>)" onclick="remove_popup_body();show_element_in_popup('site', '<%= element.id %>', '<%= popup_show_site_path %>');">
+				<% else %>
+					<div class="bookmarked_box" style="background-image:url('/images/watermarks/b_watermark_site.png')" onclick="remove_popup_body();show_element_in_popup('site', '<%= element.id %>', '<%= popup_show_site_path %>');">
+				<% end %>
+						<div class="remove_bookmark" onclick="remove_bookmarked_element(this,<%= element.id %>,'site');event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();">
+						</div>
+						<div class="bookmarked_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>	
+	
+		<hr>
+		<div class="bookmarked_documentaries list_elements_container"> 
+			<div class="prompt"><img src="/images/black_documentary_100.png"/><%= t("documentaries") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @bookmarked_documentaries.length %></span></span></div>
+			<% @bookmarked_documentaries.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="bookmarked_box" style="background-image:url(<%= element.element_image.url %>)" onclick="remove_popup_body();show_element_in_popup('documentary', '<%= element.id %>', '<%= popup_show_documentary_path %>');">
+				<% else %>
+					<div class="bookmarked_box" style="background-image:url('/images/watermarks/b_watermark_documentary.png')" onclick="remove_popup_body();show_element_in_popup('documentary', '<%= element.id %>', '<%= popup_show_documentary_path %>');">
+				<% end %>
+						<div class="remove_bookmark" onclick="remove_bookmarked_element(this,<%= element.id %>,'documentary');event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();">
+						</div>
+						<div class="bookmarked_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>
+		
+		
+		<hr>
+		<div class="bookmarked_courses list_elements_container"> 
+			<div class="prompt"><img src="/images/black_course_100.png"/><%= t("courses") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @bookmarked_courses.length %></span></span></div>
+			<% @bookmarked_courses.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="bookmarked_box" style="background-image:url(<%= element.element_image.url %>)" onclick="remove_popup_body();show_element_in_popup('course', '<%= element.id %>', '<%= popup_show_course_path %>');">
+				<% else %>
+					<div class="bookmarked_box" style="background-image:url('/images/watermarks/b_watermark_course.png')" onclick="remove_popup_body();show_element_in_popup('course', '<%= element.id %>', '<%= popup_show_course_path %>');">
+				<% end %>
+						<div class="remove_bookmark" onclick="remove_bookmarked_element(this,<%= element.id %>,'course');event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();">
+						</div>
+						<div class="bookmarked_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>	
+		
+		
+		<hr>
+		<div class="bookmarked_articles list_elements_container"> 
+			<div class="prompt"><img src="/images/black_article_100.png"/><%= t("articles") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @bookmarked_articles.length %></span></span></div>
+			<% @bookmarked_articles.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="bookmarked_box" style="background-image:url(<%= element.element_image.url %>)" onclick="remove_popup_body();show_element_in_popup('article', '<%= element.id %>', '<%= popup_show_article_path %>');">
+				<% else %>
+					<div class="bookmarked_box" style="background-image:url('/images/watermarks/b_watermark_article.png')" onclick="remove_popup_body();show_element_in_popup('article', '<%= element.id %>', '<%= popup_show_article_path %>');">
+				<% end %>
+						<div class="remove_bookmark" onclick="remove_bookmarked_element(this,<%= element.id %>,'article');event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();">
+						</div>
+						<div class="bookmarked_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>	
+		
+		
+		<hr>
+		<div class="bookmarked_lres list_elements_container"> 
+			<div class="prompt"><img src="/images/black_lre_100.png"/><%= t("lres") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @bookmarked_lres.length %></span></span></div>
+			<% @bookmarked_lres.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="bookmarked_box" style="background-image:url(<%= element.element_image.url %>)" onclick="remove_popup_body();show_element_in_popup('lre', '<%= element.id %>', '<%= popup_show_lre_path %>');">
+				<% else %>
+					<div class="bookmarked_box" style="background-image:url('/images/watermarks/b_watermark_lre.png')" onclick="remove_popup_body();show_element_in_popup('lre', '<%= element.id %>', '<%= popup_show_lre_path %>');">
+				<% end %>
+						<div class="remove_bookmark" onclick="remove_bookmarked_element(this,<%= element.id %>,'lre');event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();">
+						</div>
+						<div class="bookmarked_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>
+		
+		<hr>
+		<div class="bookmarked_posts list_elements_container"> 
+			<div class="prompt"><img src="/images/black_post_100.png"/><%= t("posts") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @bookmarked_posts.length %></span></span></div>
+			<% @bookmarked_posts.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="bookmarked_box" style="background-image:url(<%= element.element_image.url %>)" onclick="remove_popup_body();show_element_in_popup('post', '<%= element.id %>', '<%= popup_show_post_path %>');">
+				<% else %>
+					<div class="bookmarked_box" style="background-image:url('/images/watermarks/b_watermark_post.png')" onclick="remove_popup_body();show_element_in_popup('post', '<%= element.id %>', '<%= popup_show_post_path %>');">
+				<% end %>
+						<div class="remove_bookmark" onclick="remove_bookmarked_element(this,<%= element.id %>,'post');event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();">
+						</div>
+						<div class="bookmarked_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>	
+		
+	
+		<hr>
+		<div class="bookmarked_slideshows list_elements_container"> 
+			<div class="prompt"><img src="/images/black_slideshow_100.png"/><%= t("slideshows") %><span class="total_results"><%= t("total_results") %> <span class="number"><%= @bookmarked_slideshows.length %></span></span></div>
+			<% @bookmarked_slideshows.each do |element| %>
+				<% if element.element_image.url!="none" %>
+					<div class="bookmarked_box" style="background-image:url(<%= element.element_image.url %>)" onclick="remove_popup_body();show_element_in_popup('slideshow', '<%= element.id %>', '<%= popup_show_slideshow_path %>');">
+				<% else %>
+					<div class="bookmarked_box" style="background-image:url('/images/watermarks/b_watermark_slideshow.png')" onclick="remove_popup_body();show_element_in_popup('slideshow', '<%= element.id %>', '<%= popup_show_slideshow_path %>');">
+				<% end %>
+						<div class="remove_bookmark" onclick="remove_bookmarked_element(this,<%= element.id %>,'slideshow');event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();">
+						</div>
+						<div class="bookmarked_box_footer">
+							<p><%= element.name %></p>
+						</div>
+				</div>				
+			<% end %>
+		</div>	
+		
+				
+	</div>
+	<div id="popups" class="popup_bookmarks_page">
+		<%= render :partial => "adding_popups" %> 
+	</div>	
+	
+
+<% end %>

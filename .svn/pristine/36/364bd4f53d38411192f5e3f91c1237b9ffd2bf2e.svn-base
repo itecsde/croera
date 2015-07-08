@@ -1,0 +1,44 @@
+class Source < ActiveRecord::Base
+  has_many :tasks  
+  has_many :comments, :as => :commentable, :dependent => :destroy
+  has_attached_file :element_image, :styles => { :original => "300x300>", :medium => "200x200>", :thumb => "30x30>" }, :default_url => "none"
+  include Ownable
+  
+  def self.create_or_select_source(source_name,source_type, url)
+    if Source.find_by_name_and_source_type(source_name,source_type) != nil
+      source = Source.find_by_name_and_source_type(source_name,source_type)
+      source.scrape_status = "active"
+      source.scraped_correct = false
+      source.save
+    else
+      source = Source.new
+      source.name = source_name
+      source.source_type = source_type
+      source.url = url
+      source.scrape_status = "active"
+      source.scraped_correct = false
+      source.save
+    end
+    return source
+  end
+  
+  def correct_scrape
+    #Scrape was correct => fill in the source fields
+    self.number_of_resources = Site.where(:scraped_from => url).size
+    self.last_scraping = Time.now
+    self.scraped_correct = true
+    self.scrape_status = "finished"
+    self.save
+  end
+  
+  def incorrect_scrape
+    #Scrape was no correct => fill in the source fields
+    self.number_of_resources = Site.where(:scraped_from => url).size
+    self.last_scraping = Time.now
+    self.scraped_correct = false
+    self.scrape_status = "finished"
+    self.save
+  end
+
+  
+end

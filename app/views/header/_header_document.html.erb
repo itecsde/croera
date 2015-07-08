@@ -1,0 +1,8 @@
+<% if current_user == nil %>
+	<%= render :partial => "header/main_navbar_not_logged_document", :locals => {:element_active => element_active} %>
+<% else %>
+	<%= render :partial => "header/main_navbar", :locals => {:element_active => element_active} %>
+<% end %>
+
+
+	

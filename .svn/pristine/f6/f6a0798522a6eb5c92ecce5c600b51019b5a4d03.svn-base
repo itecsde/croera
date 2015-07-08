@@ -1,0 +1,1 @@
+$(".search_elements_type_box.list_<%= @date_range %>").html("<%=j render :partial => 'list_date_range', locals: { :elements => @elements, :section => @section, :date_range => @date_range } %>");

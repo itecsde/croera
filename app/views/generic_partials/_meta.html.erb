@@ -1,0 +1,18 @@
+<% if element != nil %>
+	<title><%= element.name %></title>
+	<% if element.description != nil %>
+		<meta name="description" content="<%= element.description %>"/>
+	<% end %>
+	<% puts element.class.name.underscore %>
+	<% if element.class.name.underscore == "document" %>
+		<meta name="keywords" content="<%= %>"/>
+	<% else%>
+		<meta name="keywords" content="<%=element.tag_list %>"/>
+	<% end%>
+<% else %>
+	<title>SDE</title>
+	<meta name="description" content="The Scenario Development Environment (SDE) provides the capability of looking for resources beyond content, such as applications, events that may have an educational value, and experts that may contribute to Learning Activities. Those resources come from the automatic crawling of web sites. Besides, you can use the SDE to configure a Learning Story with the most appropriate resources, relying on recommendations that the SDE provides taking your profile into account."/>
+<% end %>
+
+
+

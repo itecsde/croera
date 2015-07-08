@@ -1,0 +1,8 @@
+<p><%= t("Hello") %> <%= @resource.email %>!</p>
+
+<p><%= t("Someone_has_requested_a_link_to_change_your_password") %></p>
+
+<p><%= link_to t('Change_my_password'), edit_password_url(@resource, :locale => locale, :reset_password_token => @resource.reset_password_token) %></p>
+
+<p><%= t("If_you_didn_request_this_please_ignore_this_email") %></p>
+<p><%= t("Your_password_wont_change") %></p>

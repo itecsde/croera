@@ -1,0 +1,132 @@
+<% if @site.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@site.errors.count, "error") %> prohibited this site from being saved:</h2>	
+	  <ul>
+	  <% @site.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="site_name field_body">
+		<% if @edition_mode==true %>
+			<textarea id="site_name" name="site[name]" placeholder="<%= t("title") %>"><%= @site.name %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<span><%= @site.name %></span>
+		<% end %>
+	</div>
+	
+		
+	<div class="site_description description field_body">
+		<% if @edition_mode==true %>
+			<textarea id="site_description" name="site[description]" placeholder="<%= t("description") %>"><%= @site.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<div>
+				<% if @site.description != nil %>			
+					<%= raw @site.description.truncate(1000, :separator => " ", :omission => "...") %>
+				<% end %>					
+			</div>
+		<% end %>
+	</div>
+	
+	
+	<div class="site_tags element_field_box">
+		<div class="field_prompt"><%= t("keywords") %></div>
+		<div class="field_body">			
+			<% if @edition_mode==true %>    
+		    	<textarea id="site_tags" class="tags" name="site[tag_list]"><% if @site!=nil %><%= @site.tag_list %><% end %></textarea>
+		    	<i class="icon-pencil icon-grey"></i>
+		    <% else %>
+		    	<span class="tags"><% if @site!=nil %><%= @site.tag_list_with_links.html_safe %><% end %></span>	
+		    <% end %>														
+		</div>
+	</div>		
+			
+	
+	<div class="site_url element_field_box">
+		<div class="field_prompt"><%= t("url") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>    
+		    	<%= site_form.text_field :url %>
+		    	<i class="icon-pencil icon-grey"></i>			    	
+		    <% else %>
+		    	<a href="<%= @site.url %>" target="_blank"><%= @site.url %></a>
+		    <% end %>
+	   </div>		
+	</div>
+		
+	
+	<% if @edition_mode!=true && @site.scraped_from!=nil && @site.scraped_from!="" %>  
+		<div class="site_scraped_from element_field_box">
+			<div class="field_prompt"><%= t("source") %></div>
+			<div class="field_body">
+				<a href="<%= @site.scraped_from %>" target="_blank"><%= @site.scraped_from %></a>
+			</div>
+		</div>
+	<% end %>
+			
+</div>
+
+
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<% if @edition_mode == false && @popup == nil %>	
+		<div class="watermark_container_show">
+			<div class="watermark_show <%=@resource_type.downcase%>_watermark"></div>
+		</div>
+	<% end %>
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>		
+			<% if @site.element_image.url() != "none" %>
+				<%= image_tag @site.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_site.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= site_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		<% else %>
+			<% if @site.element_image.url() != "none" %>
+				<%= image_tag @site.element_image.url(:medium), width:'100%', :class => "image_preview_show" %>
+			<% else %>
+				<%= image_tag "/images/no_photo.png", width:'100%', :class => "image_preview_show" %>
+			<% end %>
+		<% end %>
+	</div>
+	
+	
+	<% if @edition_mode==true %>
+		<div class="site_address element_field_box field editable active">
+	<% else %>
+		<div class="site_address element_field_box">
+	<% end %>
+		<div class="field_prompt"><%= t("address") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>
+				<%= site_form.text_field :address,  :onChange => "change_location_written();",:onkeypress => "return press_key(event)" %>
+			<% else %>
+				<%= site_form.text_field :address, :readonly=>"readonly" %>
+			<% end %>
+			<%= site_form.hidden_field :latitude %>
+	 		<%= site_form.hidden_field :longitude %>
+		</div>
+	</div>
+	
+	<div class="site_map" id="map-canvas"></div>
+	
+	
+</div>
+
+	
+
+
+
+

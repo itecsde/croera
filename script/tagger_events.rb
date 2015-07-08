@@ -1,0 +1,19 @@
+require 'rubygems'
+
+Event.all.each do |element|
+  if element.scraping_status != nil #&& element.scraping_status.automatically_tagged == false
+    if element.name == nil
+      name=""
+    else
+      name=element.name
+    end
+    if element.description == nil
+      description=""
+    else
+      description=element.description
+    end
+    
+    element.create_automatic_semantic_annotations(name+" "+description)
+  end
+  
+end

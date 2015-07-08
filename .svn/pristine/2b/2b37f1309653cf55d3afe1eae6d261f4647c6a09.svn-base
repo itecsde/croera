@@ -1,0 +1,7 @@
+classificator = Classify.new
+
+training_secuence = [5,10,50,100]
+
+training_secuence.each do |training_elements|
+   classificator.ieee_semantic_classifier(0.1, training_elements)
+end

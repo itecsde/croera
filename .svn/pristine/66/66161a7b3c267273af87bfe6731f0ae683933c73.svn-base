@@ -1,0 +1,157 @@
+class Documentary < ActiveRecord::Base
+  include Taggable
+  include Ownable
+  include Wikipediable
+  include Globalizable
+  include Aggregable  
+  include Categorizable
+  include Scrapeable
+  
+    
+  translates :name
+  translates :description
+  translates :link
+  
+  searchable do
+    integer :id    
+    text :name
+    text :tags do |p|
+      p.tags.map(&:name)
+    end
+    text :categories do |p|
+      p.categories.map(&:name)
+    end   
+    text :subjects do |p|
+      p.subjects.map(&:name)
+    end 
+    text :language do |lan|
+      lan.languages.map(&:language)
+    end
+    string :translations, :multiple => true do
+      translations.map{|translation| translation.locale}
+    end 
+    I18n.available_locales.each do |locale|
+      text "description_" + locale.to_s do
+        read_attribute(:description, :locale => locale.to_s)
+      end
+    end    
+    integer :owner_id
+    time :updated_at
+  end
+  
+  # A documentary may have many comments
+  has_many :comments, :as => :commentable, :dependent => :destroy
+  
+  # A documentary is categorised into many subjects
+  has_many :documentary_subject_annotations, :dependent => :destroy
+  has_many :subjects, :through => :documentary_subject_annotations
+  accepts_nested_attributes_for :documentary_subject_annotations, :allow_destroy => :true
+  
+  
+  # A documentary is bookmarkable
+  has_many :bookmark_user_element_annotations, :as => :element, :dependent => :destroy
+  has_many :bookmarked_by, :through => :bookmark_user_element_annotations, :source =>:user
+
+  # And a documentary may include a representative picture
+  attr_accessible :element_image, :name, :description, :url, :link, :documentary_subject_annotations_attributes, :owner_type, :owner_id, :scraped_from, :creator_id, :tag_list
+  has_attached_file :element_image, :styles => { :original => "300x300>", :medium => "200x200>", :thumb => "30x30>" }, :default_url => "none"
+  
+  def persist(idiomas_disponibles, prosa, array_tags,*translated_array_tags)
+    recent_hash = Digest::MD5.hexdigest(prosa)
+    check_result = check_resource_storage_state(self.url,recent_hash)
+    if check_result == "insert"
+      puts "SE INSERTA EL DOCUMENTARY"
+      self.info_to_wikify = prosa
+      self.hash_resource = recent_hash
+      self.create_semantic_annotations(array_tags)
+      automatic_tags_ids = self.create_automatic_semantic_annotations(prosa)
+      #self.categorize(automatic_tags_ids)
+      self.save
+      if translated_array_tags[0] != nil
+        if translated_array_tags[0].length != 0
+          I18n.locale = "en"
+          self.create_translated_to_english_semantic_annotations(translated_array_tags[0])
+        end
+      end
+      self.reload
+      Sunspot.index self
+      Sunspot.commit      
+    elsif check_result == "update"
+      puts "UPDATE => SE ACTUALIZA EL DOCUMENTARY"
+      scraped_documentary = Documentary.where(:url => self.url)[0]
+      idiomas_disponibles.each do |idioma|
+        I18n.locale = idioma
+        scraped_documentary.name = self.name
+        scraped_documentary.description = self.description
+        scraped_documentary.link = self.link
+      end
+      scraped_documentary.create_semantic_annotations(array_tags)
+      automatic_tags_ids = scraped_documentary.create_automatic_semantic_annotations(prosa)
+      #scraped_documentary.categorize(automatic_tags_ids)
+      scraped_documentary.info_to_wikify = prosa.gsub(/[^0-9a-z:,. ]/i, '')
+      scraped_documentary.hash_resource = recent_hash
+      scraped_documentary.save
+      if translated_array_tags[0] != nil
+        if translated_array_tags[0].length != 0
+          I18n.locale = "en"
+          scraped_documentary.create_translated_to_english_semantic_annotations(translated_array_tags[0])
+        end
+      end
+      scraped_documentary.reload
+      Sunspot.index scraped_documentary
+      Sunspot.commit      
+    elsif check_result == "do_nothing"
+      puts "DO_NOTHING => NI SE INSERTA NI SE ACTUALIZA EL DOCUMENTARY, COMPROBAMOS TRADUCCIONES"
+      if Documentary.where(:url => self.url).size != 0
+        documentary = Documentary.find_by_url(self.url)
+        locales_string = Array.new
+        documentary.translated_locales.each do |locale|
+          locales_string << locale.to_s
+        end
+        idiomas_disponibles_string = Array.new
+        idiomas_disponibles.each do |idioma_disponible|
+          idiomas_disponibles_string << idioma_disponible.to_s          
+        end
+        if (idiomas_sin_traducciones = idiomas_disponibles_string - locales_string) != []
+          puts "ACTUALIZAMOS TRADUCCIONES"
+          idiomas_sin_traducciones.each do |idioma|
+            I18n.locale = idioma
+            puts I18n.locale
+            puts self.description
+            documentary.name = self.name
+            documentary.description = self.description
+            documentary.link = self.link
+            documentary.save
+          end
+        else
+          puts "LAS TRADUCCIONES ESTAN COMPLETAS. NO HACEMOS NADA"
+        end
+      end
+    end   
+  end
+  
+   def check_resource_storage_state(url,recent_hash)
+    result = "do_nothing"
+    documentary = Documentary.where(:url => url)
+    if documentary.size > 0
+      puts "hash BD: " + documentary[0].hash_resource
+      puts "hash actual: " + recent_hash
+      if documentary[0].hash_resource != recent_hash
+        result = "update"
+      end
+    else
+      result = "insert"
+    end
+    return result
+  end #check_resource_storage_state
+  
+  def tag_list
+    self.tags.map { |t| t.name }.join(", ")
+  end
+
+  def tag_list=(new_value)
+    tag_names = new_value.split(/,\s+/)
+    self.tags = tag_names.map { |name| Tag.where('name = ?', name).first or Tag.create(:name => name.strip) }
+  end
+  
+end

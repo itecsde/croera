@@ -1,0 +1,61 @@
+<%
+	if box.id == nil
+		component_picture = box.components.new
+		component_picture.component_type = "picture"
+		component_picture.position = 1
+		component_name = box.components.new
+		component_name.component_type = "header"
+		component_name.position = 2
+		component_name.texts.new
+		component_description = box.components.new
+		component_description.component_type = "textarea"
+		component_description.position = 3
+		component_description.texts.new
+	else
+		box.components.each do |box_component|
+			case box_component.component_type
+			when "picture"
+				component_picture = box_component
+			when "header"
+				component_name = box_component
+			when "textarea"
+				component_description = box_component
+			end
+		end		
+	end
+%>
+
+<div class= "picture_container">
+	<span class="change_picture edition_control active" onclick= "change_picture(this);"><p><%= t("Change_picture") %></p></span>
+	<%= image_tag component_picture.area_image.url(), width:'100%', :class => "image_preview" %>
+	<%= hidden_field_tag :component_id, component_picture.id %>
+	<div class= "file_upload">
+		<%= file_field_tag :image, :onchange => "handleFileSelect(this, event);" %>
+	</div>
+	<div class= "picture_information">
+		<div class="component_container">
+			<%= hidden_field_tag :component_id, component_name.id %>
+			<%= hidden_field_tag :component_type, component_name.component_type %>
+			<% component_name.texts.each do |text| %>
+				<div class= "text_container header editable active">
+					<%= hidden_field_tag :text_id, text.id, :class => "text_id" %>
+					<%= text_area_tag "text_content", text.content, :class => "text_content", :placeholder => t("title") %>
+					<i class="icon-pencil icon-white"></i>
+				</div>
+			<% end %>
+		</div>
+		<div class="component_container">
+			<%= hidden_field_tag :component_id, component_description.id %>
+			<%= hidden_field_tag :component_type, "textarea" %>
+			<% component_description.texts.each do |text| %>
+				<div class= "text_container textarea editable active">
+					<%= hidden_field_tag :text_id, text.id, :class => "text_id" %>
+					<textarea class="text_content" placeholder="<%= t("Write_here") %>"><%= text.content %></textarea>
+					<i class="icon-pencil icon-white"></i>
+				</div>
+			<% end %>
+		</div>
+		<div class="clear"></div>
+	</div>
+</div>
+

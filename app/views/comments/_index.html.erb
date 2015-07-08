@@ -1,0 +1,39 @@
+<div class= "comments">
+	<div class= "actual_comments">
+		<% if comments == [] %>
+			<p style="font-style:italic;color:#868688;font-size:13px;"><%= t("No_comments") %></p>
+		<% end %>
+		<% comments.order("created_at DESC").each do |comment| %>
+			<div class="comment">
+				<span class= "comment_image">
+					<%= link_to image_tag(comment.user.avatar.url(:thumb)), user_path(comment.user) %>
+				</span>
+				<span class= "comment_text">
+					<% if (comment.user.first_name != nil && comment.user.first_name != "") %>
+						<%= link_to comment.user.first_name+" "+comment.user.last_name, user_path(comment.user), :class => "comment_profile_link" %>
+					<% else %>
+						<%= link_to comment.user.email, user_path(comment.user), :class => "comment_profile_link" %>
+					<% end %>
+					<p><%= comment.description %></p>
+					<span class="comment_timestamp"><%= comment.created_at.strftime("%d %b. %Y") %> - <%= comment.created_at.strftime("%H:%M") %></span>
+				</span>
+			</div>
+		<% end %>
+	</div>
+	<div class="your_comment comment">
+		<span class= "comment_image">
+			<%= link_to image_tag(current_user.avatar.url(:thumb)), user_path(current_user)	%>
+		</span>
+		<%= form_tag({:controller => :comments, :action => :new}, :remote => true, :class => 'new_comment') do %>
+		<span class= "comment_text">
+			<%= fields_for :comment do |comments_fields|%>
+				<%= comments_fields.text_area :description,:value => "", :class => "comment_input", :placeholder => t("Your_comment"), :width =>'100%', :height => 'auto', :size => '1x1' %>
+				<%= comments_fields.hidden_field :commentable_id, :value => commentable_id %>
+				<%= comments_fields.hidden_field :commentable_type, :value => commentable_type %>
+			<% end %>
+		</span>
+		<%= submit_tag t('Comment_it')%>
+		<% end %>
+		
+	</div>
+</div>

@@ -1,0 +1,42 @@
+<% if @previous_search_params != nil && @previous_search_params[:advanced_search] == "1" %>
+<div class="advanced_search row-fluid visible">
+<% else %>
+<div class="advanced_search row-fluid">
+<% end %>
+	<div class="span12 advanced_search_padding">
+		
+		<form class="advanced_search_form" id="advanced_search_form">
+			<div class="row-fuid">
+				<div class="span3">			
+					<div style="margin-top:50px;" class="field_label c_white"><%= t('search_terms') %></div>
+					<div>
+						<% if @previous_search_params[:search]!=nil && @previous_search_params[:search]!="" %>
+							<input type="text" name="search" id="search" value="<%=@previous_search_params[:search]%>"/>
+						<% else %>
+							<input type="text" name="search" id="search"/>
+						<% end %>		
+					</div>				
+				</div>
+				<div class="span2">										
+					<div style="margin-top:60px;">
+						<button class="button_advanced_search field_label" id="search_button" onclick="submit_advanced_search(event);"><%= t('search') %></button>
+						<input type="hidden" id="advanced_search" name="advanced_search" value="0">
+					</div>
+					
+				</div>
+				<div class="span4">
+															
+		
+				</div>
+				<div class="span3">
+					<div class="row-fluid" style="height: 100px;">
+						<div class="span11 num_results_advanced_search c_white"><%= t('results')%>:&nbsp;<span id="num_results"></span><%=@num_results%></div>
+						<div class="span11 title_advanced_search c_white"  style="margin-top: 20px;"><%= t("search") %> </div>
+						<div class="span11 description_advanced_search c_white"><%= t('fill_inputs_and_search') %></div>
+						<div class="clear"></div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>		

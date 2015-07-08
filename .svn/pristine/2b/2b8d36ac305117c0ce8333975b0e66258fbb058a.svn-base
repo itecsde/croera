@@ -1,0 +1,113 @@
+<% if @post.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@post.errors.count, "error") %> prohibited this post from being saved:</h2>
+	
+	  <ul>
+	  <% @post.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+
+
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="post_name field_body">
+		<% if @edition_mode==true %>
+			<textarea id="post_name" name="post[name]" placeholder="<%= t("title") %>"><%= @post.name %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<span><%= @post.name %></span>
+		<% end %>
+	</div>
+	
+		
+	<div class="post_description description field_body">
+		<% if @edition_mode==true %>
+			<textarea id="post_description" name="post[description]" placeholder="<%= t("description") %>"><%= @post.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<div>
+				<% if @post.description != nil %>			
+					<%= raw @post.description.truncate(1000, :separator => " ", :omission => "...") %>
+				<% end %>
+				
+			</div>
+		<% end %>
+	</div>
+	
+	
+	<div class="post_tags element_field_box">
+		<div class="field_prompt"><%= t("keywords") %></div>
+		<div class="field_body">			
+			<% if @edition_mode==true %>    
+		    	<textarea id="post_tags" class="tags" name="post[tag_list]"><% if @post!=nil %><%= @post.tag_list %><% end %></textarea>
+		    	<i class="icon-pencil icon-grey"></i>
+		    <% else %>
+		    	<span class="tags"><% if @post!=nil %><%= @post.tag_list_with_links.html_safe %><% end %></span>	
+		    <% end %>														
+		</div>
+	</div>		
+	
+	
+	<div class="post_url element_field_box">
+		<div class="field_prompt"><%= t("url") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>    
+		    	<%= post_form.text_field :url %>
+		    	<i class="icon-pencil icon-grey"></i>			    	
+		    <% else %>
+		    	<a href="<%= @post.url %>" target="_blank"><%= @post.url %></a>
+		    <% end %>
+	   </div>		
+	</div>
+	
+	<% if @edition_mode!=true && @post.scraped_from!=nil && @post.scraped_from!="" %>  
+		<div class="post_scraped_from element_field_box">
+			<div class="field_prompt"><%= t("source") %></div>
+			<div class="field_body">
+				<a href="<%= @post.scraped_from %>" target="_blank"><%= @post.scraped_from %></a>
+			</div>
+		</div>
+	<% end %>
+	
+	
+</div>
+
+
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<% if @edition_mode == false && @popup == nil %>	
+		<div class="watermark_container_show">
+			<div class="watermark_show <%=@resource_type.downcase%>_watermark"></div>
+		</div>
+	<% end %>
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>		
+			<% if @post.element_image.url() != "none" %>
+				<%= image_tag @post.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_post.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= post_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		<% else %>
+			<% if @post.element_image.url() != "none" %>
+				<%= image_tag @post.element_image.url(:medium), width:'100%', :class => "image_preview_show" %>
+			<% else %>
+				<%= image_tag "/images/no_photo.png", width:'100%', :class => "image_preview_show" %>
+			<% end %>
+		<% end %>
+	</div>
+
+</div>
+
+
+
+

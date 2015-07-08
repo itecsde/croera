@@ -1,0 +1,40 @@
+<!-- This section implements the list of elements in a popup -->
+<div class= "popup_content">
+	<div class="popup_header">
+		<div id="section_header" class="resource_header">
+			<div id="actions" class="a-left">
+				<%= render :partial => "events/popup_list_actions", :locals => {:popup_id => 'event_assignment_selection'} %>
+			</div>
+			<div id="section_title" class="a-right">
+				<p><%= t("events") %></p>
+			</div>		
+		</div>			
+	</div>
+	<div class="clear"></div>
+
+	<div class="popup_body">
+		<div class="content_selectable_header"><%= t("you_can_use") %></div>
+		<div class="clear"></div>
+		<div class= "paginate_controls"></div>
+		<div id="event_list" class="event_list element_list"></div>
+	</div>
+</div>
+
+<!-- This section implements the detail of an element in a popup -->
+<div class= "popup_details_content">
+	<div class="popup_header">
+		<div id="section_header" class="resource_header">
+			<div id="actions" class="a-left">
+				<a class="back_icon has_tooltip" onclick ="popup_go_back('#<%=popup_id%>');">
+					 <%= image_tag("/images/icons/atras_30.png") %>
+					<span class="tooltip"><%= t("go_back")%></span>
+				</a>
+			</div>
+			<div id="section_title" class="a-right">
+				<p><%= t(details_header_title) %></p>
+			</div>		
+		</div>			
+	</div>
+	<div class="popup_body">
+	</div>
+</div>

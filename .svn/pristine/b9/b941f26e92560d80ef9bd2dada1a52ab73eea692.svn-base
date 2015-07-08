@@ -1,0 +1,183 @@
+class CoursesController < ApplicationController
+  
+  def index
+    @resource_type = "Course"
+    if I18n.locale.to_s == "gl"
+      search_languages=["gl","es"]
+    else 
+      search_languages=[I18n.locale.to_s]
+    end
+    if current_user != nil
+      per_page = 31
+    else
+      per_page = 32
+    end
+    
+    if (params[:advanced_search]=="1") 
+      @search=Course.search do          
+          keywords params[:keywords], :fields => [:tags] 
+          if params[:subject]!=""
+            keywords Subject.find(params[:subject]).name
+          end
+          with(:translations, search_languages)                    
+          paginate :page => params[:page], :per_page => per_page           
+        end
+      @courses = @search.results 
+      @num_results=@search.total
+    
+    elsif (params[:search] != nil && params[:search].size > 0)
+      if params[:article_id] == nil
+        @disambiguation = Search.disambiguation(params[:search])
+      end
+      if params[:search].index("#") == 0 
+        search = Search.new
+        @disambigued_term_info = search.disambigued_term_info(params[:search])
+      end        
+      @search = Search.search_elements_by_type('Course', params[:search],params[:article_id],per_page,params[:page])
+      @courses = @search[:results]          
+      @num_results = @search[:total]
+                       
+    else
+      @search = Course.search do |query|
+=begin        
+          if current_user != nil && current_user.circumstances != []
+            search_terms = current_user.circumstances.first.tag_list + ", " + current_user.circumstances.first.subject.name
+            query.keywords search_terms, :fields => [:tags, :name] {minimum_match 1}
+          end
+=end          
+          query.with(:translations, search_languages)  
+          query.paginate :page => params[:page],:per_page => per_page 
+      end
+      @courses = @search.results 
+      @num_results=@search.total
+    end  
+        
+    #@search = Course.search do
+    #  fulltext params[:search]
+    #  order_by :updated_at, :desc
+    #  paginate :page => params[:page], :per_page => 30
+    #end
+     
+    @previous_search_params=params      
+    @subjects=Subject.all     
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @courses }
+    end
+  end
+  
+  
+  def show
+    @course = Course.find(params[:id])
+    
+    if current_user!=nil
+      current_user.add_preferences_to_user_history(@course.taggable_tag_annotations)
+    end
+         
+    @subjects=Subject.all
+    @related_elements=RelatedElement.new(@course)   
+    @edition_mode=false
+    @resource_type="Course"
+        
+    if notice == 'Course was successfully created.' || notice == 'Course was successfully updated.'
+      @previous_action = 'saved'
+    else
+      @previous_action = 'list'
+    end    
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @course }
+    end
+  end
+  
+  
+  def new
+    if current_user != nil
+      @course = Course.new
+      @subjects=Subject.all
+      @edition_mode=true
+  
+      respond_to do |format|
+        format.html # new.html.erb
+        format.json { render json: @course }
+      end
+    else
+      redirect_to courses_path
+    end
+  end
+  
+  def edit
+    @course = Course.find(params[:id])
+    if current_user !=nil && ((@course.owner == current_user) or (@course.owner_type=="Group" && @course.owner.users.exists?(current_user)))
+      @subjects=Subject.all
+      @edition_mode=true
+    else
+      redirect_to course_path(@course)
+    end
+  end
+  
+  
+  def create
+    @course = Course.new(params[:course])
+    if (params[:course][:owner_type]==nil)
+      @course.owner_type="User"
+      @course.owner=current_user
+    end
+    @course.creator = current_user
+    @course.save
+
+    respond_to do |format|
+      if @course.save
+        format.html { redirect_to @course, notice: 'Course was successfully created.' }
+        format.json { render json: @course, status: :created, location: @course }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @course.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+  
+  
+  def update
+    @course = Course.find(params[:id])
+    if (params[:course][:owner_type]==nil)
+      @course.owner_type="User"
+      @course.owner=current_user
+    end
+    @course.subjects.destroy_all
+    
+    respond_to do |format|
+      if @course.update_attributes(params[:course])
+        format.html { redirect_to @course, notice: 'Course was successfully updated.' }
+        format.json { head :ok }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @course.errors, status: :unprocessable_entity }
+      end
+    end    
+  end
+  
+  
+  def destroy
+    @course = Course.find(params[:id])
+    @course.destroy
+
+    respond_to do |format|
+      format.html { redirect_to courses_url }
+      format.json { head :ok }
+    end
+  end
+  
+  
+  def popup_show_course
+    @course = Course.find(params[:element_id])
+    @subjects=Subject.all
+    @edition_mode=false
+
+    respond_to do |format|
+      format.js
+    end
+  end
+  
+  
+end

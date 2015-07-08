@@ -1,0 +1,216 @@
+# encoding: utf-8
+class Wikipediator
+  include ActionView::Helpers::SanitizeHelper
+  
+  # wikify recibe prosa y devuelve un array de tags
+  
+  def wikify(prose)
+    begin 
+      #prose.force_encoding('binary')  
+      url = "http://"+get_wikipediator_server+":8080/wikipediaminer/services/wikify?source=" + URI.encode(prose.gsub(/[^0-9a-z:,. ]/i, ''))
+      page = Nokogiri::XML(open(url))
+      tags = page.xpath("//message/detectedTopics/detectedTopic")
+      #puts tags
+      return tags
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message 
+      puts "Exception in wikify"    
+    end
+  end #wikify
+  
+  
+  def suggest(array_ids)
+    begin
+        list_ids=array_ids.map { |id| id }.join(",")
+        url = "http://"+get_wikipediator_server+":8080/wikipediaminer/services/suggest?queryTopics=" + list_ids
+        page = Nokogiri::XML(open(url))
+        categories = page.xpath("//message/suggestionCategories/suggestionCategory")
+        array_categories=Array.new
+        categories.each do |category|
+          array_categories << {:id => category['id'],:title => category['title'],:weight => category['weight']}
+        end
+      return array_categories
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message 
+      puts "Exception in suggest"      
+    end
+  end #suggest
+  
+  def search(name)
+    begin   
+        url = "http://"+get_wikipediator_server+":8080/wikipediaminer/services/search?query=" + name
+        page = Nokogiri::XML(open(url))
+        entries = page.xpath("//label/senses/sense")
+      return entries
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message 
+      puts "Exception in search"      
+    end
+  end #search
+   
+   
+  def getDefinition(title)    
+    begin   
+        url = "http://"+get_wikipediator_server+":8080/wikipediaminer/services/exploreArticle?definition=true&definitionLength=long&title=" + URI.encode(title)
+        page = Nokogiri::XML(open(url))
+        definition = page.xpath("//definition")
+        definition=strip_tags(definition.text)
+      return definition
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message 
+      puts "Exception in getDefinition"      
+    end 
+  end #getDefinition
+  
+  
+  def translations(id)
+    begin   
+        url = "http://"+get_wikipediator_server+":8080/wikipediaminer/services/exploreArticle?id=" + id.to_s + "&translations=true"
+        page = Nokogiri::XML(open(url))
+        languages = page.xpath("//message/translations/tranlation")
+      return languages
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message 
+      puts "Exception in translations"      
+    end
+  end #translations
+  
+  def parentCategories(id)
+    begin   
+        url = "http://"+get_wikipediator_server+":8080/wikipediaminer/services/exploreArticle?id=" + id.to_s + "&parentCategories"
+        page = Nokogiri::XML(open(url))
+        parentCategories = page.xpath("//message/parentCategories/parentCategory")
+      return parentCategories
+    rescue Exception => e
+      puts e.backtrace.inspect
+      puts e.message 
+      puts "Exception in parentCategories"      
+    end
+  end #parentCategories
+  
+  ####################################################################################
+  ##### DEVUELVE UN ARRAY CON LAS URLS EN TODOS LOS IDIOMAS DE LA UE DISPONIBLES
+  ##### DE UN PROGRAMA SOFTWARE DE LA WIKIPEDIA
+  #######################################################
+  
+  def application_translation_urls(name)
+    begin
+      array_ids = []
+      array_matches = []
+      url_idiomas = []
+      idiomas_ue = ["gl","de","bg","cs","hr","da","sk","sl","es","et","fi","fr","el","hu","en","ga","it","lv","lt","mt","nl","pl","pt","ro","sv","tr","no"]
+      id=-1
+      i=0
+      matches = 0
+      wikipediator = Wikipediator.new
+      entries = wikipediator.search(name)      
+      if entries.length!=0  
+        if entries.length > 1
+          entries.each do |entry|
+            parent_categories = wikipediator.parentCategories(entry['id'])
+            parent_categories.each do |parent_category|
+              if ApplicationParentCategory.find_by_name(parent_category['title'])
+                matches+=1
+              end
+            end
+            if matches > 0
+              array_ids << entry['id']
+              array_matches << matches
+              matches = 0
+            end 
+          end
+          #obtenemos el mayor numero de matches
+          maximo = array_matches.max
+          if maximo != nil
+            max_index = array_matches.index(maximo)
+            #id es el identificador del elemento con mayor numero de matches
+            id = array_ids[max_index]
+          end     
+        else
+          parent_categories = wikipediator.parentCategories(entries[0]['id'])
+          parent_categories.each do |parent_category|
+            if ApplicationParentCategory.find_by_name(parent_category['title'])
+              matches+=1
+            end
+          end
+          if matches>0
+            id = entries[0]['id']
+          end
+        end
+        puts "Procedemos a obtener las url translations del id: " + id.to_s
+        translations = wikipediator.translations(id)
+        translations.each do |translation|
+          if translation['lang'].in? idiomas_ue
+            url_idioma = "http://" + translation['lang'] + ".wikipedia.org/wiki/" + translation.text
+            url_idiomas << {:url => url_idioma, :lang => translation['lang']}
+          end
+        end      
+      end
+      return url_idiomas
+    rescue Exception => e
+      puts "Failed url_translations"
+      puts e.message
+      puts e.backtrace.inspect
+    end
+  end #application_translations_url
+  
+  ###############################################################################
+  #### DEVUELVE UN ARRAY CON LAS URLS EN TODOS LOS IDIOMAS DE LA UE DISPONIBLES
+  #### DEL NOMBRE name
+  ##############################################################################
+  
+  def translations_urls(name)
+    array_ids = []
+    array_matches = []
+    url_idiomas = []
+    idiomas_ue = ["gl","de","bg","cs","hr","da","sk","sl","es","et","fi","fr","el","hu","en","ga","it","lv","lt","mt","nl","pl","pt","ro","sv","tr","no"]
+    wikipediator = Wikipediator.new
+    entries = wikipediator.search(name)     
+    if entries.length > 0   
+      translations = wikipediator.translations(entries[0]['id'])
+      translations.each do |translation|
+        if translation['lang'].in? idiomas_ue
+          url_idioma = "http://" + translation['lang'] + ".wikipedia.org/wiki/" + translation.text
+          url_idiomas << {:url => url_idioma, :lang => translation['lang']}
+        end
+      end      
+    end
+    return url_idiomas
+    #puts url_idiomas
+  end
+  
+  
+ 
+  def get_wikipediator_server       
+    wiki_servers = ["10.0.0.2","10.0.0.3","10.0.0.4","192.168.1.82"]
+    #wiki_servers = ["192.168.1.82"]
+    actual_wiki_server=WikipediatorServerCounter.first
+    if actual_wiki_server == nil
+       new_wiki_server = WikipediatorServerCounter.new
+       new_wiki_server.counter = 0
+       new_wiki_server.server_ip = wiki_servers[0]
+       new_wiki_server.save
+       puts "Wikipediador :" + new_wiki_server.server_ip
+       return new_wiki_server.server_ip
+    else 
+      if (actual_wiki_server.counter + 1) >= wiki_servers.size
+        actual_wiki_server.counter = 0
+        actual_wiki_server.server_ip = wiki_servers[0]
+      else
+        actual_wiki_server.counter =  actual_wiki_server.counter + 1
+        actual_wiki_server.server_ip =  wiki_servers[actual_wiki_server.counter]          
+      end
+      actual_wiki_server.save
+      puts "Wikipediador :" + actual_wiki_server.server_ip
+      return actual_wiki_server.server_ip
+    end
+        
+  end
+  
+  
+end

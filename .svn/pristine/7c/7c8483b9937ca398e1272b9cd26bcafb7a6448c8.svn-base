@@ -1,0 +1,16 @@
+<%= render :partial => "header", :locals => {:section_title => (t ("Devices")), :actions => "resources/list_actions"} %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => (t ('resources')), :actions => "resources/list_actions"} %>
+<% end -%>
+
+<% content_for :content do %>
+
+<div id="content_index">
+	<%= render :partial => "list", :locals => { :current_layout => "application" }%>
+</div> <!-- CONTENT -->
+
+<script src="/javascript/resource_index.js"></script>
+
+<% end -%>

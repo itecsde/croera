@@ -1,0 +1,124 @@
+<% if @guide.errors.any? %>
+<div id="error_explanation">
+  <h2><%= pluralize(@guide.errors.count, "error") %> prohibited this activity from being saved:</h2>
+
+  <ul>
+  <% @guide.errors.full_messages.each do |msg| %>
+    <li><%= msg %></li>
+  <% end %>
+  </ul>
+</div> 
+<% end %>
+<!-- Guide Identification -->
+	<div id="guide_identification">
+		<div class="guide_name editable active name">
+	    	<%= guide_form.text_field :name, :class => "guide_title", :placeholder => t("title") %>
+	    	<i class="icon-pencil icon-grey"></i>
+	    </div>
+	    		
+		<div class= "description_container">
+			<div class="guide_image picture_container image ">
+				<div class="editable active">
+					<% if @guide.element_image.url() != "none" %>
+					<%= image_tag @guide.element_image.url(), width:'100%', :class => "image_preview" %>
+					<% else %>
+					<img class="image_preview" width="100%"/>
+					<% end %>
+					<div class= "file_upload">
+						<%= guide_form.file_field :element_image, :onchange => "image_preview(this, event);", :class =>"input_element_image" %>
+					</div>
+				</div>
+			</div>
+			<% if @guide.element_image.url() != "none" %>
+			<div class="guide_description editable active description description_right">
+			<% else %>
+			<div class="guide_description editable active description">
+			<% end %>
+				<textarea id="guide_description" name="guide[description]" placeholder="<%= t("Description") %>"><%= @guide.description %></textarea>
+				<i class="icon-pencil icon-grey"></i>
+			</div>
+			<div class="clear"></div>
+			<div class= "select_element_picture_button has_edition_controls active">
+				<button onclick= "select_element_picture(this); return false;" class="edition_control"><%= t("Select_picture") %></button>
+			</div>
+		</div>
+		
+		<div class="clear"></div>
+		<!--<div class="guide_tags">
+			<span class="label_tags"><%=t :keywords %></span><br />
+			<p>-</p>
+		</div>-->
+	</div>
+<!-- Guide Technological Setting -->
+	<div id="guide_technological_setting" class="colapsable technological_setting_container">
+		<div id="guide_technological_setting_header" class="guide_section_header">
+			<div class="header_left">
+				<div class="header_actions_bar">
+					<a class="select_technological_setting_button has_tooltip" onclick="open_area_popup('#technological_settings','/selectors/paginate_elements/?element_class=technological_settings');">
+						<i class="icon-search"></i><%= t("select_one") %><span class="tooltip"><%= t("select") %></span>
+					</a>
+					<div class="header_actions"></div>
+				</div>
+			</div>
+			<div class="header_right">
+				<div class="setting_title">
+					<span><%=t :technological_setting %></span>
+					<span style="float:right">
+						<img onclick="maximize(this);this.src=change_triangle(this.src);" src="/images/triangle_down.png" style="cursor:pointer">
+					</span>
+				</div>				
+			</div>			
+		</div>
+		<div id="guide_technological_setting_content" class="minimizable default_hidden guide_section_content">
+			<div id="guide_technological_setting_id"><input id="technological_setting_id" type="hidden" value="<%=@guide.technological_setting_id%>" /></div>
+		</div>
+	</div>
+	<div class="clear"></div>
+<!-- Guide Contextual Setting -->
+	<div id="guide_contextual_setting" class="colapsable contextual_setting_container">
+		<div id="guide_contextual_setting_header" class="guide_section_header">
+			<div class="header_left">
+				<div class="header_actions_bar">
+					<a class="select_contextual_setting_button has_tooltip" onclick="open_area_popup('#contextual_settings','/selectors/paginate_elements/?element_class=contextual_settings');">
+						<i class="icon-search"></i><%= t("select_one") %><span class="tooltip"><%= t("select") %></span>
+					</a>
+					<div class="header_actions"></div>
+				</div>
+			</div>
+			<div class="header_right">
+				<div class="setting_title">
+					<span><%=t :contextual_setting %></span>
+					<span style="float:right">
+						<img onclick="maximize(this);this.src=change_triangle(this.src);" src="/images/triangle_down.png" style="cursor:pointer">
+					</span>
+				</div>				
+			</div>
+		</div>
+		<div id="guide_contextual_setting_content" class="minimizable default_hidden guide_section_content">
+			<div id="guide_contextual_setting_id"><input id="contextual_setting_id" type="hidden" value="<%=@guide.contextual_setting_id%>" /></div>	
+		</div>
+	</div>
+	
+	<!-- Guide Sequence -->	
+	<div id="guide_sequence" class="sequence_container">
+		<div id="guide_sequence_header" class="guide_section_header">
+			<div class="header_left">
+				<div class="header_actions_bar">
+					
+					<div class="header_actions"></div>
+				</div>
+			</div>
+			<div class="header_right">
+				<div class="setting_title"><%=t :activity_sequence %></div>
+			</div>
+		</div>
+		<div id="guide_sequence_content" class="guide_section_content">
+			<div id="guide_sequence_id"><input id="sequence_id" type="hidden" value="<%=@guide.activity_sequence_id%>" /></div>
+		</div>
+	</div>
+
+
+	<div id="technological_setting_attributes" class="guide_elements_attributes"></div>
+	<div id="sequence_attributes" class="guide_elements_attributes"></div>
+	
+	

@@ -1,0 +1,81 @@
+<%
+	@experience_step = experience_step
+
+%>
+<div class="experience_step has_edition_controls active has_action_controls">
+	<% if position == "first" || position == "unique" %>
+	<div class="experience_step_top flat">
+		<div class="top_left ">
+		</div>
+	<% else %>
+	<div class="experience_step_top with_arrow">
+		<div class="top_left ">
+			<div class="arrow_top"></div>
+		</div>	
+	<% end %>
+		<div class="top_right">
+			<div class="link_bar">
+				<div class="actions_controls_bar">
+					<!--
+					<div class="maximize action_control has_tooltip" onclick="maximize_experience_step(this)"><i class="icon-resize-small icon-grey"></i><span class="tooltip"><%= t("Collapse") %></span></div>
+					-->
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="experience_step_body" >
+		<%= fields_for @experience_step do |experience_fields| %>
+			<%= experience_fields.hidden_field :id %>
+			<%= experience_fields.hidden_field :position %>
+			<%= experience_fields.hidden_field :name %>
+			<%= experience_fields.hidden_field :description %>
+		<% end %>
+		<!--
+		<div class= "experience_activity_name">
+			<%= @experience_step.name %>
+		</div>
+		<div class= "experience_activity_description">
+			<%= @experience_step.description %>
+		</div>
+		-->
+		<div class="minimizable_area">
+			<div class="contributions">
+				<% @experience_step.experience_step_contribution_annotations.sort_by{|e| e[:position]}.each do |contribution_annotation| %>
+					<%= render :partial => "contribution_annotation", :locals => {:contribution_annotation => contribution_annotation} %>
+				<% end %>
+			</div>
+			<div class="clear"></div>
+			<div class="add_contribution_align">
+				<div class="add_contribution active">
+					<div class="add_cotribution_first_row">
+						<span class= "plus">+</span>
+						<span class= "add_contribution_type has_tooltip" onclick="add_contribution(this,'free_text')"><img src="/images/icons/free_text_50.png" /><span class="tooltip"><%= t("free_text") %></span></span>
+						<span class= "add_contribution_type has_tooltip" onclick="display_activities(this,'activity')"><img src="/images/white_activity_50.png" /><span class="tooltip"><%= t("activity") %></span></span>					
+						<span class= "add_contribution_type has_tooltip" onclick="display_events(this,'event')"><img src="/images/white_event_50.png" /><span class="tooltip"><%= t("event") %></span></span>
+						<span class= "add_contribution_type has_tooltip" onclick="display_applications(this,'application')"><img src="/images/white_application_50.png" /><span class="tooltip"><%= t("application") %></span></span>					
+						<span class= "add_contribution_type has_tooltip" onclick="display_biographies(this,'biography')"><img src="/images/white_biography_50.png" /><span class="tooltip"><%= t("biography") %></span></span>
+						<span class= "add_contribution_type has_tooltip" onclick="display_lectures(this,'lecture')"><img src="/images/white_lecture_50.png" /><span class="tooltip"><%= t("lecture") %></span></span>
+						<span class= "add_contribution_type has_tooltip" onclick="display_sites(this,'site')"><img src="/images/white_site_50.png" /><span class="tooltip"><%= t("site") %></span></span>
+					</div>
+					<div class="add_cotribution_second_row" >
+						<span class= "add_contribution_type has_tooltip" onclick="display_documentaries(this,'documentary')"><img src="/images/white_documentary_50.png" /><span class="tooltip"><%= t("documentary") %></span></span>
+						<span class= "add_contribution_type has_tooltip" onclick="display_courses(this,'course')"><img src="/images/white_course_50.png" /><span class="tooltip"><%= t("course") %></span></span>
+						<span class= "add_contribution_type has_tooltip" onclick="display_articles(this,'article')"><img src="/images/white_article_50.png" /><span class="tooltip"><%= t("article") %></span></span>				
+						<span class= "add_contribution_type has_tooltip" onclick="display_lres(this,'lre')"><img src="/images/white_lre_50.png" /><span class="tooltip"><%= t("lre") %></span></span>				
+						<span class= "add_contribution_type has_tooltip" onclick="display_posts(this,'post')"><img src="/images/white_post_50.png" /><span class="tooltip"><%= t("post") %></span></span>
+						<span class= "add_contribution_type has_tooltip" onclick="display_slideshows(this,'slideshow')"><img src="/images/white_slideshow_50.png" /><span class="tooltip"><%= t("slideshow") %></span></span>
+					</div>																									
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<% if position == "last"|| position == "unique" %>
+	<div class="experience_step_bottom">
+	</div>
+	<% else %>
+	<div class="experience_step_bottom">
+		<div id="arrow_bottom"></div>
+	</div>
+	<% end %>	
+</div>

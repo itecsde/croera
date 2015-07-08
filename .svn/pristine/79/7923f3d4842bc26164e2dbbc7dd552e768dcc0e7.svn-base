@@ -1,0 +1,103 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+#require "capybara/dsl"
+
+class ScraperArtworks
+  include ActionView::Helpers::SanitizeHelper
+  #include Capybara::DSL
+  #############################################################
+  ####### scrape_google_art_project
+  ###########################################################
+  def scrape_google_art_project
+
+    Capybara.register_driver :webkit_ignore_ssl do |app|
+      browser = Capybara::Driver::Webkit::Browser.new(:ignore_ssl_errors => true)
+      Capybara::Driver::Webkit.new(app, :browser => browser)
+    end
+  
+    Capybara.javascript_driver = :webkit_ignore_ssl
+
+    session = Capybara::Session.new(:webkit)
+    puts "after session"
+    session.visit "https://www.google.com/culturalinstitute/collection/albertina-vienna"
+    
+    puts "aqui llega"
+    
+    nokogiri_html_collection_page = Nokogiri::HTML(session.body)
+    
+    photo_url = nokogiri_html_collection_page.css(".gci-asset-gallery div.collections-image-holder div.holder-background")[0]['style']
+    photo_url = photo_url.split("url(")[1].split("=s")[0]
+    
+    puts "PHOTO URL"
+    puts photo_url
+       
+    session.find('.gci-asset-gallery div.gci-asset-title-date a.gci-asset-title').click
+      
+    nokogiri_html_first_resource_page = Nokogiri::HTML(session.body)  
+    
+    session.click_button 'Details'
+    
+    nokogiri_html_detail_page = Nokogiri::HTML(session.body)     
+    
+    name = nokogiri_html_detail_page.css("h1.gci-unified-header-title-container span.gci-asset-viewer-title")[0].text.strip
+
+    description = nokogiri_html_detail_page.css("div.gci-asset-viewer-tab-description-content")[0].text.strip
+    
+    puts "name"
+    puts name
+    puts "description"
+    puts description
+    
+    scraped_artwork = Klascement.new
+    scraped_artwork.name = name
+    scraped_artwork.description = description
+    scraped_artwork.element_image = URI.parse(photo_url)
+    scraped_artwork.save
+    scraped_artwork.reload
+    Sunspot.index scraped_artwork
+    Sunspot.commit      
+    
+    session.save_and_open_page
+    
+    puts "imprimiendo pagina a archivo"
+    File.open('capybara_web_1.html', 'w') do |f2|
+      f2.puts session.body
+    end
+
+    html_resource_page = session.body
+
+    nokogiri_page = Nokogiri::HTML(html_resource_page)
+
+    puts "El titulo del recurso es: "
+    name = nokogiri_page.css("div.column h1")[0].text.strip
+    puts name
+    photo_url = nokogiri_page.css("div.logo img")[0]['src']
+    puts "photo_url:"
+    puts photo_url
+
+    scraped_oer = Lre.new
+
+    scraped_oer.name = name
+    scraped_oer.description = "Description"
+    puts "b"
+    if photo_url!=nil
+      begin
+        a = URI.parse(photo_url)
+        scraped_oer.element_image = URI.parse(photo_url)
+      rescue
+        puts "klascement:  IMAGEN NO GUARDADA"
+      scraped_oer.element_image.clear
+      end
+    end
+
+    scraped_oer.save
+
+    puts "fin imprimiendo pagina a archivo"
+
+    session.save_and_open_page
+
+  end
+
+end

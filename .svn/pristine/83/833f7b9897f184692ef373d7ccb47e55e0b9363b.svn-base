@@ -1,0 +1,86 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+
+#require "capybara/dsl"
+class ScraperArtworks
+  include ActionView::Helpers::SanitizeHelper
+  #include Capybara::DSL
+  #############################################################
+  ####### scrape_google_art_project
+  ###########################################################
+  def scrape_google_art_project
+    artwork_id = -1
+    disabled = false
+    i=0
+    Capybara.register_driver :webkit_ignore_ssl do |app|
+      browser = Capybara::Driver::Webkit::Browser.new(:ignore_ssl_errors => true)
+      Capybara::Driver::Webkit.new(app, :browser => browser)
+    end
+
+    Capybara.javascript_driver = :webkit_ignore_ssl
+
+    session = Capybara::Session.new(:webkit)
+    
+    session.visit "https://www.google.com/culturalinstitute/collection/fide-fundaci%C3%B3n"
+    puts "Haciendo click hasta el final de la coleccion."
+    while disabled != true
+      session.find('.SPRITE_icon_asset_viewer_nav_right_arrow').click
+      sleep 1
+      nokogiri_clicked_page = Nokogiri::HTML(session.body)
+      if nokogiri_clicked_page.css("div.gci-page-arrow")[1]['disabled'] == "disabled"
+        disabled = true
+      end
+    end
+   
+    sleep 1
+    
+    session.save_and_open_page
+          
+    puts "Acabo de hacer clicks, a disfrutar de las obras de arte."                              
+
+    nokogiri_html_collection_page = Nokogiri::HTML(session.body)
+
+    nokogiri_html_collection_page.css("div.gci-asset-gallery-item").each do |artwork|
+      artwork_id += 1
+      puts artwork_id
+      photo_url = artwork.css(".gci-asset-gallery div.collections-image-holder div.holder-background")[0]['style']
+      photo_url = photo_url.split("url(")[1].split("=s")[0]
+      puts "PHOTO URL"
+      puts photo_url
+      session.all('.gci-asset-gallery div.gci-asset-title-date a.gci-asset-title')[artwork_id].click
+      
+      nokogiri_html_first_resource_page = Nokogiri::HTML(session.body)
+      session.click_button 'Details'
+      
+      nokogiri_html_detail_page = Nokogiri::HTML(session.body)
+      begin
+        name = nokogiri_html_detail_page.css("h1.gci-unified-header-title-container span.gci-asset-viewer-title")[0].text.strip
+      rescue
+        puts "Exception name art_project"
+      end
+      begin
+        description = nokogiri_html_detail_page.css("div.gci-asset-viewer-tab-description-content")[0].text.strip
+      rescue
+        puts "Exception description art_project"
+      end
+      puts "name"
+      puts name
+      puts "description"
+      puts description
+
+      scraped_artwork = Klascement.new
+      scraped_artwork.name = name
+      scraped_artwork.description = description
+      scraped_artwork.element_image = URI.parse(photo_url)
+      scraped_artwork.scraped_from = "https://www.google.com/culturalinstitute/project/art-project"
+      scraped_artwork.save
+      scraped_artwork.reload
+      Sunspot.index scraped_artwork
+      Sunspot.commit
+    end #do artwork
+   
+  end #method
+
+end #class

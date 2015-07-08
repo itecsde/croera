@@ -1,0 +1,4 @@
+var technological_setting= $("<div><%=j render :partial => 'technological_setting' %></div>");
+show_technological_setting_callback(technological_setting);
+
+

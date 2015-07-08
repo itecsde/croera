@@ -1,0 +1,425 @@
+# encoding: utf-8
+
+require "nokogiri"
+require "open-uri"
+
+class CorpusCreator
+   include ActionView::Helpers::SanitizeHelper
+  
+  ###############################################################
+  #######  create_corpus_reuters_21578
+  ###############################################################
+
+   def create_corpus_reuters_21578
+      begin   
+         for i in 0..21
+            if i < 10             
+               a = open('./corpus_reuters_21578/reut2-00' + i.to_s + '.sgm')
+            else
+               a = open('./corpus_reuters_21578/reut2-0' + i.to_s + '.sgm')
+            end
+            document = Nokogiri::HTML(a)
+            document.css('reuters').each do |item|
+               topics = ""
+               places = ""    
+               people = ""      
+               orgs = ""     
+               exchanges = ""
+               companies = ""                
+               name = item.css('title').text
+               puts "Name: "
+               puts name.strip
+               date = item.css('date').text.strip
+               dateline = item.css('dateline').text.strip
+               description = item.css('text').text.gsub(name,"").gsub(dateline,"").strip
+               
+               item.css("topics").css("d").each do |topic|
+                  topics = topics + "," + topic.text.strip
+               end
+               topics[0] = "" 
+                     
+               item.css("places").css("d").each do |place|
+                  places = places + "," + place.text.strip
+               end
+               places[0] = ""               
+                  
+               item.css("people").css("d").each do |person|
+                  people = people + "," + person.text.strip
+               end
+               people[0] = ""
+                  
+               item.css("orgs").css("d").each do |org|
+                  org = orgs + "," + org.text.strip
+               end
+               orgs[0] = ""                          
+     
+               item.css("exchanges").css("d").each do |exchange|
+                  exchanges = exchanges + "," + exchange.text.strip
+               end
+               exchanges[0] = ""               
+                   
+               item.css("companies").css("d").each do |company|
+                  companies = companies + "," + company.text.strip
+               end
+               companies[0] = ""                          
+                             
+               has_topics = item['topics']               
+               lewissplit = item['lewissplit']                            
+               cgisplit = item['cgisplit']             
+               old_id = item['oldid']             
+               new_id = item['newid']          
+               
+               reuters_new_item = ReutersNewItem.new
+
+               reuters_new_item.name = name
+               reuters_new_item.description = description
+               reuters_new_item.dateline = date
+               reuters_new_item.has_topics = has_topics
+               reuters_new_item.topics = topics
+               reuters_new_item.places = places
+               reuters_new_item.people = people
+               reuters_new_item.orgs = orgs
+               reuters_new_item.exchanges = exchanges
+               reuters_new_item.companies = companies
+               reuters_new_item.lewissplit = lewissplit
+               reuters_new_item.cgisplit = cgisplit
+               reuters_new_item.old_id = old_id
+               reuters_new_item.new_id = new_id
+              
+               reuters_new_item.persist                                                                                              
+            end 
+         end
+      rescue Exception => e
+         puts "Exception create_corpus_reuters_21578"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end
+   
+  ###############################################################
+  #######  create_corpus_ohsumed
+  ###############################################################
+
+   def create_corpus_ohsumed
+      begin
+      categories_and_codes = Array.new 
+      category_and_code = {:name => "Bacterial Infections and Mycoses", :code => "C01"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Virus Diseases", :code => "C02"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Parasitic Diseases", :code => "C03"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Neoplasms", :code => "C04"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Musculoskeletal Diseases", :code => "C05"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Digestive System Diseases", :code => "C06"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Stomatognathic Diseases", :code => "C07"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Respiratory Tract Diseases", :code => "C08"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Otorhinolaryngologic Diseases", :code => "C09"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Nervous System Diseases", :code => "C10"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Eye Diseases", :code => "C11"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Urologic and Male Genital Diseases", :code => "C12"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Female Genital Diseases and Pregnancy Complications", :code => "C13"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Cardiovascular Diseases", :code => "C14"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Hemic and Lymphatic Diseases", :code => "C15"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Neonatal Diseases and Abnormalities", :code => "C16"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Skin and Connective Tissue Diseases", :code => "C17"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Nutritional and Metabolic Diseases", :code => "C18"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Endocrine Diseases", :code => "C19"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Immunologic Diseases", :code => "C20"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Disorders of Environmental Origin", :code => "C21"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Animal Diseases", :code => "C22"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Pathological Conditions, Signs and Symptoms", :code => "C23"}
+      categories_and_codes << category_and_code
+                
+         j=0
+         for i in 1..23
+            if i < 10
+               Dir.chdir("/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/corpus_ohsumed_20000/test/C0" + i.to_s)  
+               files = Dir.glob "*"
+               files.each do |file|
+                  file = File.new(file,"r")
+                  description = file.read
+                  description = description.gsub("%"," ").gsub("&"," ")
+                  topic_code = 'C0' + i.to_s
+                  topic = categories_and_codes.find {|h| h[:code] == topic_code }[:name]            
+                  ohsumed_new_item = ReutersNewItem.new
+                  ohsumed_new_item.description = description
+                  ohsumed_new_item.cgisplit = "test"
+                  ohsumed_new_item.topics = topic
+                  ohsumed_new_item.persist
+               end
+            else
+               Dir.chdir("/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/corpus_ohsumed_20000/test/C" + i.to_s)  
+               files = Dir.glob "*"
+               files.each do |file|
+                  file = File.new(file,"r")
+                  description = file.read
+                  description = description.gsub("%"," ").gsub("&"," ")
+                  topic_code = 'C' + i.to_s
+                  topic = categories_and_codes.find {|h| h[:code] == topic_code }[:name]
+                  ohsumed_new_item = ReutersNewItem.new
+                  ohsumed_new_item.description = description
+                  ohsumed_new_item.cgisplit = "test" 
+                  ohsumed_new_item.topics = topic 
+                  ohsumed_new_item.persist                
+               end
+            end
+         end
+         
+         for i in 1..23
+            if i < 10
+               Dir.chdir("/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/corpus_ohsumed_20000/training/C0" + i.to_s)  
+               files = Dir.glob "*"
+               files.each do |file|
+                  file = File.new(file,"r")
+                  description = file.read
+                  description = description.gsub("%"," ").gsub("&"," ")
+                  topic_code = 'C0' + i.to_s
+                  topic = categories_and_codes.find {|h| h[:code] == topic_code }[:name]
+                  ohsumed_new_item = ReutersNewItem.new
+                  ohsumed_new_item.description = description
+                  ohsumed_new_item.cgisplit = "training" 
+                  ohsumed_new_item.topics = topic
+                  ohsumed_new_item.persist               
+               end
+            else
+               Dir.chdir("/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/corpus_ohsumed_20000/training/C" + i.to_s)  
+               files = Dir.glob "*"
+               files.each do |file|
+                  file = File.new(file,"r")
+                  description = file.read
+                  description = description.gsub("%"," ").gsub("&"," ")
+                  topic_code = 'C' + i.to_s
+                  topic = categories_and_codes.find {|h| h[:code] == topic_code }[:name]
+                  ohsumed_new_item = ReutersNewItem.new
+                  ohsumed_new_item.description = description
+                  ohsumed_new_item.cgisplit = "training" 
+                  ohsumed_new_item.topics = topic 
+                  ohsumed_new_item.persist                
+               end
+            end
+         end         
+      rescue Exception => e
+         puts "Exception create_corpus_ohsumed"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end   
+   
+  ###############################################################
+  #######  create_corpus_ohsumed_only_one_category
+  ###############################################################
+
+   def create_corpus_ohsumed_only_one_category
+      begin
+      categories_and_codes = Array.new 
+      category_and_code = {:name => "Bacterial Infections and Mycoses", :code => "C01"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Virus Diseases", :code => "C02"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Parasitic Diseases", :code => "C03"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Neoplasms", :code => "C04"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Musculoskeletal Diseases", :code => "C05"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Digestive System Diseases", :code => "C06"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Stomatognathic Diseases", :code => "C07"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Respiratory Tract Diseases", :code => "C08"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Otorhinolaryngologic Diseases", :code => "C09"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Nervous System Diseases", :code => "C10"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Eye Diseases", :code => "C11"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Urologic and Male Genital Diseases", :code => "C12"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Female Genital Diseases and Pregnancy Complications", :code => "C13"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Cardiovascular Diseases", :code => "C14"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Hemic and Lymphatic Diseases", :code => "C15"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Neonatal Diseases and Abnormalities", :code => "C16"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Skin and Connective Tissue Diseases", :code => "C17"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Nutritional and Metabolic Diseases", :code => "C18"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Endocrine Diseases", :code => "C19"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Immunologic Diseases", :code => "C20"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Disorders of Environmental Origin", :code => "C21"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Animal Diseases", :code => "C22"}
+      categories_and_codes << category_and_code
+      category_and_code = {:name => "Pathological Conditions, Signs and Symptoms", :code => "C23"}
+      categories_and_codes << category_and_code
+                
+         j=0
+         for i in 1..23
+            if i < 10
+               Dir.chdir("/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/corpus_ohsumed_20000/test/C0" + i.to_s)  
+               files = Dir.glob "*"
+               files.each do |file|
+                  file_id = file
+                  file = File.new(file,"r")
+                  description = file.read
+                  description = description.gsub("%"," ").gsub("&"," ")
+                  topic_code = 'C0' + i.to_s
+                  topic = categories_and_codes.find {|h| h[:code] == topic_code }[:name]            
+                  ohsumed_new_item = ReutersNewItem.new
+                  ohsumed_new_item.description = description
+                  ohsumed_new_item.cgisplit = "test"
+                  ohsumed_new_item.topics = topic
+                  ohsumed_new_item.file_id = file_id
+                  ohsumed_new_item.persist
+               end
+            else
+               Dir.chdir("/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/corpus_ohsumed_20000/test/C" + i.to_s)  
+               files = Dir.glob "*"
+               files.each do |file|
+                  file_id = file
+                  file = File.new(file,"r")
+                  description = file.read
+                  description = description.gsub("%"," ").gsub("&"," ")
+                  topic_code = 'C' + i.to_s
+                  topic = categories_and_codes.find {|h| h[:code] == topic_code }[:name]
+                  ohsumed_new_item = ReutersNewItem.new
+                  ohsumed_new_item.description = description
+                  ohsumed_new_item.cgisplit = "test" 
+                  ohsumed_new_item.topics = topic 
+                  ohsumed_new_item.file_id = file_id                
+                  ohsumed_new_item.persist                
+               end
+            end
+         end
+         
+         for i in 1..23
+            if i < 10
+               Dir.chdir("/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/corpus_ohsumed_20000/training/C0" + i.to_s)  
+               files = Dir.glob "*"
+               files.each do |file|
+                  file_id = file                  
+                  file = File.new(file,"r")
+                  description = file.read
+                  description = description.gsub("%"," ").gsub("&"," ")
+                  topic_code = 'C0' + i.to_s
+                  topic = categories_and_codes.find {|h| h[:code] == topic_code }[:name]
+                  ohsumed_new_item = ReutersNewItem.new
+                  ohsumed_new_item.description = description
+                  ohsumed_new_item.cgisplit = "training" 
+                  ohsumed_new_item.topics = topic
+                  ohsumed_new_item.file_id = file_id
+                  ohsumed_new_item.persist               
+               end
+            else
+               Dir.chdir("/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/corpus_ohsumed_20000/training/C" + i.to_s)  
+               files = Dir.glob "*"
+               files.each do |file|
+                  file_id = file                  
+                  file = File.new(file,"r")
+                  description = file.read
+                  description = description.gsub("%"," ").gsub("&"," ")
+                  topic_code = 'C' + i.to_s
+                  topic = categories_and_codes.find {|h| h[:code] == topic_code }[:name]
+                  ohsumed_new_item = ReutersNewItem.new
+                  ohsumed_new_item.description = description
+                  ohsumed_new_item.cgisplit = "training" 
+                  ohsumed_new_item.topics = topic 
+                  ohsumed_new_item.file_id = file_id
+                  ohsumed_new_item.persist                
+               end
+            end
+         end         
+      rescue Exception => e
+         puts "Exception create_corpus_ohsumed_only_one_category"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end      
+   
+  ###############################################################
+  #######  create_corpus_20newsgroups_bydate
+  ###############################################################
+
+   def create_corpus_20newsgroups_bydate
+      begin
+         i=0              
+         Dir.chdir("/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/20news-bydate/20news-bydate-test") 
+         categories = Dir.glob "*"
+         categories.each do |category|
+            Dir.chdir("/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/20news-bydate/20news-bydate-test/" + category)
+            files = Dir.glob "*"
+            files.each do |file|
+               puts i+=1
+               file_id = file
+               file = File.new(file,"r")
+               puts category
+               puts file_id
+               description = file.read.encode("UTF-8", "binary", :invalid => :replace, :undef => :replace) 
+               description = description.gsub("%"," ").gsub("&"," ")
+               topic = category
+               ohsumed_new_item = ReutersNewItem.new
+               ohsumed_new_item.description = description
+               ohsumed_new_item.cgisplit = "test"
+               ohsumed_new_item.topics = topic
+               ohsumed_new_item.file_id = file_id
+               ohsumed_new_item.persist
+            end
+         end
+     
+         Dir.chdir("/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/20news-bydate/20news-bydate-train") 
+         categories = Dir.glob "*"
+         categories.each do |category|
+            Dir.chdir("/home/marcos/Documents/Aptana Studio 3 Workspace/iTEC-SDE/20news-bydate/20news-bydate-train/" + category)
+            files = Dir.glob "*"
+            files.each do |file|
+               puts i+=1       
+               file_id = file
+               file = File.new(file,"r")
+               puts category
+               puts file_id
+               description = file.read.encode("UTF-8", "binary", :invalid => :replace, :undef => :replace)                       
+               description = description.gsub("%"," ").gsub("&"," ")
+               topic = category
+               ohsumed_new_item = ReutersNewItem.new
+               ohsumed_new_item.description = description
+               ohsumed_new_item.cgisplit = "train"
+               ohsumed_new_item.topics = topic
+               ohsumed_new_item.file_id = file_id
+               ohsumed_new_item.persist      
+            end
+         end       
+      rescue Exception => e
+         puts "Exception create_corpus_20newsgroups_bydate"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end         
+   
+
+end

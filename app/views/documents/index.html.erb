@@ -1,0 +1,264 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header_document", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader_document", :locals => {:section_title => 'documents', :actions => "resources/list_actions"} %> 
+<% end %>
+
+
+<% content_for :advanced_search do %>	
+	<%= render :partial =>"advanced_search" %>
+<% end %>
+
+
+<% content_for :content do %>
+
+<% user_id = params[:user_id]%>
+
+<div class="taxonomy">
+	<div class="container_navbar_repositories">
+		<% if params[:repository] == nil or params[:repository] == "" %> 
+			<% repositories_array = ["oercommons", "merlot", "cnx"]
+			   index = Random.rand(3)
+			   @repository = repositories_array[index]
+			   cadena = documents_path(:repository => @repository, :user_id => user_id)
+			%>
+			<script type="text/javascript">
+    			window.location.href="<%= cadena %>"  // put your correct path in a string here
+  			</script>
+		<%else
+			@repository = params[:repository]
+		end %>					
+		<% repository = {@repository => "active"}%>
+		<ul class="nav_report_repository">
+			<li class="classification_scheme">
+				<%= t('classification_scheme') %>
+			</li>
+			<li class="<%= repository["oercommons"] %>">
+				<%= link_to t('oercommons'), documents_path(:repository => "oercommons", :user_id => user_id) %>
+			</li>
+			<li class="<%= repository["merlot"] %>">
+				<%= link_to t('merlot'), documents_path(:repository => "merlot", :user_id => user_id) %>
+			</li>		
+			<li class="<%= repository["cnx"] %>">
+				<%= link_to t('cnx'), documents_path(:repository => "cnx", :user_id => user_id) %>
+			</li>
+			<!--				
+			<li class="<%= repository["wikipedia"] %>">
+				<%= link_to t('wikipedia'), documents_path(:repository => "wikipedia") %>
+			</li>
+			-->	
+		</ul>
+	</div>
+	
+	<div class="clear"></div>
+	
+	<% if params[:repository] == "oercommons" or params[:repository] == nil%>
+		<% if params[:section] == nil or params[:repository] == "" 
+			@section = "all"
+		else
+			@section = params[:section]
+		end %>		
+		<div class="container_navbar_repositories">
+			<% repository = {@section => "active"}%>
+			<ul class="nav_report_repository">
+				<li class="classification_scheme">
+					<%= t('categories') %>
+				</li>				
+				<li class="<%= repository["all"] %>">
+					<%= link_to t('all'), documents_path(:repository => "oercommons", :section => "all", :user_id => user_id) %>
+				</li>				
+				<li class="<%= repository["arts"] %>">
+					<%= link_to t('arts'), documents_path(:repository => "oercommons", :section => "arts", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["education"] %>">
+					<%= link_to t('education'), documents_path(:repository => "oercommons", :section => "education", :user_id => user_id) %>
+				</li>		
+				<li class="<%= repository["business"] %>">
+					<%= link_to t('business'), documents_path(:repository => "oercommons", :section => "business", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["humanities"] %>">
+					<%= link_to t('humanities'), documents_path(:repository => "oercommons", :section => "humanities", :user_id => user_id) %>
+				</li>	
+				<li class="<%= repository["mathematics and statistics"] %>">
+					<%= link_to t('mathematics_and_statistics'), documents_path(:repository => "oercommons", :section => "mathematics and statistics", :user_id => user_id) %>
+				</li>	
+				<li class="<%= repository["physics"] %>">
+					<%= link_to t('physics'), documents_path(:repository => "oercommons", :section => "physics", :user_id => user_id) %>
+				</li>	
+				<li class="<%= repository["geoscience"] %>">
+					<%= link_to t('geoscience'), documents_path(:repository => "oercommons", :section => "geoscience", :user_id => user_id) %>
+				</li>	
+				<li class="<%= repository["computing and information"] %>">
+					<%= link_to t('computing_and_information'), documents_path(:repository => "oercommons", :section => "computing and information", :user_id => user_id) %>
+				</li>		
+				<li class="<%= repository["ecology"] %>">
+					<%= link_to t('ecology'), documents_path(:repository => "oercommons", :section => "ecology", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["engineering"] %>">
+					<%= link_to t('engineering'), documents_path(:repository => "oercommons", :section => "engineering", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["science and technology"] %>">
+					<%= link_to t('science_and_technology'), documents_path(:repository => "oercommons", :section => "science and technology", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["forestry and agriculture"] %>">
+					<%= link_to t('forestry_and_agriculture'), documents_path(:repository => "oercommons", :section => "forestry and agriculture", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["space science"] %>">
+					<%= link_to t('space_science'), documents_path(:repository => "oercommons", :section => "space science", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["mathematics"] %>">
+					<%= link_to t('mathematics'), documents_path(:repository => "oercommons", :section => "mathematics", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["life science"] %>">
+					<%= link_to t('life_science'), documents_path(:repository => "oercommons", :section => "life science", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["politics"] %>">
+					<%= link_to t('politics'), documents_path(:repository => "oercommons", :section => "politics", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["law"] %>">
+					<%= link_to t('law'), documents_path(:repository => "oercommons", :section => "law", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["technology"] %>">
+					<%= link_to t('technology'), documents_path(:repository => "oercommons", :section => "technology", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["social sciences"] %>">
+					<%= link_to t('social_sciences'), documents_path(:repository => "oercommons", :section => "social sciences", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["chemistry"] %>">
+					<%= link_to t('chemistry'), documents_path(:repository => "oercommons", :section => "chemistry", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["history"] %>">
+					<%= link_to t('history'), documents_path(:repository => "oercommons", :section => "history", :user_id => user_id) %>
+				</li>	
+															
+			</ul>
+		</div>
+	<% end %>
+	
+	<% if params[:repository] == "merlot" %>
+		<% if params[:section] == nil or params[:repository] == "" 
+			@section = "all"
+		else
+			@section = params[:section]
+		end %>		
+		<div class="container_navbar_repositories">
+			<% repository = {@section => "active"}%>
+			<ul class="nav_report_repository">
+				<li class="classification_scheme">
+					<%= t('categories') %>
+				</li>
+				<li class="<%= repository["all"] %>">
+					<%= link_to t('all'), documents_path(:repository => "merlot", :section => "all", :user_id => user_id) %>
+				</li>				
+				<li class="<%= repository["arts"] %>">
+					<%= link_to t('arts'), documents_path(:repository => "merlot", :section => "arts", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["academic support services"] %>">
+					<%= link_to t('academic_support_services'), documents_path(:repository => "merlot", :section => "academic support services", :user_id => user_id) %>
+				</li>		
+				<li class="<%= repository["business"] %>">
+					<%= link_to t('business'), documents_path(:repository => "merlot", :section => "business", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["humanities"] %>">
+					<%= link_to t('humanities'), documents_path(:repository => "merlot", :section => "humanities", :user_id => user_id) %>
+				</li>	
+				<li class="<%= repository["mathematics and statistics"] %>">
+					<%= link_to t('mathematics_and_statistics'), documents_path(:repository => "merlot", :section => "mathematics and statistics", :user_id => user_id) %>
+				</li>	
+				<li class="<%= repository["science and technology"] %>">
+					<%= link_to t('science_and_technology'), documents_path(:repository => "merlot", :section => "science and technology", :user_id => user_id) %>
+				</li>	
+				<li class="<%= repository["social sciences"] %>">
+					<%= link_to t('social_sciences'), documents_path(:repository => "merlot", :section => "social sciences", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["workforce development"] %>">
+					<%= link_to t('workforce_development'), documents_path(:repository => "merlot", :section => "workforce development", :user_id => user_id) %>
+				</li>	
+				<li class="<%= repository["education"] %>">
+					<%= link_to t('education'), documents_path(:repository => "merlot", :section => "education", :user_id => user_id) %>
+				</li>																																		
+			</ul>
+		</div>
+	<% end %>
+	
+	<% if params[:repository] == "cnx" %>
+		<% if params[:section] == nil or params[:repository] == "" 
+			@section = "all"
+		else
+			@section = params[:section]
+		end %>			
+		<div class="container_navbar_repository">
+			<% repository = {@section => "active"}%>
+			<ul class="nav_report_repository">	
+				<li class="classification_scheme">
+					<%= t('categories') %>
+				</li>
+				<li class="<%= repository["all"] %>">
+					<%= link_to t('all'), documents_path(:repository => "cnx", :section => "all",:user_id => user_id) %>
+				</li>				
+				<li class="<%= repository["arts"] %>">
+					<%= link_to t('arts'), documents_path(:repository => "cnx", :section => "arts", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["business"] %>">
+					<%= link_to t('business'), documents_path(:repository => "cnx", :section => "business", :user_id => user_id) %>
+				</li>		
+				<li class="<%= repository["humanities"] %>">
+					<%= link_to t('humanities'), documents_path(:repository => "cnx", :section => "humanities", :user_id => user_id) %>
+				</li>	
+				<li class="<%= repository["mathematics and statistics"] %>">
+					<%= link_to t('mathematics_and_statistics'), documents_path(:repository => "cnx", :section => "mathematics and statistics", :user_id => user_id) %>
+				</li>
+				<li class="<%= repository["science and technology"] %>">
+					<%= link_to t('science_and_technology'), documents_path(:repository => "cnx", :section => "science and technology", :user_id => user_id) %>		
+				<li class="<%= repository["social sciences"] %>">
+					<%= link_to t('social_sciences'), documents_path(:repository => "cnx", :section => "social sciences", :user_id => user_id) %>
+				</li>																																
+			</ul>
+		</div>
+	<% end %>
+
+	<% if params[:repository] == "wikipedia" %>
+		<% if params[:section] == nil or params[:repository] == "" 
+			@section = "all"
+		else
+			@section = params[:section]
+		end %>			
+		<div class="container_navbar_repository">
+			<% repository = {@section => "active"}%>
+			<ul class="nav_report_repository">	
+				<li class="classification_scheme">
+					<%= t('categories') %>
+				</li>
+				<li class="<%= repository["all"] %>">
+					<%= link_to t('all'), documents_path(:repository => "wikipedia", :section => "all") %>
+				</li>					
+				<li class="<%= repository["arts"] %>">
+					<%= link_to t('arts'), documents_path(:repository => "wikipedia", :section => "arts") %>
+				</li>
+				<li class="<%= repository["business"] %>">
+					<%= link_to t('business'), documents_path(:repository => "wikipedia", :section => "business") %>
+				</li>		
+				<li class="<%= repository["humanities"] %>">
+					<%= link_to t('humanities'), documents_path(:repository => "wikipedia", :section => "humanities") %>
+				</li>	
+				<li class="<%= repository["mathematics and statistics"] %>">
+					<%= link_to t('mathematics_and_statistics'), documents_path(:repository => "wikipedia", :section => "mathematics and statistics") %>
+				</li>
+				<li class="<%= repository["science and technology"] %>">
+					<%= link_to t('science_and_technology'), documents_path(:repository => "wikipedia", :section => "science and technology") %>		
+				<li class="<%= repository["social sciences"] %>">
+					<%= link_to t('social_sciences'), documents_path(:repository => "wikipedia", :section => "social sciences") %>
+				</li>																																
+			</ul>
+		</div>
+	<% end %>	
+	
+</div>
+
+	<div id="content_index">	
+		<%= render :partial => "list", :locals => { :current_layout => "application" }%>
+	</div> <!-- CONTENT -->
+	
+	
+	<script src="/javascript/resource_index.js"></script>
+	<script src="/javascript/books_index.js"></script>
+<% end %>

@@ -1,0 +1,32 @@
+class AdministrationsController < ApplicationController
+  
+  def index
+    scraper_reports = ScraperReports.new  
+    #scraper_reports.scrape_rss_report("http://feeds.feedburner.com/neuroscience-rss-feeds-neuroscience-news")
+    #scraper_reports.scrape_rss_report("http://www.npr.org/rss/rss.php?id=1007")          
+    #scraper_reports.scrape_rss_report("http://feeds.latimes.com/latimes/news/science")
+    #scraper_reports.scrape_rss_report("http://www.farodevigo.es/elementosInt/rss/26") 
+    if params[:rss_feed] != nil   
+      Thread.new do
+        begin
+          scraper_reports.scrape_rss_report(params[:rss_feed])   
+        rescue
+        end
+      end      
+    end
+    @sites = Source.where(:source_type => "Site")
+    @events = Source.where(:source_type => "Event")
+    @reports = Source.where(:source_type => "Report")
+    @lectures = Source.where(:source_type => "Lecture")
+    @biographies = Source.where(:source_type => "Biography")
+    @slideshows = Source.where(:source_type => "Slideshow")
+    @documentaries = Source.where(:source_type => "Documentary")
+    @lres = Source.where(:source_type => "Lre")
+    @courses = Source.where(:source_type => "Course")
+    @articles = Source.where(:source_type => "Article")
+    @posts = Source.where(:source_type => "Post")
+    @applications = Source.where(:source_type => "Application")
+    
+
+  end
+end

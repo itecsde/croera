@@ -1,0 +1,244 @@
+class EventsController < ApplicationController
+
+  
+  def index
+    @resource_type = "Event"
+    if I18n.locale.to_s == "gl"
+      search_languages=["gl","es"]
+    else 
+      search_languages=[I18n.locale.to_s]
+    end
+    if current_user != nil
+      per_page = 31
+    else
+      per_page = 32
+    end
+    if (params[:advanced_search]=="1") 
+      @search=Event.search do
+          if params[:enriched]=="0"            
+           without(:itec_id, nil)
+          end
+          keywords params[:keywords], :fields => [:tags]
+          if params[:subject]!=""
+            keywords Subject.find(params[:subject]).name
+          end
+          if params[:start_date]!="" && params[:end_date]!=""
+            with :start_date, params[:start_date]..params[:end_date]
+          elsif  params[:start_date]!=""
+            with(:start_date).greater_than_or_equal_to(params[:start_date]) 
+            #with :start_date, (params[:start_date])..(Time.now+600.days)
+          end
+          if params[:radius]!="" && params[:event_latitude]!="" && params[:event_longitude]!=""
+            with(:location).in_radius(params[:event_latitude], params[:event_longitude], params[:radius])
+          end 
+          if params[:event_latitude]!="" && params[:event_longitude]!=""
+            order_by_geodist(:location, params[:event_latitude], params[:event_longitude])
+          end
+          with(:translations, search_languages)
+          paginate :page => params[:page],:per_page => per_page          
+        end
+      @events = @search.results
+      @num_results=@search.total
+      
+    elsif (params[:search] != nil && params[:search].size > 0)
+      if params[:article_id] == nil
+        @disambiguation = Search.disambiguation(params[:search])
+      end
+      if params[:search].index("#") == 0 
+        search = Search.new
+        @disambigued_term_info = search.disambigued_term_info(params[:search])
+      end 
+      @search = Search.search_elements_by_type('Event', params[:search],params[:article_id],per_page,params[:page])
+      @events = @search[:results]          
+      @num_results = @search[:total]
+                 
+    else
+      #@search = Event.search do
+      #  fulltext params[:search]
+      #  order_by :updated_at, :desc
+      #  paginate :page => params[:page], :per_page => per_page
+      #end
+      
+      @search = Event.search do |query|
+        if current_user !=nil && current_user.circumstances != []
+          search_terms = current_user.circumstances.first.tag_list_quoted + ", " + current_user.circumstances.first.subject.name
+          puts "SEARCHING FOR:"
+          puts search_terms
+          query.fulltext search_terms, :fields => [:tags, :subjects, :name] {minimum_match 1}
+#          query.fulltext search_terms do
+#            phrase_fields :tags => 5.0
+#            boost_fields :tags => 5.0
+#            boost_fields :description => 1.0
+#            minimum_match 1
+#          end        
+         #query.with(:geohash_location).near(current_user.circumstances.first.latitude, current_user.circumstances.first.longitude, :precision => 2, :boost => 5)
+          if current_user.circumstances.first.latitude!=nil
+            query.with(:location).in_radius(current_user.circumstances.first.latitude, current_user.circumstances.first.longitude, 2000)       
+            query.order_by_geodist(:location, current_user.circumstances.first.latitude, current_user.circumstances.first.longitude)
+          end 
+        end
+        query.with(:translations, search_languages)         
+        query.paginate :page => params[:page],:per_page => per_page 
+      end
+      
+      
+      @events = @search.results 
+      @num_results=@search.total   
+    end
+    @previous_search_params=params
+    @subjects=Subject.all
+    
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @applications }
+    end
+  end
+  
+  # GET /events/1
+  # GET /events/1.json
+  def show
+    @event = Event.find(params[:id]) 
+    @subjects = Subject.all
+    @education_levels = EducationLevel.all
+    @languages = ContextualLanguage.all
+    @related_elements=RelatedElement.new(@event)
+    @resource_type="Event"
+    
+    @edition_mode=false
+
+    if notice == 'Event was successfully created.' || notice == 'Event was successfully updated.'
+      @previous_action = 'saved'
+    else
+      @previous_action = 'list'
+    end
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @event }
+    end
+    
+  end
+  
+  # GET /events/new
+  # GET /events/new.json
+  def new
+    if current_user !=nil 
+      @event = Event.new
+      @subjects = Subject.all
+      @education_levels = EducationLevel.all
+      @languages = ContextualLanguage.all
+      @edition_mode=true
+      
+      respond_to do |format|
+        format.html # new.html.erb
+        format.json { render json: @event }
+      end
+    else
+      redirect_to events_path
+    end
+  end
+  
+    # GET /events/1/edit
+  def edit
+    @event = Event.find(params[:id])
+    if current_user !=nil && ((@event.owner == current_user) or (@event.owner_type=="Group" && @event.owner.users.exists?(current_user)))
+      @subjects = Subject.all
+      @education_levels = EducationLevel.all
+      @languages = ContextualLanguage.all
+      @edition_mode=true
+    else 
+      redirect_to event_path(@event)
+    end
+  end
+
+  # POST /events
+  # POST /events.json
+  def create
+    @event = Event.new(params[:event])
+    if (params[:event][:owner_type]==nil)
+      @event.owner_type="User"
+      @event.owner=current_user
+    end
+    if @event.start_date==""
+        @event.start_date=nil
+    end
+    if @event.end_date==""
+        @event.end_date=nil
+    end
+    @event.creator = current_user
+    @event.save
+    
+    
+    #@event.owner_type="user"
+    #@event.owner = current_user
+    #@event.creator = current_user
+    #@event.save
+ 
+
+    respond_to do |format|
+      if @event.save
+        format.html { redirect_to @event, notice: 'Event was successfully created.' }
+        format.json { render json: @event, status: :created, location: @event }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @event.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /events/1
+  # PUT /events/1.json
+  def update
+    @event = Event.find(params[:id])
+     if (params[:event][:owner_type]==nil)
+      @event.owner_type="User"
+      @event.owner=current_user
+    end
+    if @event.start_date==""
+        @event.start_date=nil
+    end
+    if @event.end_date==""
+        @event.end_date=nil
+    end
+    @event.taggable_tag_annotations.delete_all
+    @event.subjects.destroy_all
+     
+    respond_to do |format|
+      if @event.update_attributes(params[:event])
+        format.html { redirect_to @event, notice: 'Event was successfully updated.' }
+        format.json { head :ok }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @event.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /events/1
+  # DELETE /events/1.json
+  def destroy
+    @event = Event.find(params[:id])
+    @event.destroy
+
+    respond_to do |format|
+      format.html { redirect_to events_url }
+      format.json { head :ok }
+    end
+  end
+  
+  def popup_show_event
+    @event = Event.find(params[:element_id])
+     
+    @subjects = Subject.all
+    @education_levels = EducationLevel.all
+    @languages = ContextualLanguage.all
+    @edition_mode=false
+    
+    respond_to do |format|
+      format.js
+    end
+  end
+  
+  
+
+
+end

@@ -1,0 +1,217 @@
+class ArtworksController < ApplicationController
+  
+  def index
+    @resource_type = "Artwork"
+    if I18n.locale.to_s == "gl"
+      search_languages=["gl","es"]
+    else 
+      search_languages=[I18n.locale.to_s]
+    end    
+    per_page = 32
+    
+    if (params[:advanced_search]=="1") 
+      if params[:search] != nil && params[:search].size > 0
+         search_text = params[:search]
+         if search_text.index("#") != 0
+            @disambiguation = Search.disambiguation(search_text)
+         else
+         #Esto es para tener el termino traducido al ingles para hacer las busquedas con el tag en ingles
+            if I18n.locale.to_s != "en" && search_text.index("@") != nil
+               clean_search_text = search_text[0,search_text.index("@")]
+               search_text_en_translation = Wikipediator.wikipedia_get_article_title_tranlation(Util.to_tag(clean_search_text),I18n.locale.to_s,"en")
+            #Esto es para traducir el termino al idioma de la vista para ver la info de desambiguacion del termino en ese idioma
+            elsif I18n.locale.to_s != "en" && search_text.index("@") == nil
+               search_text_locale_translation = Wikipediator.wikipedia_get_article_title_tranlation(Util.to_tag(search_text),"en",I18n.locale.to_s)
+            end
+            search = Search.new
+            if I18n.locale.to_s != "en" && search_text_locale_translation != nil
+               @disambigued_term_info = search.disambigued_term_info(Util.to_hashtag_with_language(search_text_locale_translation))
+            else
+               @disambigued_term_info = search.disambigued_term_info(search_text)
+            end
+         end         
+      else
+         search_text = ""
+      end
+      advanced_parameters = Hash[]
+      @search = Search.advanced_search_elements_by_type('Artwork', search_text,search_text_en_translation, advanced_parameters,per_page,params[:page])
+      @num_results = @search[:total]
+      @artworks = @search[:results]
+      
+    
+    elsif (params[:search] != nil && params[:search].size > 0)
+      search_text = params[:search]
+      if search_text.index("#") != 0
+        @disambiguation = Search.disambiguation(search_text)
+      else        
+        #Esto es para tener el termino traducido al ingles para hacer las busquedas con el tag en ingles
+        if I18n.locale.to_s != "en" && search_text.index("@") != nil         
+          clean_search_text = search_text[0,search_text.index("@")]
+          search_text_en_translation = Wikipediator.wikipedia_get_article_title_tranlation(Util.to_tag(clean_search_text),I18n.locale.to_s,"en")
+        #Esto es para traducir el termino al idioma de la vista para ver la info de desambiguacion del termino en ese idioma          
+        elsif I18n.locale.to_s != "en" && search_text.index("@") == nil
+          search_text_locale_translation = Wikipediator.wikipedia_get_article_title_tranlation(Util.to_tag(search_text),"en",I18n.locale.to_s)
+        end
+        search = Search.new
+        if I18n.locale.to_s != "en" && search_text_locale_translation != nil
+          @disambigued_term_info = search.disambigued_term_info(Util.to_hashtag_with_language(search_text_locale_translation))
+        else
+          @disambigued_term_info = search.disambigued_term_info(search_text)  
+        end
+      end 
+             
+      @search = Search.search_elements_by_type('Artwork', search_text,search_text_en_translation, params[:article_id],per_page,params[:page])
+      @artworks = @search[:results]          
+      @num_results = @search[:total]                   
+    else
+      @search = Search.listing_elements_by_type_without_boost_circumstance('Artwork', search_languages, current_user, per_page,params[:page])
+      @artworks = @search[:results]          
+      @num_results = @search[:total] 
+=begin        
+      @search = Artwork.search do |query|
+      
+          if current_user != nil && current_user.circumstances != []
+            search_terms = current_user.circumstances.first.tag_list + ", " + current_user.circumstances.first.subject.name
+            query.keywords search_terms, :fields => [:tags, :name] {minimum_match 1}
+          end
+       
+          query.with(:translations, search_languages)  
+          query.paginate :page => params[:page],:per_page => per_page 
+      end
+      @artworks = @search.results 
+      @num_results=@search.total
+=end         
+    end  
+            
+    @previous_search_params = params      
+    @subjects = Subject.all     
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @artworks }
+    end
+  end
+  
+  
+  def show
+    @artwork = Artwork.find(params[:id])
+    
+    if current_user!=nil
+      current_user.add_preferences_to_user_history(@artwork.taggable_tag_annotations)
+    end
+         
+    @subjects=Subject.all
+    @related_elements=RelatedElement.new(@artwork)   
+    @edition_mode=false
+    @resource_type="Artwork"
+            
+    if notice == 'Artwork was successfully created.' || notice == 'Artwork was successfully updated.'
+      @previous_action = 'saved'
+    else
+      @previous_action = 'list'
+    end    
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @artwork }
+    end
+  end
+  
+  
+  def new
+    if current_user !=nil 
+      @artwork = Artwork.new
+      @subjects=Subject.all
+      @edition_mode=true
+  
+      respond_to do |format|
+        format.html # new.html.erb
+        format.json { render json: @artwork }
+      end
+    else
+      redirect_to artworks_path
+    end
+  end
+  
+  def edit
+    @artwork = Artwork.find(params[:id])
+    if current_user !=nil && ((@artwork.owner == current_user) or (@artwork.owner_type=="Group" && @artwork.owner.users.exists?(current_user)))
+      @subjects=Subject.all
+      @edition_mode=true
+    else
+      redirect_to artwork_path(@artwork) 
+    end
+  end
+  
+  
+  def create
+    @artwork = Artwork.new(params[:artwork])
+    if (params[:artwork][:owner_type]==nil)
+      @artwork.owner_type="User"
+      @artwork.owner=current_user
+    end
+    @artwork.creator = current_user
+    manual_tags = params[:artwork][:tag_list].split(',')
+    #@artwork.persist([], @artwork.description, manual_tags)
+    
+    respond_to do |format|
+      if @artwork.persist([], @artwork.description, manual_tags)
+        format.html { redirect_to @artwork, notice: 'Artwork was successfully created.' }
+        format.json { render json: @artwork, status: :created, location: @artwork }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @artwork.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+  
+  
+  def update
+    @artwork = Artwork.find(params[:id])
+    if (params[:artwork][:owner_type]==nil)
+      @artwork.owner_type="User"
+      @artwork.owner=current_user
+    end
+    @artwork.subjects.destroy_all
+    name = params[:artwork][:name]
+    description = params[:artwork][:description]
+    manual_tags = params[:artwork][:tag_list].split(',')    
+    @artwork.info_to_wikify = name + ". " + description      
+    
+    respond_to do |format|
+      if @artwork.update_attributes(params[:artwork])
+        @artwork.tags.destroy_all
+        @artwork.extract_wikitopics(name, description, manual_tags)           
+        format.html { redirect_to @artwork, notice: 'Artwork was successfully updated.' }
+        format.json { head :ok }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @artwork.errors, status: :unprocessable_entity }
+      end
+    end    
+  end
+  
+  
+  def destroy
+    @artwork = Artwork.find(params[:id])
+    @artwork.destroy
+
+    respond_to do |format|
+      format.html { redirect_to artworks_url }
+      format.json { head :ok }
+    end
+  end
+  
+  
+  def popup_show_artwork
+    @artwork = Artwork.find(params[:element_id])
+    @subjects=Subject.all
+    @edition_mode=false
+    @resource_type = "Artwork"
+    @popup = true
+
+    respond_to do |format|
+      format.js
+    end
+  end
+  
+  
+end

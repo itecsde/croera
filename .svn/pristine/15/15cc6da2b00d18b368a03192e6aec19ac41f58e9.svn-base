@@ -1,0 +1,14 @@
+scrape_events = ScraperEvents.new
+scrape_events.scrape_spainisculture
+scrape_events.scrape_discoveringfinland
+scrape_events.scrape_unesco
+scrape_events.scrape_finnbay
+scrape_events.scrape_openeducationeuropa
+scrape_events.scrape_visitportugal
+scrape_events.scrape_ulisboa
+scrape_events.scrape_uoslo
+scrape_events.scrape_google_calendar_pt
+scrape_events.scrape_visithungary
+scrape_events.scrape_visitbudapest
+scrape_events.scrape_visitbrussels
+scrape_events.scrape_universidad_algarve

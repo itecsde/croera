@@ -1,0 +1,2 @@
+scraper_widgets = ScraperWidgets.new
+scraper_widgets.scrape_widgets

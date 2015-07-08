@@ -1,0 +1,9 @@
+
+<div id="section_header" class="resource_header">
+	<div id="actions" class="a-left">
+		<%= render actions %>
+	</div>
+	<div id="section_title" class="a-right">
+		<p><%= section_title %></p>
+	</div>		
+</div>

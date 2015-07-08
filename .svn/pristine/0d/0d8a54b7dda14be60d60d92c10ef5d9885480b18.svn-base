@@ -1,0 +1,7 @@
+round_robin_tag_interesting:
+  taggable: round_robin (Activity)
+  tag: interesting
+
+round_robin_tag_cooperative:
+  taggable: round_robin (Activity)
+  tag: cooperative

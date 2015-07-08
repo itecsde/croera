@@ -1,0 +1,84 @@
+# encoding: utf-8
+
+require "nokogiri"
+require "open-uri"
+
+class CreatorCorpusReuters
+   include ActionView::Helpers::SanitizeHelper
+  
+  ###############################################################
+  #######  create_corpus_reuters_21578
+  ###############################################################
+
+   def create_corpus_reuters_21578
+      begin   
+
+         for i in 0..0   
+            
+            a = open('./corpus_reuters_21578/reut2-00' + i.to_s + '.sgm')                
+            document = Nokogiri::HTML(a)
+            document.css('reuters').each do |item|
+               topics = Array.new     
+               places = Array.new    
+               people = Array.new      
+               orgs = Array.new     
+               exchanges = Array.new    
+               companies = Array.new                
+               name = item.css('title').text
+               puts "Name: "
+               puts name.strip
+               puts "Date: "
+               date = item.css('date').text.strip
+               puts date
+               dateline = item.css('dateline').text.strip
+               puts "Description: "
+               description = item.css('text').text.gsub(name,"").gsub(dateline,"").strip
+               puts description
+               puts "End description"
+               
+               puts "Topics"
+               item.css("topics").css("d").each do |topic|
+                  topics << topic.text.strip
+               end
+               puts topics     
+                
+               puts "Places"      
+               item.css("places").css("d").each do |place|
+                  places << place.text.strip
+               end
+               puts places
+               
+               puts "People"      
+               item.css("people").css("d").each do |person|
+                  people << person.text.strip
+               end
+               puts people
+               
+               puts "Orgs"      
+               item.css("orgs").css("d").each do |org|
+                  orgs << org.text.strip
+               end
+               puts orgs               
+
+               puts "Exchanges"      
+               item.css("exchanges").css("d").each do |exchange|
+                  exchanges << exchange.text.strip
+               end
+               puts exchanges
+               
+               puts "Companies"      
+               item.css("companies").css("d").each do |company|
+                  companies << company.text.strip
+               end
+               puts companies               
+                                          
+            end 
+         end
+      rescue Exception => e
+         puts "Exception create_corpus_reuters_21578"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end
+
+end

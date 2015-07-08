@@ -1,0 +1,19 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'articles', :actions => "resources/list_actions"} %>
+<% end %>
+
+<% content_for :advanced_search do %>	
+	<%= render :partial =>"advanced_search" %>
+<% end %>
+
+<% content_for :content do %>
+	<%= render :partial => "generic_partials/resource_disambiguation" %>
+
+	<div id="content_index">	
+		<%= render :partial => "list", :locals => { :current_layout => "application" }%>
+	</div> <!-- CONTENT -->
+	
+	<script src="/javascript/resource_index.js"></script>
+	<script src="/javascript/articles_index.js"></script>
+<% end %>

@@ -1,0 +1,9 @@
+<div id="item_to_itemize">
+	<div class= "text_container editable active deleteable has_edition_controls">
+		<div class="delete_button edition_control" onclick="delete_text_container(this);"><%= image_tag("/images/icons/delete_item.png") %></div>
+		<%= hidden_field_tag :text_id,"", :class => "text_id" %>
+		<li class="itemize_li"></li>
+		<%= text_area_tag "text_content","", :class => "text_content", :placeholder => t("write_here") %>
+		<i class="icon-pencil icon-grey"></i>
+	</div>		
+</div>

@@ -1,0 +1,44 @@
+class PublicController < ApplicationController
+  def index
+     if current_user!=nil
+       redirect_to user_root_path
+     end
+     if Biography.all.size > 0    
+      counter = Biography.where("element_image_file_size != ?", "").count
+      if counter>0  
+        @biography=Biography.where("element_image_file_size != ?", "").offset(rand(counter)).first
+      else
+        @biography=Biography.first(:offset => rand(Biography.count))
+      end   
+    end
+
+    if Event.all.size > 0    
+      counter = Event.where("element_image_file_size != ?", "").count
+      if counter>0
+        @event=Event.where("element_image_file_size != ?", "").offset(rand(counter)).first
+      else
+        @event=Event.first(:offset => rand(Event.count)) 
+      end
+    end
+    
+    if Application.all.size > 0    
+      counter = Application.where("element_image_file_size != ?", "").count
+      if counter>0
+        @application=Application.where("element_image_file_size != ?", "").offset(rand(counter)).first
+      else
+        @application=Application.first(:offset => rand(Application.count)) 
+      end
+    end 
+    
+    if Lecture.all.size > 0    
+      counter = Lecture.where("element_image_file_size != ?", "").count
+      if counter>0
+        @lecture=Lecture.where("element_image_file_size != ?", "").offset(rand(counter)).first
+      else
+        @lecture=Lecture.first(:offset => rand(Lecture.count)) 
+      end
+    end       
+     
+  end
+  
+end

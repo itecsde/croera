@@ -1,0 +1,18 @@
+$(document).ready(function() {
+	site_index_init();
+});
+
+function site_index_init(){
+	infinite_scroll_init('#content_index','.extract_box', 'page', 'window');
+	var latitude= $("#site_latitude").val();
+	var longitude= $("#site_longitude").val();
+   	initialize_map(latitude, longitude); 
+
+}
+
+function submit_advanced_search(event){
+	$("#advanced_search").val(1);
+	event.preventDefault(); 
+	$("#advanced_search_form").submit();
+}
+

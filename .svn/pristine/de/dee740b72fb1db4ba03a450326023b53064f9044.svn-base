@@ -1,0 +1,9 @@
+<%= render :partial => "header", :locals => {:section_title => (t :picture), :actions => "picture_actions"} %>
+
+<div id="content_container" class="picture_form">
+	<%= render :partial => "pictures/form", :locals => {:picture_id => @picture_id, :layout => 'application'} %>
+	<div class="clear"></div>
+	<input type="hidden" id="edition_mode" value="off"/>
+</div>
+
+<script src="/javascript/picture_form.js"></script>

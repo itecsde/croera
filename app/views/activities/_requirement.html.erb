@@ -1,0 +1,467 @@
+<% 
+	optionalities= Hash.new()
+	optionalities[""] = t("select_one")
+	optionalities["0"] = t("required")
+	optionalities["1"] = t("recommended")
+	optionalities["2"] = t("nice_to_have")
+	
+	optionalities_reverse= Hash.new()
+	optionalities_reverse[t("select_one")] = ""
+	optionalities_reverse[t("required")] = "0" 
+	optionalities_reverse[t("recommended")] = "1" 
+	optionalities_reverse[t("nice_to_have")] = "2"
+	
+	requirement_type = requirement.class.name.underscore.to_sym
+ 
+%>
+<div class="requirement_row active deleteable has_edition_controls">
+	<div class="requirement_row_display" onclick= "close_requirement_extract(this);">
+		<div class="delete_button edition_control" onclick="delete_requirement_row(this);"><%= image_tag("/images/icons/delete_item.png") %></div>
+		<div class="requirement_icon"><i class="icon-<%=requirement_type %>"></i></div>
+		<div class="requirement_sentence">
+		<% if I18n.locale== :fi %>
+			<% if requirement.description!="" %>
+				<span class="requirement_description_display"><%= requirement.description %>,&nbsp;</span>
+			<% else %>
+				<span class="requirement_description_display"></span>
+			<% end %>
+			<span class="requirement_sentence_part">joka&nbsp;</span>
+		<% else %>
+			<span class="requirement_sentence_part"><%= t("it_is")%>&nbsp;</span>
+			<div class="requirement_optionality_display display_field">
+			<% if (requirement.optionality != nil) %>
+				<%= optionalities[requirement.optionality] %>
+			<% else %>
+				<span class="placeholder"><%= t("requirement_optionality")%></span>
+			<% end %>
+			</div>
+		<% end %>
+			
+
+	<% case requirement_type
+		when :concrete_requirement %>
+			<div class="resource_selected_display display_field">
+			<% if(requirement.concrete_requirement_tool_annotation != nil) %>
+				<%= requirement.concrete_requirement_tool_annotation.tool.name %>
+			<% else %>
+				<span class="placeholder"><%= t("specific_tool")%></span>
+			<% end %>
+			</div>
+	<% 	when :abstract_requirement %>
+			<% if I18n.locale!= :fi %>
+			<span class="requirement_sentence_part"><%= t("a")%>&nbsp;</span>
+			<% end %>
+			<span class="requirement_sentence_part">&nbsp;</span>
+			<div class="tool_functionality_display display_field">
+			<% if(requirement.abstract_requirement_functionality_annotation != nil ) %>
+				<%= requirement.abstract_requirement_functionality_annotation.functionality.name %>
+			<% else %>
+				<span class="placeholder"><%= t("functionality")%></span>
+			<% end %>
+			</div>
+			<span class="requirement_sentence_part">&nbsp;</span>
+			<% if I18n.locale!= :fi %>
+				<span class="requirement_sentence_part"><%= t("tool")%></span>				
+			<% else %>
+				<span class="requirement_sentence_part">&nbsp;on&nbsp;</span>
+			<% end %>
+	<% 	when :person_concrete_requirement %>
+			<div class="resource_selected_display display_field">
+			<% if(requirement.person_concrete_requirement_person_annotation != nil) %>
+				<%= requirement.person_concrete_requirement_person_annotation.person.name %>
+			<% else %>
+				<span class="placeholder"><%= t("specific_person")%></span>
+			<% end %>
+			</div>
+	<% 	when :contributor_requirement %>
+			<span class="requirement_sentence_part"><%= t("a")%>&nbsp;</span>
+			<div class="person_category_display display_field">
+			<% if(requirement.contributor_requirement_person_category_annotation !=nil ) %>
+				<%= requirement.contributor_requirement_person_category_annotation.person_category.name %>
+			<% else %>
+				<span class="placeholder"><%= t("Person_category")%></span>
+			<% end %>
+			</div>
+			<span class="requirement_sentence_part">&nbsp;</span>
+			<span class="requirement_sentence_part"><%= t("as")%>&nbsp;</span>
+			<div class="person_role_display display_field">
+			<% if(requirement.contributor_requirement_person_role_annotation !=nil ) %>
+				<%= requirement.contributor_requirement_person_role_annotation.person_role.name %>
+			<% else %>
+				<span class="placeholder"><%= t("person_role")%></span>
+			<% end %>
+			</div>
+	<% 	when :event_concrete_requirement %>
+			<div class="resource_selected_display display_field">
+			<% if(requirement.event_concrete_requirement_event_annotation != nil) %>
+				<%= requirement.event_concrete_requirement_event_annotation.event.name %>
+			<% else %>
+				<span class="placeholder"><%= t("specific_event")%></span>
+			<% end %>
+			</div>
+	<% 	when :event_requirement %>
+			<span class="requirement_sentence_part"><%= t("a")%>&nbsp;</span>
+			<div class="event_type_display display_field">
+			<% if(requirement.event_requirement_event_type_annotation != nil) %>
+				<%= requirement.event_requirement_event_type_annotation.event_type.name %>
+			<% else %>
+				<span class="placeholder"><%= t("event_type")%></span>
+			<% end %>
+			</div>
+			<span class="requirement_sentence_part">&nbsp;</span>
+			<span class="requirement_sentence_part"><%= t("in")%>&nbsp;</span>
+			<div class="event_place_display display_field">
+			<% if(requirement.event_requirement_event_place_annotation != nil) %>
+				<%= requirement.event_requirement_event_place_annotation.event_place.name %>
+			<% else %>
+				<span class="placeholder"><%= t("event_place")%></span>
+			<% end %>
+			</div>
+	<% end %>		
+		
+		<% if I18n.locale== :fi %>	
+			<div class="requirement_optionality_display display_field">
+			<% if (requirement.optionality != nil) %>
+				<%= optionalities[requirement.optionality] %>
+			<% else %>
+				<span class="placeholder"><%= t("requirement_optionality")%></span>
+			<% end %>
+			</div>	
+		<% end %>
+			
+		</div>
+		<span class="validation_icon" style="float:right"><img src="/images/transparent_placeholder.png"/></span>
+	</div>
+
+	
+<% 
+case requirement_type
+when :abstract_requirement	
+	if(requirement.abstract_requirement_tool_assignment != nil) %>
+	<div class="resource_cell covered has_edition_controls active">
+		<%= hidden_field_tag :resource_identification, requirement.abstract_requirement_tool_assignment.tool.id , :class => "resource_identification" %>
+		<%= hidden_field_tag :resource_type, requirement.abstract_requirement_tool_assignment.tool.class, :class => "resource_type" %>
+		<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= requirement.abstract_requirement_tool_assignment.tool.name %></p></div>
+		<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+	</div>
+	<% else %>
+	<div class="resource_cell uncovered has_edition_controls active">
+		<%= hidden_field_tag :resource_identification, "" , :class => "resource_identification" %>
+		<%= hidden_field_tag :resource_type, "" , :class => "resource_type" %>
+		<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= t("select") %></p></div>
+		<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+	</div>
+	<% end %>
+<%
+when :contributor_requirement	
+	if(requirement.contributor_requirement_person_assignment != nil) %>
+	<div class="resource_cell covered has_edition_controls active">
+		<%= hidden_field_tag :resource_identification, requirement.contributor_requirement_person_assignment.person.id , :class => "resource_identification" %>
+		<%= hidden_field_tag :resource_type, requirement.contributor_requirement_person_assignment.person.class, :class => "resource_type" %>
+		<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= requirement.contributor_requirement_person_assignment.person.name %></p></div>
+		<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+	</div>
+	<% else %>
+	<div class="resource_cell uncovered has_edition_controls active">
+		<%= hidden_field_tag :resource_identification, "" , :class => "resource_identification" %>
+		<%= hidden_field_tag :resource_type, "" , :class => "resource_type" %>
+		<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= t("select") %></p></div>
+		<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+	</div>
+	<% end %>
+<%
+when :event_requirement	
+	if(requirement.event_requirement_event_assignment != nil) %>
+	<div class="resource_cell covered has_edition_controls active">
+		<%= hidden_field_tag :resource_identification, requirement.event_requirement_event_assignment.event.id , :class => "resource_identification" %>
+		<%= hidden_field_tag :resource_type, requirement.event_requirement_event_assignment.event.class, :class => "resource_type" %>
+		<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= requirement.event_requirement_event_assignment.event.name %></p></div>
+		<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+	</div>
+	<% else %>
+	<div class="resource_cell uncovered has_edition_controls active">
+		<%= hidden_field_tag :resource_identification, "" , :class => "resource_identification" %>
+		<%= hidden_field_tag :resource_type, "" , :class => "resource_type" %>
+		<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= t("select") %></p></div>
+		<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+	</div>
+	<% end %>		
+<%
+when :concrete_requirement	
+	if(requirement.concrete_requirement_tool_assignment != nil) %>
+	<div class="resource_cell covered has_edition_controls active">
+		<%= hidden_field_tag :resource_identification, requirement.concrete_requirement_tool_assignment.tool.id , :class => "resource_identification" %>
+		<%= hidden_field_tag :resource_type, requirement.concrete_requirement_tool_assignment.tool.class, :class => "resource_type" %>
+		<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= requirement.concrete_requirement_tool_assignment.tool.name %></p></div>
+		<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+	</div>
+	<% else if(requirement.concrete_requirement_tool_annotation != nil) %>
+				<div class="resource_cell covered has_edition_controls active">
+					<%= hidden_field_tag :resource_identification, requirement.concrete_requirement_tool_annotation.tool.id , :class => "resource_identification" %>
+					<%= hidden_field_tag :resource_type, requirement.concrete_requirement_tool_annotation.tool.class, :class => "resource_type" %>
+					<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= requirement.concrete_requirement_tool_annotation.tool.name %></p></div>
+					<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+				</div>
+			<% else %>
+				<div class="resource_cell uncovered has_edition_controls active">
+					<%= hidden_field_tag :resource_identification, "" , :class => "resource_identification" %>
+					<%= hidden_field_tag :resource_type, "" , :class => "resource_type" %>
+					<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= t("select") %></p></div>
+					<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+				</div>
+			<% end %>
+	<% end %>
+<% 
+when :person_concrete_requirement	
+	if(requirement.person_concrete_requirement_person_assignment != nil) %>
+	<div class="resource_cell covered has_edition_controls active">
+		<%= hidden_field_tag :resource_identification, requirement.person_concrete_requirement_person_assignment.person.id , :class => "resource_identification" %>
+		<%= hidden_field_tag :resource_type, requirement.person_concrete_requirement_person_assignment.person.class , :class => "resource_type" %>
+		<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= requirement.person_concrete_requirement_person_assignment.person.name %></p></div>
+		<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+	</div>
+	<% else if(requirement.person_concrete_requirement_person_annotation != nil) %>
+		<div class="resource_cell covered has_edition_controls active">
+			<%= hidden_field_tag :resource_identification, requirement.person_concrete_requirement_person_annotation.person.id , :class => "resource_identification" %>
+			<%= hidden_field_tag :resource_type, requirement.person_concrete_requirement_person_annotation.person.class , :class => "resource_type" %>
+			<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= requirement.person_concrete_requirement_person_annotation.person.name %></p></div>
+			<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+		</div>
+			<% else %>
+			<div class="resource_cell uncovered has_edition_controls active">
+				<%= hidden_field_tag :resource_identification, "" , :class => "resource_identification" %>
+				<%= hidden_field_tag :resource_type, "" , :class => "resource_type" %>
+				<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= t("select") %></p></div>
+				<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+			</div>
+			<% end %>
+	<% end %>
+<% 
+when :event_concrete_requirement	
+	if(requirement.event_concrete_requirement_event_assignment != nil) %>
+	<div class="resource_cell covered has_edition_controls active">
+		<%= hidden_field_tag :resource_identification, requirement.event_concrete_requirement_event_assignment.event.id , :class => "resource_identification" %>
+		<%= hidden_field_tag :resource_type, requirement.event_concrete_requirement_event_assignment.event.class , :class => "resource_type" %>
+		<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= requirement.event_concrete_requirement_event_assignment.event.name %></p></div>
+		<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+	</div>
+	<% else if(requirement.event_concrete_requirement_event_annotation != nil) %>
+			<div class="resource_cell covered has_edition_controls active">
+				<%= hidden_field_tag :resource_identification, requirement.event_concrete_requirement_event_annotation.event.id , :class => "resource_identification" %>
+				<%= hidden_field_tag :resource_type, requirement.event_concrete_requirement_event_annotation.event.class , :class => "resource_type" %>
+				<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= requirement.event_concrete_requirement_event_annotation.event.name %></p></div>
+				<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+			</div>
+			<% else %>
+			<div class="resource_cell uncovered has_edition_controls active">
+				<%= hidden_field_tag :resource_identification, "" , :class => "resource_identification" %>
+				<%= hidden_field_tag :resource_type, "" , :class => "resource_type" %>
+				<div class="resource select_resource_button" onclick="enable_assignment(this, '<%= requirement_type %>');"><p><%= t("select") %></p></div>
+				<div class="triangle"></div><div class="uncovered_text"><%= t("unassigned") %></div>
+			</div>
+			<% end %>
+	<% end %>
+
+<% 
+end%>
+
+
+	<div class="requirement_extract <%= requirement_type %>">
+		<div class="requirement_extract_close_button" onclick="close_requirement_extract(this)"></div>
+		<%= hidden_field_tag :requirement_id, requirement.id , :class => "requirement_id" %>
+		<%= hidden_field_tag :requirement_type, requirement.class , :class => "requirement_type" %>
+		<div class="requirement_extract_icon"><span class="icon-<%= requirement_type %> icon-grey"></span></div>
+		<div class="requirement_description_field editable active">
+			<label for="requirement_description"><%= t("is_needed_to")%>&nbsp;</label>
+			<textarea id="requirement_description" class="requirement_description" name="requirement[description]" placeholder="<%= t("Description") %>"><%= requirement.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		</div>
+		<hr/>
+		<div class="requirement_optionality_field editable active">
+			<label for="requirement_optionality"><%= t("the_optionality_level_is")%>&nbsp;</label>
+			<span class="requirement_optionality_name">
+				<% if(requirement.optionality != nil) %>
+					<%= optionalities[requirement.optionality] %>
+				<% end %>
+			</span>
+			<br/>
+			<select id="requirement_optionality" class="requirement_optionality edition_control" onchange="update_requirement_element_name(this)">
+				<%= options_for_select(optionalities_reverse,requirement.optionality) %>
+			</select>
+		</div>
+		<div class="clear"></div>
+		<hr />
+<% 
+case requirement_type 
+when :concrete_requirement	 %>
+		<div class="specify_resource">
+			<label for="specify_resource_button"><%= t("the_tool_selected_is")%>&nbsp;</label>
+			<% if(requirement.concrete_requirement_tool_annotation != nil) %>
+			<div class="resource_name">
+				<%= requirement.concrete_requirement_tool_annotation.tool.name %>
+			</div><br/>
+			<input type="hidden" class="tool_id" value="<%= requirement.concrete_requirement_tool_annotation.tool_id %>"/>
+			<input type="hidden" class="tool_type" value="<%= requirement.concrete_requirement_tool_annotation.tool_type %>"/>
+				<% if (requirement.concrete_requirement_tool_annotation.tool_type == "Device") %>
+					<input type="hidden" class="tool_itec_id" value="<%= Device.find(requirement.concrete_requirement_tool_annotation.tool_id).itec_id  %>" />
+				<% else %>
+					<input type="hidden" class="tool_itec_id" value="<%= Application.find(requirement.concrete_requirement_tool_annotation.tool_id).itec_id  %>" />
+				<% end %>
+			<% else %>
+			<div class="resource_name"></div><br/>
+			<input type="hidden" class="tool_id"/>
+			<input type="hidden" class="tool_type"/>
+			<input type="hidden" class="tool_itec_id"/>
+			<% end %>
+			
+			<% if(requirement.concrete_requirement_tool_assignment != nil) %>
+			<input type="hidden" class="tool_assignment_id" value="<%= requirement.concrete_requirement_tool_assignment.tool_id %>"/>
+			<input type="hidden" class="tool_assignment_type" value="<%= requirement.concrete_requirement_tool_assignment.tool_type %>"/>
+			<% else %>
+			<input type="hidden" class="tool_assignment_id"/>
+			<input type="hidden" class="tool_assignment_type"/>
+			<% end %>
+			
+			<div class="clear"></div>
+			<div id="specify_resource_button" class="specify_resource_button edition_control" onclick="annotate_callback_location($(this)); open_area_popup('#tool_requirement_selection','/selectors/paginate_elements/?element_class=tool_requirement_selection');">
+				<%= t("Select")%>
+			</div>
+		</div>
+<%
+when :person_concrete_requirement	%>
+		<div class="specify_resource">
+			<label for="specify_resource_button"><%= t("the_person_selected_is")%>&nbsp;</label>
+			<% if(requirement.person_concrete_requirement_person_annotation != nil) %>
+			<div class="resource_name">
+				<%= requirement.person_concrete_requirement_person_annotation.person.name %>
+			</div><br/>
+			<input type="hidden" class="resource_id" value="<%= requirement.person_concrete_requirement_person_annotation.person.id %>"/>
+			<% else %>	
+			<div class="resource_name"></div><br/>
+			<input type="hidden" class="resource_id"/>
+			<% end %>
+			
+			<% if(requirement.person_concrete_requirement_person_assignment != nil) %>
+			<input type="hidden" class="resource_assignment_id" value="<%= requirement.person_concrete_requirement_person_assignment.person.id %>"/>
+			<% else %>
+			<input type="hidden" class="resource_assignment_id"/>
+			<% end %>
+			
+			<div class="clear"></div>
+			<div id="specify_resource_button" class="specify_resource_button edition_control" onclick="annotate_callback_location($(this)); open_area_popup('#person_requirement_selection','/selectors/paginate_elements/?element_class=person_requirement_selection');">
+				<%= t("Select")%>
+			</div>
+		</div>
+<%
+when :event_concrete_requirement %>
+		<div class="specify_resource">
+			<label for="specify_resource_button"><%= t("the_event_selected_is")%>&nbsp;</label>
+			<% if(requirement.event_concrete_requirement_event_annotation != nil) %>
+			<div class="resource_name">
+				<%= requirement.event_concrete_requirement_event_annotation.event.name %>
+			</div><br/>
+			<input type="hidden" class="resource_id" value="<%= requirement.event_concrete_requirement_event_annotation.event.id %>"/>
+			<% else %>
+			<div class="resource_name"></div><br/>
+			<input type="hidden" class="resource_id"/>
+			<% end %>
+			
+			<% if(requirement.event_concrete_requirement_event_assignment != nil) %>
+			<input type="hidden" class="resource_assignment_id" value="<%= requirement.event_concrete_requirement_event_assignment.event.id %>"/>
+			<% else %>
+			<input type="hidden" class="resource_assignment_id"/>
+			<% end %>
+			<div class="clear"></div>
+			<div id="specify_resource_button" class="specify_resource_button edition_control" onclick="annotate_callback_location($(this)); open_area_popup('#event_requirement_selection','/selectors/paginate_elements/?element_class=event_requirement_selection');">
+				<%= t("Select")%>
+			</div>
+		</div>
+<%
+when :abstract_requirement %>
+		<label for="functionality"><%= t("the_functionality_required_is")%>&nbsp;</label>
+		<span class="functionality_name">
+		<% if(requirement.abstract_requirement_functionality_annotation != nil ) %>
+			<%= requirement.abstract_requirement_functionality_annotation.functionality.name %>
+		</span><br/>
+		<%= select_tag "functionality", options_from_collection_for_select(@functionalities, "id", "name", requirement.abstract_requirement_functionality_annotation.functionality.id), :prompt => t("Select_one"), :class => "edition_control" , :onchange => "update_requirement_element_name(this)" %>
+		<% else %>
+		</span><br/>
+		<%= select_tag "functionality", options_from_collection_for_select(@functionalities, "id", "name"), :prompt => t("Select_one"), :class => "edition_control" , :onchange => "update_requirement_element_name(this)" %>
+		<% end %>
+		
+		<div class="specify_resource">			
+			<% if(requirement.abstract_requirement_tool_assignment != nil) %>
+			<input type="hidden" class="resource_assignment_id" value="<%= requirement.abstract_requirement_tool_assignment.tool.id %>"/>
+			<% else %>
+			<input type="hidden" class="resource_assignment_id"/>
+			<% end %>
+		</div>
+<%
+when :contributor_requirement %>		
+		<label for="person_category"><%= t("the_person_category_required_is")%>&nbsp;</label>
+		<span class="person_category_name">
+		<% if(requirement.contributor_requirement_person_category_annotation !=nil ) %>
+			<%= requirement.contributor_requirement_person_category_annotation.person_category.name %>
+		</span><br/>
+		<%= select_tag "person_category", options_from_collection_for_select(@person_categories, "id", "name", requirement.contributor_requirement_person_category_annotation.person_category.id), :prompt => "Select something", :class => "edition_control", :onchange => "update_requirement_element_name(this)" %>
+		<% else %>
+		</span><br/>
+		<%= select_tag "person_category", options_from_collection_for_select(@person_categories, "id", "name"), :prompt => "Select something", :class => "edition_control", :onchange => "update_requirement_element_name(this)" %>
+		<% end %> 
+		<div class="clear"></div>
+		<label for="person_role"><%= t("the_person_role_required_is")%>&nbsp;</label>
+		<span class="person_role_name">
+		<% if(requirement.contributor_requirement_person_role_annotation !=nil ) %>
+			<%= requirement.contributor_requirement_person_role_annotation.person_role.name %>
+		</span><br/>
+		<%= select_tag "person_role", options_from_collection_for_select(@person_roles, "id", "name", requirement.contributor_requirement_person_role_annotation.person_role.id), :prompt => "Select something", :class => "edition_control", :onchange => "update_requirement_element_name(this)" %>
+		<% else %>	
+		</span><br/>
+		<%= select_tag "person_role", options_from_collection_for_select(@person_roles, "id", "name"), :prompt => "Select something", :class => "edition_control", :onchange => "update_requirement_element_name(this)" %>
+		<% end %>
+		
+		<div class="specify_resource">			
+			<% if(requirement.contributor_requirement_person_assignment != nil) %>
+			<input type="hidden" class="resource_assignment_id" value="<%= requirement.contributor_requirement_person_assignment.person.id %>"/>
+			<% else %>
+			<input type="hidden" class="resource_assignment_id"/>
+			<% end %>
+		</div>
+<%
+when :event_requirement %>
+		<label for="event_type"><%= t("the_event_type_required_is")%>&nbsp;</label>
+		<span class="event_type_name">
+		<% if(requirement.event_requirement_event_type_annotation != nil) %>
+			<%= requirement.event_requirement_event_type_annotation.event_type.name %>
+		</span><br/>
+		<%= select_tag "event_type", options_from_collection_for_select(@event_types, "id", "name", requirement.event_requirement_event_type_annotation.event_type.id), :prompt => "Select something", :class => "edition_control", :onchange => "update_requirement_element_name(this)"%>
+		<% else %>	
+		</span><br/>
+		<%= select_tag "event_type", options_from_collection_for_select(@event_types, "id", "name"), :prompt => "Select something", :class => "edition_control", :onchange => "update_requirement_element_name(this)"%>
+		<% end %> 
+		<div class="clear"></div>
+		<label for="event_place"><%= t("the_event_place_required_is")%>&nbsp;</label>
+		<span class="event_place_name">
+		<% if(requirement.event_requirement_event_place_annotation != nil) %>
+			<%= requirement.event_requirement_event_place_annotation.event_place.name %>
+		</span><br/>
+		<%= select_tag "event_place", options_from_collection_for_select(@event_places, "id", "name", requirement.event_requirement_event_place_annotation.event_place.id), :prompt => "Select something", :class => "edition_control", :onchange => "update_requirement_element_name(this)"%>
+		<% else %>	
+		</span><br/>
+		<%= select_tag "event_place", options_from_collection_for_select(@event_places, "id", "name"), :prompt => "Select something", :class => "edition_control", :onchange => "update_requirement_element_name(this)"%>
+		<% end %>
+		
+		<div class="specify_resource">			
+			<% if(requirement.event_requirement_event_assignment != nil) %>
+			<input type="hidden" class="resource_assignment_id" value="<%= requirement.event_requirement_event_assignment.event.id %>"/>
+			<% else %>
+			<input type="hidden" class="resource_assignment_id"/>
+			<% end %>
+		</div>
+		
+		
+<% end %>
+		<div class="clear"></div>
+		<div class="tooltip_triangle"></div>
+	</div>
+</div>

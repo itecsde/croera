@@ -1,0 +1,7 @@
+<% if @recommended_people.length == 0 %>
+	var recommended_people= ("<p class='no_recommend_text'><%=j t("no_recommends") %></p>");
+<% else %>
+	var recommended_people= ("<% @recommended_people.each_with_index do |person, index| %><%=j render :partial => "recommended_resource", :locals => {:resource => person, :details_button => "person_details_button", :select_button => "select_person_resource", :recommendation_position => index + 1} %><% end %>");
+<% end %>
+
+recommend_people_callback();

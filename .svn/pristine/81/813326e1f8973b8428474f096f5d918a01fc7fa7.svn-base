@@ -1,0 +1,10 @@
+<li>
+	<%= link_to user_root_path do %>
+		<img src="/images/white_arrow_left.png" title="<%= t('back_to_home') %>"></img>
+	<% end %>	
+</li>
+
+<li>
+	<img src="/images/search.png" title="<%= t('search') %>"></img>
+</li>	
+

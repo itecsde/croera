@@ -1,0 +1,18 @@
+# encoding: utf-8
+require 'net/http'
+require 'net/https'
+require 'uri'
+
+class RecordLinkage
+   include ActionView::Helpers::SanitizeHelper
+   def record_linkage
+      begin
+                  
+  
+      rescue Exception => e
+         puts "Exception Record Linkage"
+         puts e.message
+         puts e.backtrace.inspect
+      end
+   end
+end

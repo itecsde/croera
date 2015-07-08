@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  name: MyString
+  description: MyText
+  subject: MyText
+  curriculum_topic: MyText
+  url: MyString
+
+two:
+  name: MyString
+  description: MyText
+  subject: MyText
+  curriculum_topic: MyText
+  url: MyString

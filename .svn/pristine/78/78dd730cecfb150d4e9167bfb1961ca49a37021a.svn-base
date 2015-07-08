@@ -1,0 +1,15 @@
+<%= render :partial => "header", :locals => {:section_title => (t :activity), :actions => "activity_actions"} %>
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'activities', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => t('activities'), :actions => "activities/activity_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+
+	<div id="content_container" class="activity_container">	
+		<%= render "activity" %>
+	</div> <!-- CONTENT -->
+
+	<script src="/javascript/bootstrap_tooltip.js"></script>
+	<script src="/javascript/activities_form.js"></script>
+<% end %>

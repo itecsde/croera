@@ -1,0 +1,7 @@
+<% annotation = StepRequirementResourceAnnotation.new %>
+var assignments_rows= ("<% @activity.abstract_requirements.each do |requirement| %><%=j render :partial => "activity_sequences/assignment_row", :locals => {:requirement => requirement, :annotation_id => "", :annotation => annotation} %><% end %>\
+<% @activity.concrete_requirements.each do |requirement| %><%=j render :partial => "activity_sequences/assignment_row", :locals => {:requirement => requirement, :annotation_id => "", :annotation => annotation} %><% end %>\
+<% @activity.contributor_requirements.each do |requirement| %><%=j render :partial => "activity_sequences/assignment_row", :locals => {:requirement => requirement, :annotation_id => "", :annotation => annotation} %><% end %>\
+<% @activity.person_concrete_requirements.each do |requirement| %><%=j render :partial => "activity_sequences/assignment_row", :locals => {:requirement => requirement, :annotation_id => "", :annotation => annotation} %><% end %>\
+<% @activity.event_requirements.each do |requirement| %><%=j render :partial => "activity_sequences/assignment_row", :locals => {:requirement => requirement, :annotation_id => "", :annotation => annotation} %><% end %>\
+<% @activity.event_concrete_requirements.each do |requirement| %><%=j render :partial => "activity_sequences/assignment_row", :locals => {:requirement => requirement, :annotation_id => "", :annotation => annotation} %><% end %>");

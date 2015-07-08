@@ -1,0 +1,27 @@
+<% content_for :meta do %>
+	<%= render :partial => "/generic_partials/meta", :locals => {:element => @biography}%>
+<% end %>
+
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'biography', :actions => "biographies/biography_actions"} %>
+<% end %>
+
+<% content_for :content do %>
+	
+	<% if current_user != nil%>
+		<%= render :partial => "generic_partials/header_show_resource", :locals => {:element => @biography} %>	
+	<% end %>
+
+	<div id="content_container" class="biography_container">
+		<%= render "biography" %>
+		<%= render :partial => "search_results/related_elements_same_type",:locals => {:related_title =>'related_biographies'} %>				
+	</div> <!-- CONTENT -->
+	<%= render :partial => "search_results/related_elements", :locals => {:element_type =>'biography'} %>
+
+	
+	<span style="display:none" id="is_edition" data-value="false"></span>	
+	
+	
+	<script src="/javascript/biographies_form.js"></script>
+<% end %>

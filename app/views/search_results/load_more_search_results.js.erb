@@ -1,0 +1,1 @@
+$(".search_elements_type_box.search_<%= @element_type.downcase %>").html("<%=j render :partial => 'search_results/partial_search_results', locals: { elements: @elements, element_type: @element_type, search_text: @search_text, article_id: @article_id } %>");

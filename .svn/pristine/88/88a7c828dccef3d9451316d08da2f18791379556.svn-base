@@ -1,0 +1,2 @@
+<!-- Contributions selector -->
+<%= render :partial => "selectors/contribution_type_selector", :layout => "layouts/slider", :locals => {:slider_id => "contribution_types", :slider_location => "right", :slider_header => "Select_a_contribution_type", :callback => "select_contribution_type()"} %>

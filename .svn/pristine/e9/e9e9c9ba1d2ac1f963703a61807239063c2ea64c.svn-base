@@ -1,0 +1,53 @@
+<%
+	if picture_id == nil
+		@picture = Picture.new
+		@box= Box.new
+		@box.box_type= "full_box"
+		@box.position= 1
+		@box.document_type= "Picture"
+		@component= Component.new
+		@component.component_type= "image"
+		@component.position= 1
+		@text = ActiveRecord::Base::Text.new
+		@component.texts << @text
+		@box.components << @component
+		@picture.boxes << @box
+	else
+		@picture= Picture.find(picture_id)
+	end
+%>
+
+<% if layout == 'application'%>
+	<%= fields_for @picture do |f|%>
+		<div id="element_head">
+			<div class="element_id">
+				<%= f.hidden_field :id %>
+			</div>
+			<div class="element_name editable active">
+				<%= f.text_field :name, :class => "element_title", :placeholder => t("title")  %>
+				<i class="icon-pencil icon-grey"></i>
+			</div>
+			<div class="clear"></div>
+			<div class="element_description editable active">
+				<textarea id="element_description" name="picture[description]" placeholder="<%= t("Description") %>"><%= @picture.description %></textarea>
+				<i class="icon-pencil icon-grey"></i>
+			</div>
+		</div>
+	<% end %>
+<% else %>
+	<%= fields_for @picture do |f|%>
+		<%= f.hidden_field :id %>
+	<% end %>
+<% end %>
+
+<% @picture.boxes.sort_by{|e| e[:position]}.each do |box| %>
+	<div class="box_container <%= box.box_type %>">
+		<%= hidden_field_tag :box_id, box.id %>
+		<%= hidden_field_tag :box_type, box.box_type %>
+		<% box.components.sort_by{|e| e[:position]}.each do |component| %>
+			<div class="component_container">				
+				<%= render :partial => "components/"+component.component_type, :locals => {:component => component}  %>
+			</div>
+		<%end%>
+	</div>
+<%end%>

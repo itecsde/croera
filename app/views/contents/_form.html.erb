@@ -1,0 +1,84 @@
+  <%
+  @subjects = Subject.all
+  %>
+  
+  <% if @content.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@content.errors.count, "error") %> prohibited this content from being saved:</h2>
+
+      <ul>
+      <% @content.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+	<div class="content_name editable active">
+		<%= content_form.text_field :name, :class => "element_title", :placeholder => t("title") %>
+		<i class="icon-pencil icon-grey"></i>
+	</div>
+		
+	<div class= "description_container">
+		<div class="content_image picture_container image ">
+			<div class="editable active">
+				<% if @content.element_image.url() != "none" %>
+				<%= image_tag @content.element_image.url(), width:'100%', :class => "image_preview" %>
+				<% else %>
+				<img class="image_preview" width="100%"/>
+				<% end %>
+				<div class= "file_upload">
+					<%= content_form.file_field :element_image, :onchange => "image_preview(this, event);", :class =>"input_element_image" %>
+				</div>
+			</div>
+		</div>
+		<% if @content.element_image.url() != "none" %>
+		<div class="content_description editable active description description_right">
+		<% else %>
+		<div class="content_description editable active description">
+		<% end %>
+			<textarea id="content_description" name="content[description]" placeholder="<%= t("Description") %>"><%= @content.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		</div>
+		<div class="clear"></div>
+		<div class= "select_element_picture_button has_edition_controls active">
+			<button onclick= "select_element_picture(this); return false;" class="edition_control"><%= t("Select_picture") %></button>
+		</div>
+	</div>
+	<div class="clear"></div>
+	
+	<hr />
+	<div class="field editable active">
+		<p class= "field_label"><%= t("Subject") %>:</p>
+		<div style="position: relative;float: left">
+			<% if(@content.subject != nil ) %>
+			<div class="selector_input">
+				<span><%= @content.subject.name %></span>
+				<%= select_tag "content[subject_id]", options_from_collection_for_select(@subjects, "id", "name", @content.subject.id), :prompt => "", :class => "edition_control" %>
+			</div>
+			<% else %>
+			<div class="selector_input">
+				<span></span>
+				<%= select_tag "content[subject_id]", options_from_collection_for_select(@subjects, "id", "name"),  :prompt => "", :class => "edition_control" %>
+			</div>
+			<% end %>
+		</div>
+	</div>
+	
+	<div class="field editable active">
+	    <p class= "field_label"><%= t("Curriculum_topic") %>:</p>
+	    <div style="position: relative;float: left; width: 80%;">
+		    <%= content_form.text_field :curriculum_topic %>
+		    <i class="icon-pencil icon-grey"></i>
+		</div>
+	</div>
+	
+	<div class="field editable active">
+	    <p class= "field_label"><%= t("url") %>:</p>
+	    <div class="url_editor" style="position: relative;float: left; width: 80%;">
+	    	<span><a href="<%= @content.url %>" target="_blank"><%= @content.url %></a></span>
+		    <%= content_form.text_field :url %>
+		    <i class="icon-pencil icon-grey"></i>
+		</div>
+	</div>	
+  	

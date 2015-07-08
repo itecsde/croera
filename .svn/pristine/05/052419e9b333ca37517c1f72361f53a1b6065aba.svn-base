@@ -1,0 +1,9 @@
+<a class="back_icon has_tooltip" href="javascript: history.back();"><img src="/images/icons/atras_30.png" /><span class="tooltip"><%= t("Back")%></span></a>
+<%=link_to edit_technological_setting_path(@technological_setting), :class => "has_tooltip" do %>
+	 <%= image_tag("/images/icons/edit-white.png") %>
+	<span class="tooltip"><%= t("Edit")%></span>
+<% end %>
+<%=link_to  @technological_setting, confirm: 'Are you sure?', method: :delete, :class => "has_tooltip" do %>
+	 <%= image_tag("/images/icons/delete.png") %>
+	<span class="tooltip"><%= t("Delete")%></span>
+<% end %>

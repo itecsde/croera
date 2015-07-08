@@ -1,0 +1,239 @@
+<% 
+	if current_user.circumstances.first != nil
+		if (current_user.first_name != nil && current_user.first_name != "")
+			current_user_display = current_user.first_name+" "+current_user.last_name
+		else
+			current_user_display = current_user.email
+		end	
+			
+		if current_user.circumstances.first.name != nil
+			circumstance_name=current_user.circumstances.first.name.truncate(30,:separator=>"",:omission=>"...")
+		else 
+			circumstance_name="Context placeholder"
+		end
+		
+		circumstance_classroom="No classroom details provided"
+		if current_user.circumstances.first.has_internet != nil && current_user.circumstances.first.has_internet
+			circumstance_classroom=t('has_internet')	
+		else 
+			circumstance_classroom=t('no_internet')
+		end
+			
+		if current_user.circumstances.first.operating_system != nil
+			circumstance_classroom += ", " + current_user.circumstances.first.operating_system.name
+		end
+		
+		if current_user.circumstances.first.address != nil
+			circumstance_address=current_user.circumstances.first.address.truncate(30,:separator=>"",:omission=>"...")
+		else 
+			circumstance_address=t('no_address_provided')
+		end
+		
+		if current_user.circumstances.first.educational_level != nil
+			circumstance_educational_level=current_user.circumstances.first.educational_level.name.truncate(30,:separator=>"",:omission=>"...")
+		else 
+			circumstance_educational_level=t('no_educational_level_provided')
+		end
+		
+		if current_user.circumstances.first.subject != nil
+			circumstance_subject=current_user.circumstances.first.subject.name.truncate(30,:separator=>"",:omission=>"...")
+		else 
+			circumstance_subject=t('no_subject_provided')
+		end
+	end		
+%>	
+
+<header class="z-max" role="top_navigation">
+	<div class="dropdown hamburger" onmouseout="$('.full_hamburger').css('width', '0px')">
+		<div class="dropdown_button" onclick="toggle_full_hamburger(this)">
+			<div class="icon_hamburger">
+			</div>
+		</div>		
+		<div class="full_hamburger" onmouseover="$('.full_hamburger').css('width', '350px')">		
+			<ul>
+				<%= link_to scenarios_path do %>
+				<li>
+					<img src="/images/white_scenario_30.png"></img>
+					<span><%= t('scenarios') %></span>
+				</li>	
+				<% end %>
+				<%= link_to activities_path do %>
+				<li>
+					<img src="/images/white_activity_30.png"></img>
+					<span><%= t('learning_activities') %></span>
+				</li>	
+				<% end %>
+				<%= link_to experiences_path do %>
+				<li>
+					<img src="/images/white_story_30.png"></img>
+					<span><%= t('learning_stories') %></span>
+				</li>	
+				<% end %>
+				
+				<%= link_to groups_path do %>
+				<li>
+					<img src="/images/white_group_30.png"></img>
+					<span><%= t('groups') %></span>
+				</li>	
+				<% end %>
+			</ul>	
+		</div>
+	</div>		
+	<div class="logo">
+		<a href="<%= user_root_path%>">
+			<div class="icon_logo">
+			</div>
+		</a>		
+	</div>	
+	<div class="dropdown menu_item" onmouseleave="hide_dropdown_list(this)">
+		<div class="dropdown_button" onclick="toggle_dropbox_list_visibility(this);">
+			<div class="down">
+				<img src="/images/arrow_down.png"></img>
+			</div>
+			<div class="section_title"><%= t('discover').upcase %></div>
+		</div>
+		<ul class="dropdown_list">
+			<a href="<%= applications_path %>">
+				<li><%= t('applications') %></li>
+			</a>
+			<a href="<%= events_path %>">
+				<li><%= t('events') %></li>
+			</a>
+			<a href="<%= biographies_path %>">
+				<li><%= t('biographies') %></li>				
+			</a>
+			<a href="<%= lectures_path %>">
+				<li><%= t('lectures') %></li>
+			</a>
+			<a href="<%= sites_path %>">
+				<li><%= t('sites') %></li>
+			</a>
+			<a href="<%= documentaries_path %>">
+				<li><%= t('documentaries') %></li>
+			</a>
+			<a href="<%= courses_path %>">
+				<li><%= t('courses') %></li>
+			</a>
+			<a href="<%= articles_path %>">
+				<li><%= t('articles') %></li>			
+			<a href="<%= posts_path %>">
+				<li><%= t('posts') %></li>				
+			</a>
+			<a href="<%= slideshows_path %>">
+				<li><%= t('slideshows') %></li>				
+			</a>
+			<a href="<%= reports_path %>">
+				<li><%= t('reports') %></li>				
+			</a>
+			<a href="<%= lres_path %>">
+				<li><%= t('lres') %></li>				
+			</a>	
+			<a href="<%= klascements_path %>">
+				<li><%= t('klascement') %></li>				
+			</a>
+			<a href="<%= widgets_path %>">
+				<li><%= t('widgets') %></li>				
+			</a>	
+			<a href="<%= widgets_path %>">
+				<li><%= t('artworks') %></li>				
+			</a>																							
+		</ul>	
+	</div>
+	<div class="dropdown menu_item" onmouseleave="hide_dropdown_list(this)">
+		<div class="dropdown_button" onclick="toggle_dropbox_list_visibility(this);">
+			<div class="down">
+				<img src="/images/arrow_down.png"></img>
+			</div>
+			<div class="section_title"><%= t('create').upcase %></div>
+		</div>
+		<ul class="dropdown_list">
+			<a href="<%= new_scenario_path %>">
+				<li><%= t('scenario') %></li>
+			</a>
+			<a href="<%= new_activity_path %>">	
+				<li><%= t('learning_activity')%></li>
+			</a>
+			<a href="<%= new_experience_path %>">
+				<li><%= t('learning_story') %></li>
+			</a>	
+		</ul>	
+	</div>	
+	<div class="dropdown menu_profile">
+		<div class="dropdown_button" onclick="toggle_full_me_and_circumstance(this);">
+			<div class="down">
+				<img src="/images/arrow_down.png"></img>
+			</div>
+			<div class="me_and_circumstance">
+				<div class="me"><%= current_user_display %></div>
+				<div class="circumstance"><%= circumstance_name %></div>
+			</div>	
+			<div class="profile_picture">
+				<%= image_tag(current_user.avatar.url(:thumb)) %>			
+			</div>	
+		</div>
+		<div class="full_me_and_circumstance">
+			<div class="full_circumstance">
+				<div class="full_circumstance_header"><%= circumstance_name %></div>	
+				<div class="full_circumstance_body">
+					<ul>
+						<li>
+							<img src="/images/black_school_30.png"></img>
+							<span><%= circumstance_address %></span>
+						</li>
+						<li>
+							<img src="/images/black_classroom_30.png"></img>							
+							<span><%= circumstance_classroom %></span>
+						</li>	
+						<li>
+							<img src="/images/black_class_30.png"></img>
+							<span><%= circumstance_educational_level %></span>
+						</li>	
+						<li>
+							<img src="/images/black_subject_30.png"></img>
+							<span><%= circumstance_subject %></span>
+						</li>	
+					</ul>
+				</div>
+				<%= link_to edit_user_path(current_user) do %>	
+					<div class="edit_circumstance"><%= t('edit_context') %></div>
+				<% end %>	
+			</div>	
+			<div class="full_me">
+				<div class="full_me_header"><%= current_user_display %></div>
+				<div class="full_me_body">
+					<ul>
+						<%= link_to bookmarks_path do %> 
+						<li>
+							<span><%= t('bookmarked_items') %></span>
+							<img src="/images/bookmark.png"></img>
+						</li>
+						<% end %>
+						<%= link_to created_elements_path do %> 
+						<li>
+							<span><%= t('created_by_me') %></span>
+							<img src="/images/black_author_30.png"></img>
+						</li>
+						<% end %>
+						<%= link_to my_groups_path do %>
+						<li>
+							<span><%= t('my_groups') %></span>
+							<img src="/images/black_group_30.png"></img>
+						</li>
+						<% end %>
+						<%= link_to destroy_user_session_path, :method => :delete do %>
+						<li>
+							<span><%= t('logout') %></span>
+							<img src="/images/black_logout_30.png"></img>
+						</li>
+						<% end %>
+					</ul>	
+				</div>
+				<%= link_to edit_user_path(current_user) do %>
+					<div class="edit_me"><%= t('edit_profile') %></div>
+				<% end %>	
+			</div>	
+		</div>	
+	</div>	
+</header>
+
+

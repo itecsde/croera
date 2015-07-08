@@ -1,0 +1,14 @@
+<% related_type_text = "related_" + Util.get_resource_plural(related_type) %>
+	
+<div class="prompt">
+	<img src="/images/black_<%= related_type.downcase %>_100.png" width="30px" height="30px"/>
+	<span class="related_title"><%= t(related_type_text) %></span>
+	<%= link_to_next_page related_elements, image_tag("/images/arrow_right.png") ,:remote => true, :params => {:controller => "search_results",:action => "load_more_related_elements",:id => element_id, :element_type => element_type, :related_type => related_type} %>
+	<%= link_to_previous_page related_elements, image_tag("/images/arrow_left.png") ,:remote => true, :params => {:controller => "search_results",:action => "load_more_related_elements",:id => element_id, :element_type => element_type, :related_type => related_type} %>
+	<a href="<%= all_related_elements_path(:element_id => element_id,:element_type => element_type,:related_type => related_type,:title => related_type_text) %>" class="view_all"><%= t("view_all") %></a>
+</div>
+<div class="body">
+	<% related_elements.each do |element| %>
+		<%= render :partial => "elements/miniature_with_source", :locals => {:element => element, :current_layout => ""} %>			 				
+	<% end %>										
+</div>

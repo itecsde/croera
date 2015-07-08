@@ -1,0 +1,254 @@
+<% if @event.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(@event.errors.count, "error") %> prohibited this event from being saved:</h2>	
+	  <ul>
+	  <% @event.errors.full_messages.each do |msg| %>
+	    <li><%= msg %></li>
+	  <% end %>
+	  </ul>
+	</div>
+<% end %>
+
+
+<!------------ Left column ------------------>
+<div class="left_column">
+	<div class="event_name field_body">
+		<% if @edition_mode==true %>
+			<textarea id="event_name" name="event[name]" placeholder="<%= t("title") %>"><%= @event.name %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<span><%= @event.name %></span>
+		<% end %>
+	</div>
+	
+		
+	<div class="event_description description field_body">
+		<% if @edition_mode==true %>
+			<textarea id="event_description" name="event[description]" placeholder="<%= t("description") %>"><%= @event.description %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else %>
+			<div>
+				<% if @event.description != nil %>			
+					<%= raw @event.description.truncate(1000, :separator => " ", :omission => "...") %>
+				<% end %>					
+			</div>
+		<% end %>
+	</div>
+	
+	
+	<div class="event_tags element_field_box">
+		<div class="field_prompt"><%= t("keywords") %></div>
+		<div class="field_body">			
+			<% if @edition_mode==true %>    
+		    	<textarea id="event_tags" class="tags" name="event[tag_list]"><% if @event!=nil %><%= @event.tag_list %><% end %></textarea>
+		    	<i class="icon-pencil icon-grey"></i>
+		    <% else %>
+		    	<span class="tags"><% if @event!=nil %><%= @event.tag_list_with_links.html_safe %><% end %></span>	
+		    <% end %>														
+		</div>
+	</div>		
+	
+	
+	<div class="event_data_range element_field_box">
+		<div class="start_date">
+			<div class="field_prompt"><%= t("start_date") %></div>
+			<div class="field_body">
+				<% if @edition_mode==true %>    
+			    	<%= event_form.text_field :start_date %>			    	
+			    <% else %>
+			    	<% if @event.start_date!=nil && @event.start_date!="" %>
+			    		<span><%= @event.start_date %></span>
+			    	<% else %>
+			    		<span style="margin-left: 25px;">-</span>
+			    	<% end %>
+			    <% end %>
+		   </div>
+		</div>
+		<div class="end_date">
+			<div class="field_prompt"><%= t("end_date") %></div>
+			<div class="field_body">
+				<% if @edition_mode==true %>    
+			    	<%= event_form.text_field :end_date %>			    	
+			    <% else %>
+			    	<% if @event.start_date!=nil && @event.start_date!="" %>
+			    		<span><%= @event.end_date %></span>
+			    	<% else %>
+			    		<span style="margin-left: 25px;">-</span>
+			    	<% end %>
+			    <% end %>
+		   </div>			
+		</div>
+	</div> 
+	<div class="clear"></div>
+	
+	
+	<div class="event_url element_field_box">
+		<div class="field_prompt"><%= t("url") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>    
+		    	<%= event_form.text_field :url %>
+		    	<i class="icon-pencil icon-grey"></i>			    	
+		    <% else %>
+		    	<a href="<%= @event.url %>" target="_blank"><%= @event.url %></a>
+		    <% end %>
+	   </div>		
+	</div>
+	
+	
+	<% if @edition_mode==true or @event.event_subject_annotations.size > 0%>
+		<div class="event_subjects element_field_box">
+			<div class="field_prompt"><%= t("subjects") %></div>
+			<div class="field_body">
+				<% @event.event_subject_annotations.each do |annotation| %>
+					<div class="subject_item">
+						<% if @edition_mode==true %>
+							<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name", annotation.subject.id), :prompt => "", :class => "subject" %>
+							<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+						<% else %>
+							<span><%= annotation.subject.name %></span>	
+						<% end %>
+					</div>
+				<% end %>			
+			</div>
+			<% if @edition_mode==true %>
+				<div class="add_item_to_itemize" onclick="add_subject(this);">
+					<span>+</span>
+				</div>
+			<% end %>		
+		</div>
+	<% end %>
+				
+	
+	<% if @edition_mode==true or (@event.age_range != nil && @event.age_range != "") %>
+		<div class="event_age_range element_field_box">
+			<div class="field_prompt"><%= t("age_range") %></div>
+			<div class="field_body">
+				<div class="age_rage_field">
+					<% if @edition_mode==true %>
+						<% if @event.age_range != nil && @event.age_range != "" %>
+							<input type="hidden" id="age_range" value="<%= @event.age_range %>" />
+						<% else %>
+							<input type="hidden" id="age_range" value="" />
+						<% end %>				
+				    	<%= event_form.text_field :age_range, :readonly => "readonly"%>
+				    <% else %>
+				    	<%= @event.age_range %>
+				    <% end %>
+				</div>
+				<% if @edition_mode==true %>		   
+		    		<div id="slider-range">	    		
+		    		</div>
+		    	<% end %>	    				
+			</div>
+		</div>
+	<% end %>
+		
+	<% if @edition_mode==true or @event.education_level != nil %>	
+		<div class="event_age_range element_field_box">
+			<div class="field_prompt"><%= t("education_level") %></div>
+			<div class="field_body">
+				<% if @edition_mode==true %>  			
+					<%= event_form.select :education_level_id, options_from_collection_for_select(@education_levels, "id", "name", @event.education_level_id), :prompt => "", :class => "edition_control education_level"%>
+				<% else %>
+					<% if @event.education_level!=nil %>	
+						<%= @event.education_level.name %>
+					<%end %>				
+				<% end %>	
+			</div>
+		</div>
+	<% end %>
+	
+	<% if @edition_mode==true or @event.contextual_language != nil %>		
+		<div class="event_age_range element_field_box">
+			<div class="field_prompt"><%= t("language") %></div>
+			<div class="field_body">
+				<% if @edition_mode==true %>
+					<%= event_form.select :contextual_language_id, options_from_collection_for_select(@languages, "id", "name", @event.contextual_language_id), :prompt => "", :class => "edition_control language" %>    
+				<% else %>	
+					<% if @event.contextual_language!=nil %>	
+						<%= @event.contextual_language.name %>
+					<% end %>
+				<% end %>		
+			</div>
+		</div>
+	<% end %>
+	
+	
+	<% if @edition_mode!=true && @event.scraped_from!=nil && @event.scraped_from!="" %>  
+		<div class="event_scraped_from element_field_box">
+			<div class="field_prompt"><%= t("source") %></div>
+			<div class="field_body">
+				<a href="<%= @event.scraped_from %>" target="_blank"><%= @event.scraped_from %></a>
+			</div>
+		</div>
+	<% end %>
+			
+</div>
+
+
+
+<!------------- Right column ---------------->
+<div class="right_column">
+	<% if @edition_mode == false && @popup == nil %>	
+		<div class="watermark_container_show">
+			<div class="watermark_show <%=@resource_type.downcase%>_watermark"></div>
+		</div>
+	<% end %>
+	
+	<div class="element_image_box picture_container">
+		<% if @edition_mode==true %>	
+			<span class="change_element_image has_edition_controls active" onclick= "select_element_image_new(this);"><%= t('change_image') %></span>		
+			<% if @event.element_image.url() != "none" %>
+				<%= image_tag @event.element_image.url(:medium), width:'100%', :class => "image_preview" %>
+			<% else %>
+				<%= image_tag "/images/watermarks/b_watermark_event.png", width:'100%', :class => "image_preview" %>
+			<% end %>
+			<div class= "file_upload">
+				<%= event_form.file_field :element_image, :onchange => "image_preview_new(this, event);", :class =>"input_element_image" %>
+			</div>
+		<% else %>
+			<% if @event.element_image.url() != "none" %>
+				<%= image_tag @event.element_image.url(:medium), width:'100%', :class => "image_preview_show" %>
+			<% else %>
+				<%= image_tag "/images/no_photo.png", width:'100%', :class => "image_preview_show" %>
+			<% end %>
+		<% end %>
+	</div>
+	
+	
+	<% if @edition_mode==true %>
+		<div class="event_address element_field_box field editable active">
+	<% else %>
+		<div class="event_address element_field_box">
+	<% end %>
+		<div class="field_prompt"><%= t("address") %></div>
+		<div class="field_body">
+			<% if @edition_mode==true %>
+				<%= event_form.text_field :address,  :onChange => "change_location_written();",:onkeypress => "return press_key(event)" %>
+			<% else %>
+				<%= event_form.text_field :address, :readonly=>"readonly" %>
+			<% end %>
+			<%= event_form.hidden_field :latitude %>
+	 		<%= event_form.hidden_field :longitude %>
+		</div>
+	</div>
+	
+	<div class="event_map" id="map-canvas"></div>
+	
+	
+</div>
+
+	
+
+
+
+
+<% if @edition_mode==true %>
+	<div id="snippets_library" style="display: none">
+		<div class="subject_item">				
+			<%= select_tag "subject", options_from_collection_for_select(@subjects, "id", "name"), :prompt => "", :class => "subject" %>
+			<span class="delete_subject"  onClick="delete_subject(this);">X</span>
+		</div>
+	</div>
+<% end %>
+

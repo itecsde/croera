@@ -1,0 +1,183 @@
+<% content_for :head do %>
+	<%= render :partial => "header/header", :locals => {:element_active => 'administration', :current_layout => "search"} %>
+	<%= render :partial => "header/subheader", :locals => {:section_title => 'administration', :actions => "list_actions"} %>
+<% end %>
+
+
+<% content_for :content do %>
+	<div class="sources_container">				
+			<% if @reports.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>		
+				<div class="prompt"><img src="/images/black_site_100.png" width="50px" height="30px"/><%= t("reports") %></div>			
+				<div><%= t("Add rss Source") %>:<%= form_tag administrations_path, :method => 'get' do %>  
+					<%= text_field_tag :rss_feed, params[:rss_feed],:class => "input_search_bar" %><%= submit_tag "",:type => :image, :src => "/images/black_add_bookmark_30.png" %>  
+				<% end %>
+				</div>
+				<div class="body">
+					<% @reports.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			<div class="clear"></div>									
+			<% if @sites.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>		
+				<div class="prompt"><img src="/images/black_site_100.png" width="50px" height="30px"/><%= t("sites") %></div>
+				<div class="body">
+					<% @sites.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			<div class="clear"></div>
+			
+			<% if @events.size > 0 %>
+			<div class="source_elements_type_box">
+			<% else %>
+			<div class="source_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_event_100.png" width="50px" height="30px"/><%= t("events") %></div>
+				<div class="body">
+					<% @events.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			<div class="clear"></div>
+	
+			<% if @lectures.size > 0 %>
+			<div class="search_elements_type_box">
+			<% else %>
+			<div class="search_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_lecture_100.png" width="50px" height="30px"/><%= t("lectures") %></div>
+				<div class="body">
+					<% @lectures.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			<div class="clear"></div>
+	
+			<% if @documentaries.size > 0 %>
+			<div class="search_elements_type_box">
+			<% else %>
+			<div class="search_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_documentary_100.png" width="50px" height="30px"/><%= t("documentaries") %></div>
+				<div class="body">
+					<% @documentaries.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			
+			<% if @courses.size > 0 %>
+			<div class="search_elements_type_box">
+			<% else %>
+			<div class="search_elements_type_box" style="height:70px;">
+			<% end %>						<div class="prompt"><img src="/images/black_course_100.png" width="50px" height="30px"/><%= t("courses") %></div>
+				<div class="body">
+					<% @courses.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			
+			<% if @articles.size > 0 %>
+			<div class="search_elements_type_box">
+			<% else %>
+			<div class="search_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_article_100.png" width="50px" height="30px"/><%= t("articles") %></div>
+				<div class="body">
+					<% @articles.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			
+			<% if @lres.size > 0 %>
+			<div class="search_elements_type_box">
+			<% else %>
+			<div class="search_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_lre_100.png" width="50px" height="30px"/><%= t("lres") %></div>
+				<div class="body">
+					<% @lres.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			
+			<% if @applications.size > 0 %>
+			<div class="search_elements_type_box">
+			<% else %>
+			<div class="search_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_application_100.png" width="50px" height="30px"/><%= t("applications") %></div>
+				<div class="body">
+					<% @applications.each do |element| %>
+						<%= render :partial => "elements/source", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>			
+
+			<% if @posts.size > 0 %>
+			<div class="search_elements_type_box">
+			<% else %>
+			<div class="search_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_post_100.png" width="50px" height="30px"/><%= t("posts") %></div>
+				<div class="body">
+					<% @posts.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>
+			
+			<% if @slideshows.size > 0 %>
+			<div class="search_elements_type_box">
+			<% else %>
+			<div class="search_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_slideshow_100.png" width="50px" height="30px"/><%= t("slideshows") %></div>
+				<div class="body">
+					<% @slideshows.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>			
+			
+			<% if @biographies.size > 0 %>
+			<div class="search_elements_type_box">
+			<% else %>
+			<div class="search_elements_type_box" style="height:70px;">
+			<% end %>						
+				<div class="prompt"><img src="/images/black_biography_100.png" width="50px" height="30px"/><%= t("biographies") %></div>
+				<div class="body">
+					<% @biographies.each do |element| %>
+						<%= render :partial => "elements/element_fixed", :locals => {:element => element, :current_layout => ""} %>
+					<% end %>
+				</div>
+			</div>						
+			
+			
+		</div>	
+		
+<% end %>
+

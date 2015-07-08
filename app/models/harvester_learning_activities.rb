@@ -1,0 +1,278 @@
+class HarvesterLearningActivities
+   include ActionView::Helpers::SanitizeHelper
+   def harvest_learning_activities
+      begin
+         i=0
+         url = "http://itec-composer.eun.org/composer/activities/public-activities"
+
+         page = Nokogiri::HTML(open(url))
+
+         page.css("div.well").each do |learning_activity|
+            puts i+=1
+            harvest_learning_activity "http://itec-composer.eun.org" +learning_activity.css("div div.ff_view a.view-item-button")[0]['href']
+         end
+
+      rescue Exception => e
+         puts e.message
+         puts e.backtrace.inspect
+         puts "Exception harvest learning activities"
+      end
+   end #harvest learning activities
+
+   def harvest_learning_activity(learning_activity_url,*opcionales)
+      begin
+         sleep 1
+   
+         puts learning_activity_url
+   
+         if opcionales[0]==1
+            reintentos = opcionales[1].to_i
+         else
+            reintentos = 2
+         end
+   
+         learning_activity_html_page = open(learning_activity_url, &:read)
+         learning_activity_page = Nokogiri::HTML(learning_activity_html_page)
+
+         reintentos = 2
+   
+         begin
+            name = learning_activity_page.css("div.resource_image h1")[0].text.strip
+            name = name.gsub("Title","")
+            puts "Name: " + name
+         rescue
+            puts "Exception name harvest_learning_activity"
+         end
+   
+         activity_template = Activity.find(15)
+         if Activity.where(:name => name).size > 0
+            learning_activity = Activity.where(:name => name)[0]
+            learning_activity_id = Activity.where(:name => name)[0].id
+            boxes_size = learning_activity.boxes.size
+         else
+            learning_activity = Activity.new()
+            learning_activity.save
+            learning_activity_id = learning_activity.id
+            boxes_size = learning_activity.boxes.size 
+         end
+         if boxes_size == 0
+            activity_template.boxes.each do |box|
+               box_clone = box.clone_with_associations
+               box_clone.document_id = learning_activity_id
+               learning_activity.boxes << box_clone
+            end
+         end
+   
+         begin
+            description = strip_tags learning_activity_page.css("div.row-fluid div.span12")[0].text.strip
+            description = description.gsub("Description","")
+            if description == "" or description == nil
+               description = strip_tags learning_activity_page.css("div.resource_image p.lead")[0].text.strip
+               description = description.gsub("At a Glance","")
+            end
+            puts "Description: " + description
+         rescue
+            puts "Exception description harvest_learning_activity"
+         end
+         
+         learning_activity.boxes.first.components.last.texts.destroy_all
+         learning_activity.boxes.second.components.last.texts.destroy_all
+         learning_activity.boxes[4].components.last.texts.destroy_all
+         learning_activity.boxes[5].components.last.texts.destroy_all
+         learning_activity.boxes[6].components.last.texts.destroy_all
+         learning_activity.boxes[7].components.last.texts.destroy_all
+         learning_activity.boxes.last.components.last.texts.destroy_all
+   
+         #You may look forward to...
+         learning_activity_page.css("div.Form-activity-registration div.row-fluid")[1].css(".span6")[0].css("li").each do |li,index|
+            text = Text.create(
+               content: li.text.strip,
+               position: index
+               )
+            learning_activity.boxes.first.components.last.texts << text  
+         end
+   
+         #Your students may learn to...
+         learning_activity_page.css("div.Form-activity-registration div.row-fluid")[1].css(".span6")[1].css("li").each do |li,index|
+            text = Text.create(
+               content: li.text.strip,
+               position: index
+               )
+            learning_activity.boxes.second.components.last.texts << text  
+         end
+         
+         #1. Prepare / Listen
+         if learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[0].css(".span6")[0].css("li").size != 0
+            learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[0].css(".span6")[0].css("li").each do |li,index|
+               text = Text.create(
+                  content: li.text.strip,
+                  position: index
+                  )
+               learning_activity.boxes[4].components.last.texts << text  
+            end
+         elsif learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[0].css(".span6")[0].css("p").size != 0
+            learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[0].css(".span6")[0].css("p").each do |p,index|
+               text = Text.create(
+                  content: p.text.strip,
+                  position: index
+                  )
+               learning_activity.boxes[4].components.last.texts << text  
+            end
+         elsif !learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[0].css(".span6")[0].css(".pretty_value_label.guidelines_preparation").empty?
+            prepare_listen_text = learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[0].css(".span6")[0].css(".pretty_value_label.guidelines_preparation")[0].next.text
+            text = Text.create(
+               content: prepare_listen_text,
+               position: 0
+               )
+            learning_activity.boxes[4].components.last.texts << text               
+         end
+         
+         #2. Inspire
+         if learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[0].css(".span6")[1].css("li").size != 0      
+            learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[0].css(".span6")[1].css("li").each do |li,index|
+               text = Text.create(
+                  content: li.text.strip,
+                  position: index
+                  )
+               learning_activity.boxes[5].components.last.texts << text  
+            end
+         elsif learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[0].css(".span6")[1].css("p").size != 0
+            learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[0].css(".span6")[1].css("p").each do |p,index|
+               text = Text.create(
+                  content: p.text.strip,
+                  position: index
+                  )
+               learning_activity.boxes[5].components.last.texts << text  
+            end
+         elsif !learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[0].css(".span6")[1].css(".pretty_value_label.guidelines_introduction").empty?
+            inspire_text = learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[0].css(".span6")[1].css(".pretty_value_label.guidelines_introduction")[0].next.text
+            text = Text.create(
+               content: inspire_text,
+               position: 0
+               )
+            learning_activity.boxes[5].components.last.texts << text               
+         end          
+   
+         #3. Coach / Question / Support
+         if learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[1].css(".span6")[0].css("li").size != 0
+            learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[1].css(".span6")[0].css("li").each do |li,index|
+               text = Text.create(
+                  content: li.text.strip,
+                  position: index
+                  )
+               learning_activity.boxes[6].components.last.texts << text  
+            end
+         elsif learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[1].css(".span6")[0].css("p").size != 0
+            learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[1].css(".span6")[0].css("p").each do |p,index|
+               text = Text.create(
+                  content: p.text.strip,
+                  position: index
+                  )
+               learning_activity.boxes[6].components.last.texts << text  
+            end
+         elsif !learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[1].css(".span6")[0].css(".pretty_value_label.guidelines_activity").empty?
+            coach_question_support_text = learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[1].css(".span6")[0].css(".pretty_value_label.guidelines_activity")[0].next.text
+            text = Text.create(
+               content: coach_question_support_text,
+               position: 0
+               )
+            learning_activity.boxes[6].components.last.texts << text               
+         end
+         
+         #4. Assess
+         if learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[1].css(".span6")[1].css("li").size != 0
+            learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[1].css(".span6")[1].css("li").each do |li,index|
+               text = Text.create(
+                  content: li.text.strip,
+                  position: index
+                  )
+               learning_activity.boxes[7].components.last.texts << text  
+            end
+         elsif learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[1].css(".span6")[1].css("p").size != 0
+            learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[1].css(".span6")[1].css("p").each do |p,index|
+               text = Text.create(
+                  content: p.text.strip,
+                  position: index
+                  )
+               learning_activity.boxes[7].components.last.texts << text  
+            end
+         elsif !learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[1].css(".span6")[1].css(".pretty_value_label.guidelines_assessment").empty?
+            assess_text = learning_activity_page.css("div.Form-activity-registration .well .row-fluid")[1].css(".span6")[1].css(".pretty_value_label.guidelines_assessment")[0].next.text
+            text = Text.create(
+               content: assess_text,
+               position: 0
+               )
+            learning_activity.boxes[7].components.last.texts << text               
+         end
+   
+         #Ideas for using technology
+         if learning_activity_page.css("div.Form-activity-registration div.row-fluid")[2].css(".span12")[0].css("li").size != 0
+            learning_activity_page.css("div.Form-activity-registration div.row-fluid")[2].css(".span12")[0].css("li").each do |li,index|
+               text = Text.create(
+                  content: li.text.strip,
+                  position: index
+                  )
+               learning_activity.boxes.last.components.last.texts << text  
+            end
+         elsif learning_activity_page.css("div.Form-activity-registration div.row-fluid")[2].css(".span12")[0].css("p").size != 0
+            learning_activity_page.css("div.Form-activity-registration div.row-fluid")[2].css(".span12")[0].css("p").each do |p,index|
+               if p.text.strip.gsub("/n","").gsub("/t","").gsub("/r","") != ""
+                  text = Text.create(
+                     content: p.text.strip,
+                     position: index
+                     )
+                  learning_activity.boxes.last.components.last.texts << text
+               end  
+            end
+         elsif !learning_activity_page.css("div.Form-activity-registration div.row-fluid")[2].css(".span12 .pretty_value_label.reason_for_technology").empty?
+            technology = learning_activity_page.css("div.Form-activity-registration div.row-fluid")[2].text
+            if technology.include? "Ideas for using technology" 
+               technology = technology.gsub("Ideas for using technology","")
+               technology = technology.strip
+            end
+            text = Text.create(
+               content: technology,
+               position: 0
+               )
+            learning_activity.boxes.last.components.last.texts << text
+         end
+         
+         begin
+            photo_url = learning_activity_page.css("div.resource_image img.image")[0]['src']
+            photo_url = "http://itec-composer.eun.org" + photo_url
+            puts "photo_url: " + photo_url
+         rescue
+            puts "Exception capturando photo harvest_learning_activity"
+            photo_url = nil
+         end
+   
+         if photo_url!=nil
+            begin
+               a = URI.parse(photo_url)
+               learning_activity.element_image=URI.parse(photo_url)
+            rescue
+               puts "harvest_learning_activity:  IMAGEN NO GUARDADA"
+               learning_activity.element_image.clear
+            end
+         end
+   
+         I18n.locale = "en"
+         learning_activity.name = name
+         learning_activity.description = description
+         learning_activity.status = "class"
+         learning_activity.raw_html = learning_activity_html_page
+         learning_activity.persist
+   
+      rescue Exception => e
+         puts "Exception harvest_learning_activity"
+         puts "Reintentamos dos veces, sino saltamos a la siguiente learning activity"
+         puts e.backtrace.inspect
+         puts e.message
+         if reintentos > 0
+            reintentos-=1
+            sleep 2
+            harvest_learning_activity(learning_activity_url,1,reintentos)
+         end
+      end
+   end #harvest_learning_activity
+end

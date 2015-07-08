@@ -1,0 +1,48 @@
+o: ActiveSupport::Cache::Entry	:@compressedF:@expires_in0:@created_atf1430901480.6439674:@value{	I"length:EFiZI"digest;
+F"%0b30de4fb0539bb2d70e4ebace146ed2I"source;
+FI"Z/* line 5, ../../app/assets/stylesheets/contextual_settings.css.scss */
+#content_contextual_setting {
+  background: none repeat scroll 0% 0% #fbfbfb;
+  padding: 186px 26px 26px 26px;
+  overflow: hidden;
+}
+
+/* line 11, ../../app/assets/stylesheets/contextual_settings.css.scss */
+.contextual_setting_title {
+  color: #000000;
+  font-weight: bold;
+  font-size: 30px;
+  font-family: "PT sans";
+  width: auto;
+  float: left;
+  margin-right: 10px;
+}
+
+/* line 21, ../../app/assets/stylesheets/contextual_settings.css.scss */
+input#contextual_setting_name {
+  color: #000000;
+  font-weight: bold;
+  font-size: 30px;
+  font-family: "PT sans";
+  margin-right: 10px;
+  margin-bottom: 10px;
+  border: none;
+}
+
+/* line 31, ../../app/assets/stylesheets/contextual_settings.css.scss */
+textarea.contextual_setting_description {
+  width: 95%;
+  border: none;
+  -webkit-transition: height 0.2s;
+  -moz-transition: height 0.2s;
+  transition: height 0.2s;
+  font-family: "Trebuchet MS", Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #333333;
+  text-align: justify;
+  resize: none;
+}
+;
+FI"_version;
+F"%85cd60333621171d4a8d82dd5aee635a

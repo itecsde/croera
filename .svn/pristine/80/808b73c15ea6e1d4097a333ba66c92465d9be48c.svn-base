@@ -1,0 +1,4 @@
+<%= form_for(@contextual_setting, :html => { :class => "contextual_setting_form" }) do |fo| %>
+	<%= render :partial => "contextual_settings/form" , :locals => {:f => fo} %>
+<% end %>
+<input type="hidden" id="edition_mode" value="off"/>

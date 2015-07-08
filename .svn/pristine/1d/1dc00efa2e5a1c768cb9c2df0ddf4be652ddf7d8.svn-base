@@ -1,0 +1,47 @@
+# encoding: utf-8
+
+require 'capybara/rails'
+require "capybara"
+require "capybara/dsl"
+
+class ScraperImagesBlogs
+  include ActionView::Helpers::SanitizeHelper
+  include Capybara::DSL
+  def scrape_images_blogs
+    begin
+    blogs_without_image = Blog.where(:element_image_file_name => nil)
+    blogs_without_image.each do |blog|
+      blog_page = Nokogiri::HTML(open(blog.scraped_from))
+      image_matches = blog_page.css("img")
+      image_url = first_big_image(blog.scraped_from,image_matches)
+      puts "IMAGE_URL: " + image_url
+    end
+    rescue Exception => e
+      puts "Failed scrape_image_blogs"
+      puts e.message
+      puts e.backtrace.inspect
+    end
+  end
+     
+  def first_big_image(blog_url, image_matches)
+    image_url = nil
+    image_matches.each do |match|
+      dummy_blog = Blog.new
+      # Builds the URL
+      url = match['src']
+      if !match['src'].include? "http://"
+        url = "http://" + URI.parse(blog_url).host + match['src']
+      end
+      # Parses it
+      dummy_blog.element_image = URI.parse(url)
+      # Assigns the return value if the image is bigger than 2k
+      if dummy_blog.element_image.size > 2000
+        image_url = url
+        break
+      end
+    end
+    return image_url
+  end
+  
+  
+end

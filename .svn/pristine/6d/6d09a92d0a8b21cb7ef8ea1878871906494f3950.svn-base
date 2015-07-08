@@ -1,0 +1,39 @@
+
+<% @activities.each do |activity| %>
+	<%= render :partial => "elements/element_fixed", :locals => {:element => activity, :current_layout => current_layout} %>
+<% end %>
+
+<div class="clear"></div>
+<div class= "paginate_controls active">
+	<%= paginate @activities %>
+	<!-- paginate @activities,:remote => true, :param_name => "activities_page"-->	
+</div>
+
+<!-- New activity window -->
+<!--
+<div style="display: none">
+	<div id="activity_template_selector" style="padding: 26px">
+		<div id="selector_header">
+			<div class="selector_box_title">
+				<h1 id="list_title"><%=t :new_activity %></h1>
+			</div>
+			<div class="clear"></div>
+			<hr/>
+		</div>
+		<div class="selector">
+			<div class="content_selectable">
+				<% @templates.each do |template| %>
+					<div class="selectable_box">
+						<div class="selectable_controls">
+							<%= button_to t("select"),{:controller => "activities", :action => "new", :template_id => template.id}, :method => :get %>
+						</div>	
+						<div class="selectable_name"><%=template.name%></div>
+						<div class="selectable_description"><%=template.description %></div>
+					</div>	
+				<% end %>
+			</div>
+		</div>
+	</div>
+</div>
+
+-->

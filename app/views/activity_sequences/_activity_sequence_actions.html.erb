@@ -1,0 +1,29 @@
+<li>
+<% if @previous_action == "list" %>
+	<%=link_to  "javascript: history.back();", :class => "back_icon has_tooltip" do %>
+		 	<img src="/images/white_arrow_left.png" title="Back to home"></img>
+	<% end %>
+<% else %>
+	<%=link_to  activity_sequences_path, :class => "back_icon has_tooltip" do %>
+		 	<img src="/images/white_arrow_left.png" title="Back to home"></img>
+	<% end %>
+<% end %>
+</li>
+
+<% if (@activity_sequence.owner == current_user) or (@activity_sequence.owner_type=="Group" && @activity_sequence.owner.users.exists?(current_user))%>
+	<li>
+	<%=link_to edit_activity_sequence_path(@activity_sequence), :class => "has_tooltip" do %>
+		 <img src="/images/white_edit.png" title="Edit"></img>		
+	<% end %>
+	</li>
+	<li>
+	<%=link_to  @activity_sequence, confirm: t('Are_you_sure'), method: :delete, :class => "has_tooltip" do %>
+		<img src="/images/white_delete.png" title="Delete"></img>
+	<% end %>
+	</li>
+<% end %>
+<li>
+<%=link_to url_for({:action =>'pick_it', :activity_sequence_id => @activity_sequence.id}), :class => "has_tooltip"  do %>
+		<img src="/images/white_create_copy.png" title="Copy"></img>
+<% end %>
+</li>
