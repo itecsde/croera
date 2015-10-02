@@ -21737,3 +21737,171 @@ INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0
 INFO: {add=[Eurovoc 3064]} 0 1
 02-oct-2015 10:47:15 org.apache.solr.core.SolrCore execute
 INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=1 
+02-oct-2015 10:47:17 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3065]} 0 0
+02-oct-2015 10:47:17 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:17 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3066]} 0 0
+02-oct-2015 10:47:17 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:22 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3067]} 0 0
+02-oct-2015 10:47:22 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:24 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3068]} 0 0
+02-oct-2015 10:47:24 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:26 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3069]} 0 0
+02-oct-2015 10:47:26 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:28 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3070]} 0 1
+02-oct-2015 10:47:28 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=1 
+02-oct-2015 10:47:30 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3071]} 0 0
+02-oct-2015 10:47:30 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:32 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3072]} 0 0
+02-oct-2015 10:47:32 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:34 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3073]} 0 0
+02-oct-2015 10:47:34 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:36 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3074]} 0 0
+02-oct-2015 10:47:36 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:38 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3075]} 0 0
+02-oct-2015 10:47:38 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:40 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3076]} 0 0
+02-oct-2015 10:47:40 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:42 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3077]} 0 0
+02-oct-2015 10:47:42 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:44 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3078]} 0 0
+02-oct-2015 10:47:44 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:47 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3079]} 0 0
+02-oct-2015 10:47:47 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:49 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3080]} 0 0
+02-oct-2015 10:47:49 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:51 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3081]} 0 0
+02-oct-2015 10:47:51 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:53 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3082]} 0 1
+02-oct-2015 10:47:53 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=1 
+02-oct-2015 10:47:55 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3083]} 0 0
+02-oct-2015 10:47:55 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:57 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3084]} 0 0
+02-oct-2015 10:47:57 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:47:59 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3085]} 0 0
+02-oct-2015 10:47:59 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:01 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3086]} 0 0
+02-oct-2015 10:48:01 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:03 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3087]} 0 0
+02-oct-2015 10:48:03 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:05 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3088]} 0 0
+02-oct-2015 10:48:05 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:07 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3089]} 0 0
+02-oct-2015 10:48:07 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:09 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3090]} 0 0
+02-oct-2015 10:48:09 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:11 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3091]} 0 0
+02-oct-2015 10:48:11 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:13 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3092]} 0 1
+02-oct-2015 10:48:13 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=1 
+02-oct-2015 10:48:15 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3093]} 0 0
+02-oct-2015 10:48:15 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:17 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3094]} 0 0
+02-oct-2015 10:48:17 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:19 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3095]} 0 0
+02-oct-2015 10:48:19 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:21 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3096]} 0 0
+02-oct-2015 10:48:21 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:23 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3097]} 0 0
+02-oct-2015 10:48:23 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:25 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3098]} 0 1
+02-oct-2015 10:48:25 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=1 
+02-oct-2015 10:48:27 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3099]} 0 1
+02-oct-2015 10:48:27 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=1 
+02-oct-2015 10:48:29 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3100]} 0 0
+02-oct-2015 10:48:29 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:31 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3101]} 0 0
+02-oct-2015 10:48:31 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:33 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3102]} 0 0
+02-oct-2015 10:48:33 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:35 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3103]} 0 0
+02-oct-2015 10:48:35 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:37 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3104]} 0 0
+02-oct-2015 10:48:37 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
+02-oct-2015 10:48:38 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3105]} 0 1
+02-oct-2015 10:48:38 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=1 
+02-oct-2015 10:48:40 org.apache.solr.update.processor.LogUpdateProcessor finish
+INFO: {add=[Eurovoc 3106]} 0 0
+02-oct-2015 10:48:40 org.apache.solr.core.SolrCore execute
+INFO: [] webapp=/solr path=/update params={wt=ruby} status=0 QTime=0 
