@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141202100744) do
+ActiveRecord::Schema.define(:version => 20151001124308) do
 
   create_table "abstract_requirement_functionality_annotations", :force => true do |t|
     t.integer "abstract_requirement_id"
@@ -818,6 +818,14 @@ ActiveRecord::Schema.define(:version => 20141202100744) do
     t.string  "type_category"
   end
 
+  create_table "eurovocs", :force => true do |t|
+    t.integer "eurovoc_id"
+    t.text    "name"
+    t.integer "parent_id"
+    t.string  "type_node"
+    t.string  "ancestry"
+  end
+
   create_table "event_concrete_requirement_event_annotations", :force => true do |t|
     t.integer "event_concrete_requirement_id"
     t.integer "event_id"
@@ -1021,7 +1029,7 @@ ActiveRecord::Schema.define(:version => 20141202100744) do
 
   create_table "groups", :force => true do |t|
     t.string   "name"
-    t.text     "description",                :limit => 255
+    t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "element_image_file_name"

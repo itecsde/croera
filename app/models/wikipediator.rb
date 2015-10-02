@@ -51,6 +51,46 @@ class Wikipediator
     end
   end
   
+  def metamap_it(prose)
+     begin
+        concepts = Array.new
+        #nos dirigimos a la ubicacion de metamap
+        Dir.chdir("/home/marcos/metamap/public_mm")
+        #ejecutamos metamap
+        system 'echo "' + prose + '" |./bin/metamap --XMLf -y> file.xml'
+        
+        xml_file = File.open("file.xml")
+        fread = xml_file.read
+        chunk = fread.split("<?xml version=")
+        
+        File.open('file2.xml',"w") do |f2|
+           f2.puts "<?xml version=" + chunk[1]
+        end
+        
+        xml_page = Nokogiri::XML(open("file2.xml"))               
+        phrase = xml_page.xpath("//MMOs/MMO/Utterances/Utterance/Phrases/Phrase/PhraseText")[0].text
+        number_of_mappings = xml_page.xpath("//MMOs/MMO/Utterances/Utterance/Phrases/Phrase/Mappings")[0]['Count'].to_i
+        mappings = xml_page.xpath("//MMOs/MMO/Utterances/Utterance/Phrases/Phrase/Mappings/Mapping")
+        mappings.first(1).each do |mapping|
+           number_of_candidates = mapping.xpath("//Candidate").size
+           for i in 0..number_of_candidates-1
+              candidate = mapping.xpath("//Candidate")[i]       
+              score = candidate.xpath("//CandidateScore")[i].text.gsub("-","")
+              cui = candidate.xpath("//CandidateCUI")[i].text
+              candidate_matched = candidate.xpath("//CandidateMatched")[i].text
+              candidate_preferred = candidate.xpath("//CandidatePreferred")[i].text
+              concepts << {:candidate_matched => candidate_matched, :candidate_preferred => candidate_preferred, :cui => cui, :score => score}              
+           end
+           return concepts
+        end    
+     rescue Exception => e
+        puts "Exception in metamap_it"
+        puts e.message
+        puts e.backtrace.inspect
+     end
+  end
+  
+  
   def expand_it(annotation_id, wikipedia_article_id, expanded_concepts, wikipediator_ip = nil)
     begin
       if wikipediator_ip == nil

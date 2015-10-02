@@ -38,7 +38,28 @@
 		<% end %>
 	</div>
 	
+			<div class="book_tags element_field_box">
+				<div class="field_prompt"><%= "Keywords" %></div>
+				<div class="documents_tags_field_body">			
+					<% if @edition_mode==true %>    
+				    	<textarea id="document_tags" class="tags" name="document[tag_list]"><% if @document!=nil %><%= @document.document_tag_list %><% end %></textarea>
+				    	<i class="icon-pencil icon-grey"></i>
+				    <% else %>
+				    	<span class="tags"><% if @document!=nil %><%= @document.document_keywords %><% end %></span>	
+				    <% end %>														
+				</div>
+			</div>	
 	
+	
+	<hr>
+	
+	
+
+	
+	
+		
+	
+<!--	
 	<div class="book_tags element_field_box">
 		<div class="field_prompt"><%= "Keywords" %></div>
 		<div class="documents_tags_field_body">			
@@ -50,48 +71,242 @@
 		    <% end %>														
 		</div>
 	</div>			
-	
-	
+-->	
+
+	<% if @document.url.include? "merlot"
+      from_repository = "MERLOT"
+   elsif @document.url.include? "oercommons"
+	  from_repository = "OERCommons"
+   elsif @document.url.include? "cnx"
+	  from_repository = "Open Stax CNX" 
+   end %>	 
+
 	<div class="book_tags element_field_box">
-		<div class="field_prompt"><%= t("classified_in_category") %></div>
+		<div class="field_prompt"><%= "From repository" %></div>
 		<div class="field_body">			
 		<% if @edition_mode==true %>
 			<textarea id="document_name" name="document[name]" placeholder="<%= t("Classified in Category") %>"><%= @document.classified_in_category %></textarea>
 			<i class="icon-pencil icon-grey"></i>
 		<% else 
-		      if params[:repository] == "oercommons"
-				 classified_in_category =  @document.classified_in_category_oercommons
-		      elsif params[:repository] == "merlot"
-		         classified_in_category =  @document.classified_in_category_merlot
-		      elsif params[:repository] == "cnx"
-		         classified_in_category =  @document.classified_in_category_cnx   
-		      elsif params[:repository] == "wikipedia"
-		         classified_in_category =  @document.classified_in_category_wikipedia
-		      end   %>	 	
-			<span><%= classified_in_category %></span>
-			<% classified_in_category_size = classified_in_category.split(",").size %>
+		    repository = params[:repository] %>	 	
+			<span><%= from_repository %></span>
 		<% end %>
 		</div>
 	</div>	
+	 
 	
+	<% if params[:user_id] == nil %>
+	
+	<div class="book_tags element_field_box">
+		<div class="field_prompt"><%= "Originally classified as" %></div>
+		<div class="field_body">			
+		<% if @edition_mode==true %>
+			<textarea id="document_name" name="document[name]" placeholder="<%= t("Classified in Category") %>"><%= @document.classified_in_category %></textarea>
+			<i class="icon-pencil icon-grey"></i>
+		<% else 
+		    original_categories = @document.original_category.split(",")
+		    original_categories = original_categories.collect{|x| x.strip}
+		    original_categories = original_categories.sort 
+		    %>    
+		    <% for i in 0..original_categories.size-1 %> 	
+				<span><%= from_repository.to_s + " > " + original_categories[i].to_s %></span>
+				<br>
+			<% end %>
+		<% end %>
+		</div>
+	</div>		
+	<% end %>
+	
+	
+	<% if params[:user_id] == nil%>
+	
+	<div class="book_tags element_field_box">
+		<div class="field_body">
+			<div class="classification">	
+				<div class="classification_field_prompt"><%= "CROERA classified it as" %></div>		
+				<% if @edition_mode==true %>
+					<textarea id="document_name" name="document[name]" placeholder="<%= t("Classified in Category") %>"><%= @document.classified_in_category %></textarea>
+					<i class="icon-pencil icon-grey"></i>
+				<% else 
+				      if params[:repository] == "oercommons"
+						 classified_in_category =  @document.classified_in_category_oercommons
+				      elsif params[:repository] == "merlot"
+				         classified_in_category =  @document.classified_in_category_merlot
+				      elsif params[:repository] == "cnx"
+				         classified_in_category =  @document.classified_in_category_cnx   
+				      elsif params[:repository] == "wikipedia"
+				         classified_in_category =  @document.classified_in_category_wikipedia
+				      end   %>
+				      
+				      <% classified_in_category = @document.classified_in_category_oercommons
+				      	 classified_in_category = classified_in_category.split(",")
+				         classified_in_category = classified_in_category.sort  %>
+				      	 <% for i in 0..classified_in_category.size-1 %> 	
+							<span><%= "OERCommons" + " > " + classified_in_category[i].to_s %></span>
+							<br>
+						<% end %>	
+						
+				      <% classified_in_category = @document.classified_in_category_merlot
+				      	 classified_in_category = classified_in_category.split(",")
+				         classified_in_category = classified_in_category.sort  %>
+				      	 <% for i in 0..classified_in_category.size-1 %> 	
+							<span><%= "MERLOT" + " > " + classified_in_category[i].to_s %></span>
+							<br>
+						<% end %>	
+						
+						<% classified_in_category = @document.classified_in_category_cnx
+				      	 classified_in_category = classified_in_category.split(",")
+				         classified_in_category = classified_in_category.sort  %>
+				      	 <% for i in 0..classified_in_category.size-1 %> 	
+							<span><%= "Open Stax CNX" + " > " + classified_in_category[i].to_s %></span>
+							<br>
+						<% end %>	
+						
+					<% classified_in_category_size = classified_in_category.split(",").size %>
+				<% end %>
+				<br>
+				
+				<% if false %>				
+					<div class = "classification_correct2">
+				    <% if @document.url.include? "oercommons" 
+				    	  corpus_resource = "oercommons"
+			    	   elsif @document.url.include? "merlot"
+			    		  corpus_resource = "merlot"
+					   elsif @document.url.include? "cnx"
+			    		  corpus_resource = "cnx"    	  
+				       end %>						
+						<%= hidden_field_tag :corpus_taxonomy, params[:repository] %>
+						<%= hidden_field_tag :corpus_resource, corpus_resource %>
+						<% if params[:user_id] == nil
+						   url = "/documents?page=" + params[:page] + "&repository=" + params[:repository] + "&section=" + params[:section]
+						else 
+						   url = "/documents?page=" + params[:page] + "&repository=" + params[:repository] + "&section=" + params[:section] + "&user_id=" + params[:user_id]
+						end
+						puts url
+						   url = URI.encode(url) %> 
+						<%= hidden_field_tag :url, url %>					
+						<%= submit_tag "Send Evaluation" %>
+					</div>
+				<% end %>									
+			</div>
+			<% if false %>
+				<div class="evaluation">	
+					<div class="evaluation_field_prompt"><%= t("is_the_classification_correct") %></div>	      
+			         <% classified_in_category = @document.classified_in_category_oercommons
+			      	 classified_in_category = classified_in_category.split(",")
+			         classified_in_category = classified_in_category.sort  %>
+			      	 <% for i in 0..classified_in_category.size-1 %> 	
+						<input type="radio" name=<%="oercommons_evaluation" + i.to_s%> value= <%="Yes---" + classified_in_category[i].gsub(" ","_")%>> Yes
+						<input type="radio" name=<%="oercommons_evaluation" + i.to_s%> value= <%="No---" + classified_in_category[i].gsub(" ","_")%>> No
+						<input type="radio" name=<%="oercommons_evaluation" + i.to_s%> value= <%="N/A---" + classified_in_category[i].gsub(" ","_")%>> N/A						
+						<br>
+					<% end %>	
+					
+			         <% classified_in_category = @document.classified_in_category_merlot
+			      	 classified_in_category = classified_in_category.split(",")
+			         classified_in_category = classified_in_category.sort  %>
+			      	 <% for i in 0..classified_in_category.size-1 %> 	
+						<input type="radio" name=<%="merlot_evaluation" + i.to_s%> value= <%="Yes---" + classified_in_category[i].gsub(" ","_")%>> Yes
+						<input type="radio" name=<%="merlot_evaluation" + i.to_s%> value= <%="No---" + classified_in_category[i].gsub(" ","_")%>> No
+						<input type="radio" name=<%="merlot_evaluation" + i.to_s%> value= <%="N/A---" + classified_in_category[i].gsub(" ","_")%>> N/A			
+						<br>
+					 <% end %>	
+					
+					 <% classified_in_category = @document.classified_in_category_cnx
+			      	 classified_in_category = classified_in_category.split(",")
+			         classified_in_category = classified_in_category.sort  %>
+			      	 <% for i in 0..classified_in_category.size-1 %> 	
+						<input type="radio" name=<%="cnx_evaluation" + i.to_s%> value= <%="Yes---" + classified_in_category[i].gsub(" ","_")%>> Yes
+						<input type="radio" name=<%="cnx_evaluation" + i.to_s%> value= <%="No---" + classified_in_category[i].gsub(" ","_")%>> No
+						<input type="radio" name=<%="cnx_evaluation" + i.to_s%> value= <%="N/A---" + classified_in_category[i].gsub(" ","_")%>> N/A		
+						<br>
+					 <% end %>
+				</div>
+			<% end %>
+		</div>		
+	</div>	
+	<% end %>
+
+<% if params[:user_id] != nil %>
+
+	<div class="book_tags element_field_box">
+		<div class="categories_selection">
+			<div class="classification_title_field_prompt"> Please, select the most suitable categories for each repository: </div>
+			<br>
+			<div class="oercommons">	
+				<div class="classification_field_prompt"><%= "OERCommons" %></div>		
+				<% oercommons_categories = "Arts, Education, Business, Humanities, Mathematics and Statistics, Physics, Geoscience, Computing and Information, Ecology, Engineering, Science and Technology, Forestry and Agriculture, Space Science, Mathematics, Life Science, Politics, Law, Technology, Social Sciences, Chemistry, History"
+				oercommons_categories_array = oercommons_categories.split(",")
+				oercommons_categories_array = oercommons_categories_array.collect{|x| x.strip}
+				oercommons_categories_array = oercommons_categories_array.sort
+				for i in 0..oercommons_categories_array.size - 1 %>
+				 	<input name=<%="evaluation_oercommons" + i.to_s%> type="checkbox" value=<%=oercommons_categories_array[i].strip.gsub(" ","_")%> /> <%= oercommons_categories_array[i] %>
+					<br>
+				<% end %>
+			</div>
+			<div class="merlot">	
+				<div class="evaluation_field_prompt"><%= "MERLOT" %></div>	      
+				<% merlot_categories = "Academic Support Services, Arts, Business, Education, Humanities, Mathematics and Statistics, Science and Technology, Social Sciences, Workforce Development"
+				merlot_categories_array = merlot_categories.split(",")
+				merlot_categories_array = merlot_categories_array.collect{|x| x.strip}
+				merlot_categories_array = merlot_categories_array.sort
+				for i in 0..merlot_categories_array.size - 1 %>
+					<input  name=<%="evaluation_merlot" + i.to_s%> type="checkbox" value=<%=merlot_categories_array[i].strip.gsub(" ","_")%> /> <%= merlot_categories_array[i] %>
+					<br>
+				<% end %>				
+			</div>
+			<div class="cnx">	
+				<div class="evaluation_field_prompt"><%= "Open Stax CNX" %></div>	            
+				<% cnx_categories = "Arts, Business, Humanities, Mathematics and Statistics, Science and Technology, Social Sciences"
+				cnx_categories_array = cnx_categories.split(",")
+				cnx_categories_array = cnx_categories_array.collect{|x| x.strip}
+				cnx_categories_array = cnx_categories_array.sort
+				for i in 0..cnx_categories_array.size - 1 %>
+					<input name=<%="evaluation_cnx" + i.to_s%> type="checkbox" value=<%=cnx_categories_array[i].strip.gsub(" ","_")%> /> <%= cnx_categories_array[i] %>
+					<br>
+				<% end %>				
+			</div>			
+		</div>		
+	</div>		
+	<div class="clear"></div>
+	<br>
+	<div class = "classification_correct2">
+	    <% if @document.url.include? "oercommons" 
+	    	  corpus_resource = "oercommons"
+    	   elsif @document.url.include? "merlot"
+    		  corpus_resource = "merlot"
+		   elsif @document.url.include? "cnx"
+    		  corpus_resource = "cnx"    	  
+	       end %>		
+		<%= hidden_field_tag :corpus_taxonomy, params[:repository] %>
+		<%= hidden_field_tag :corpus_resource, corpus_resource %>
+		<% if params[:user_id] == nil
+		   url = "/documents?page=" + params[:page] + "&repository=" + params[:repository] + "&section=" + params[:section]
+		else 
+		   url = "/documents?page=" + params[:page] + "&repository=" + params[:repository] + "&section=" + params[:section] + "&user_id=" + params[:user_id]
+		end
+		puts url
+		   url = URI.encode(url) %> 
+		<%= hidden_field_tag :url, url %>					
+		<%= submit_tag "Send Evaluation" %>
+	</div>	
+	<% end %>
+	
+
 	<div class="book_url element_field_box">
+		<br>
 		<div class="field_prompt"><%= t("url") %></div>
 		<div class="field_body">
 			<% if @edition_mode==true %>    
 		    	<%= book_form.text_field :url %>
 		    	<i class="icon-pencil icon-grey"></i>			    	
 		    <% else %>
-		    <% if @document.url.include? "oercommons" 
-		    	  corpus_resource = "oercommons"
-	    	   elsif @document.url.include? "merlot"
-	    		  corpus_resource = "merlot"
-			   elsif @document.url.include? "cnx"
-	    		  corpus_resource = "cnx"    	  
-		       end %>
 		    	<a href="<%= @document.url %>" target="_blank"><%= @document.url %></a>
 		    <% end %>
 	   </div>		
 	</div>
+	
+<% if false %>	
 	
 <% if params[:user_id] != nil %>
 	
@@ -145,6 +360,7 @@
 		</div>	
 	</div>		
 	<% end %>
+<% end %>
 </div>
 
 

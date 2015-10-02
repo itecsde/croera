@@ -5,14 +5,14 @@
 #   gem 'sqlite3'
 development:  
   adapter: mysql2
-  #database: itec_sde_db
-  #username: itec_sde_user
-  #password: itec_sde_password
+  database: itec_sde_db
+  username: itec_sde_user
+  password: itec_sde_password
   #database: simplified_wikipedia_spanish_annotations_translated_to_en_th_01
   #database: simplified_oer_aggregator
-  database: simplified_oer_aggregator
-  username: classify_user
-  password: classify_password  
+  #database: simplified_oer_aggregator
+  #username: classify_user
+  #password: classify_password  
   host: localhost
   pool: 50
   encoding: utf8

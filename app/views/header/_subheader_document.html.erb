@@ -1,19 +1,19 @@
 <div class="secondary_navigation">
 	<div class="actions_menu_items">
 		<ul class="action_list">
-			<% if actions != nil %>
-				<%= render actions %>
+			<% if actions != nil %>		
+				<% if params[:user_id] != nil %>
+					<div class="location_menu_item">
+						<a style="color: #FFFFFF;" href="/documents"> Logout </a></font>
+					</div>
+				<% else %>
+					<div class="location_menu_item">
+						<a style="color: #FFFFFF;" href="/participants"> Evaluate it! </a></font>
+					</div>
+				<% end %>			
 			<% end %>		
 		</ul>	
 	</div>
-	<% if params[:user_id] != nil %>
-	<div class="location_menu_item">
-		<a style="color: #FFFFFF;" href="/documents"> Logout </a></font>
-	</div>
-	<% else %>
-	<div class="location_menu_item">
-		<a style="color: #FFFFFF;" href="/participants"> Evaluate it! </a></font>
-	</div>
-	<% end %>
+	
 	</div>	
 </div>

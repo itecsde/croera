@@ -73,7 +73,7 @@
 .documents_tags_field_body {
 	min-height:10px;
 	font-size:13px;	
-	color:#0088cc;
+	color:#000000;
 }
 
 .field_body i{
@@ -173,6 +173,31 @@
 	font-family: "Arial";
 	color:#3B3348;
 }
+
+.element_field_box .classification_field_prompt{
+	font-size:14px;
+	font-weight:bold;
+	font-family: "Arial";
+	color:#3B3348;
+	width: 53%;
+}
+
+.element_field_box .classification_title_field_prompt{
+	font-size:14px;
+	font-weight:bold;
+	font-family: "Arial";
+	color:#3B3348;
+	width: 100%;
+}
+
+.element_field_box .evaluation_field_prompt{
+	font-size:14px;
+	font-weight:bold;
+	font-family: "Arial";
+	color:#3B3348;
+	width: 64%;
+}
+
 
 .element_field_box .field_body span, .element_field_box .field_body input,.element_field_box .field_body textarea{
 	font-size:13px;	
@@ -1477,6 +1502,36 @@
 
 .logout {
 	float: left;
+}
+
+.classification{
+	float:left;
+	width: 50%;
+}
+
+.evaluation{
+	float: right;
+	width: 50%;
+}
+
+.oercommons{
+	float: left;
+	width: 33%;
+}
+
+.categories_selection{
+	float: left;
+	width: 100%;
+}
+
+.merlot{
+	float: left;
+	width: 33%;
+}
+
+.cnx{
+	float: right;
+	width: 33%;
 }
 
 .classification_correct {

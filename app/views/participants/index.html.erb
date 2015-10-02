@@ -1,6 +1,6 @@
 <% content_for :head do %>
 	<%= render :partial => "header/header_document", :locals => {:element_active => 'resources', :current_layout => "application"} %>
-
+	<%= render :partial => "header/subheader_participant", :locals => {:section_title => 'participants', :actions => "participants/participant_actions"} %> 
 <% end %>
 
 

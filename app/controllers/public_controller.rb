@@ -4,7 +4,7 @@ class PublicController < ApplicationController
        redirect_to user_root_path
      end
     if 1
-       redirect_to "/documents"
+       redirect_to "/participants"
     else 
     if ENV['RAILS_ENV'] == "development" 
       if Biography.first != nil         

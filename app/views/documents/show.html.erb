@@ -4,12 +4,15 @@
 
 <% content_for :head do %>
 	<%= render :partial => "header/header_document", :locals => {:element_active => 'resources', :current_layout => "application"} %>
+	<%= render :partial => "header/subheader_participant", :locals => {:section_title => 'participants', :actions => "documents/document_actions"} %> 
+	
 <% end %>
 
 <% content_for :content do %>
 
 	<% if current_user != nil%>
 		<%= render :partial => "generic_partials/header_show_resource", :locals => {:element => @document} %>	
+		
 	<% end %>
 	
 	<% if params[:user_id] == nil 	
@@ -20,7 +23,7 @@
     
     url = URI.encode(url) %> 
 	
-	<center><a href="<%= url %>"> <div class="icon_logo_back_documents"></div> </a></center>
+	<!-- <center><a href="<%= url %>"> <div class="icon_logo_back_documents"></div> </a></center> -->
 	<br>
 	
 	<div id="content_container" class="book_container">

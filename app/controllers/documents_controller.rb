@@ -233,35 +233,93 @@ class DocumentsController < ApplicationController
   
   
   def update
-     puts params
-    evaluations_size = 0
-       
+    puts params
+    oercommons_evaluations_size = 0
+    merlot_evaluations_size = 0
+    cnx_evaluations_size = 0   
     corpus_taxonomy = params[:corpus_taxonomy]
     corpus_resource = params[:corpus_resource]
     user_id = params[:url].split("&user_id=")[1]
     @document = Document.find(params[:id])
     
     params.each do |param|
-       if param[0].include? "evaluation"
-          evaluations_size+=1
-       end
+       if param[0].include? "evaluation_oercommons"
+          oercommons_evaluations_size+=1
+       elsif param[0].include? "evaluation_merlot"
+          merlot_evaluations_size+=1
+       elsif param[0].include? "evaluation_cnx"
+          cnx_evaluations_size+=1          
+      end
     end
     
-    for i in 0..evaluations_size - 1
-      puts params["evaluation"+ i.to_s]
-      new_evaluation = Evaluation.new
-      new_evaluation.document_id = params[:id]
-      evaluation = params["evaluation" + i.to_s]
-      category = evaluation.split("---")[1]
-      evaluation = evaluation.split("---")[0]
-      new_evaluation.evaluation = evaluation
-      new_evaluation.category = category.gsub("_"," ")
-      new_evaluation.corpus_taxonomy = corpus_taxonomy
-      new_evaluation.corpus_resource = corpus_resource
-      new_evaluation.participant_id = user_id
-      new_evaluation.save      
+    params.each do |param|
+       if param[0].include? "evaluation_oercommons" or param[0].include? "evaluation_merlot" or param[0].include? "evaluation_cnx"
+          new_evaluation = Evaluation.new
+          new_evaluation.document_id = params[:id]
+          category = param[1]
+          new_evaluation.category = category.gsub("_"," ")
+          taxonomy = param[0].gsub("evaluation_","")
+          if taxonomy.include? "oercommons"
+             taxonomy = "oercommons"
+          elsif taxonomy.include? "merlot"
+             taxonomy = "merlot"
+          elsif taxonomy.include? "cnx"
+             taxonomy = "cnx"
+          end   
+          new_evaluation.corpus_taxonomy = taxonomy 
+          new_evaluation.corpus_resource = corpus_resource
+          new_evaluation.participant_id = user_id
+          new_evaluation.save   
+       end
     end
 
+    
+    
+    
+    
+=begin     
+    for i in 0..oercommons_evaluations_size - 1
+       new_evaluation = Evaluation.new
+       new_evaluation.document_id = params[:id]
+       evaluation = params["oercommons_evaluation" + i.to_s]
+       category = evaluation.split("---")[1]
+       evaluation = evaluation.split("---")[0]
+       new_evaluation.evaluation = evaluation
+       new_evaluation.category = category.gsub("_"," ")
+       new_evaluation.corpus_taxonomy = "oercommons"
+       new_evaluation.corpus_resource = corpus_resource
+       new_evaluation.participant_id = user_id
+       new_evaluation.save   
+    end
+
+    for i in 0..merlot_evaluations_size - 1
+       new_evaluation = Evaluation.new
+       new_evaluation.document_id = params[:id]
+       evaluation = params["merlot_evaluation" + i.to_s]
+       category = evaluation.split("---")[1]
+       evaluation = evaluation.split("---")[0]
+       new_evaluation.evaluation = evaluation
+       new_evaluation.category = category.gsub("_"," ")
+       new_evaluation.corpus_taxonomy = "merlot"
+       new_evaluation.corpus_resource = corpus_resource
+       new_evaluation.participant_id = user_id
+       new_evaluation.save   
+    end
+    
+    for i in 0..cnx_evaluations_size - 1
+       new_evaluation = Evaluation.new
+       new_evaluation.document_id = params[:id]
+       evaluation = params["cnx_evaluation" + i.to_s]
+       category = evaluation.split("---")[1]
+       evaluation = evaluation.split("---")[0]
+       new_evaluation.evaluation = evaluation
+       new_evaluation.category = category.gsub("_"," ")
+       new_evaluation.corpus_taxonomy = "cnx"
+       new_evaluation.corpus_resource = corpus_resource
+       new_evaluation.participant_id = user_id
+       new_evaluation.save   
+    end        
+=end
     
     respond_to do |format|
       if @document.update_attributes(params[:document])         

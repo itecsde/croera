@@ -210,6 +210,18 @@ module Taggable
     end
     return list_tags    
   end
+  
+  def document_keywords
+    list_tags = ""
+    self.annotations.map {|annotation| annotation}.each do |tag|        
+      if list_tags.size > 0 && tag != nil
+        list_tags += ", " + tag.name 
+      elsif tag != nil
+        list_tags += tag.name
+      end        
+    end
+    return list_tags    
+  end
     
   
   def refresh_automatic_semantic_annotations    
@@ -477,6 +489,35 @@ module Taggable
     end        
   end 
   
+  def add_metamap_annotation(name, cui)
+    begin
+      #if Tag.where("name = '#{name}' collate utf8_bin")[0] != nil
+      if false
+        new_annotation = TaggableTagAnnotation.new
+        new_annotation.taggable = self 
+        new_annotation.tag = Tag.find_by_name(name)
+        new_annotation.type_tag = cui            
+        new_annotation.save
+        Sunspot.commit  
+      else
+        new_tag = Tag.new
+        new_tag.name = name
+        new_tag.save
+        new_annotation = TaggableTagAnnotation.new
+        new_annotation.taggable = self
+        new_annotation.tag = new_tag
+        new_annotation.type_tag = cui            
+        new_annotation.save
+        Sunspot.index new_tag
+        Sunspot.commit
+      end
+    rescue Exception => e
+      puts "EXCEPCION IN ADD_ANNOTATION"
+      puts e.message
+      #puts e.backtrace.inspect
+    end        
+  end   
+  
   def add_expanded_annotation (expanded_from, name, relatedness, type, wikitopic_id)
     begin
       if Tag.find_by_name(name) != nil
@@ -514,6 +555,36 @@ module Taggable
       puts e.message
     end        
   end   
+  
+  def extract_metamap_topics (prose)
+     begin
+        
+        wikipediator = Wikipediator.new
+        array = Array.new
+        
+        metamap_topics =  wikipediator.metamap_it(prose)
+        
+        metamap_topics.each do |metamap_topic|
+           add_metamap_annotation(metamap_topic[:candidate_matched], metamap_topic[:cui])
+           puts metamap_topic[:candidate_matched]
+           puts metamap_topic[:candidate_preferred]
+           puts metamap_topic[:cui]
+           array << metamap_topic[:candidate_preferred]
+        end
+          
+        puts metamap_topics.size.to_s + " topics"
+        
+        unique = array.uniq
+        
+        puts unique.size.to_s  + " unique topics"
+        
+        return metamap_topics            
+     rescue Exception => e
+        puts "Exception extract_metamap_topics"
+        puts e.message
+        puts e.backtrace.inspect
+     end
+  end
   
   
   def extract_wikitopics (name, description, manual_tags, wikipediator_ip = nil)

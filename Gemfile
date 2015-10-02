@@ -45,6 +45,8 @@ gem 'amazon-ecs', '~> 2.2.5'
 gem 'carmen-rails', '~> 1.0.0'
 gem 'cities', '~> 0.3.1'
 gem 'i18n', github: 'svenfuchs/i18n'
+gem 'ancestry'
+gem 'awesome_nested_set'
 
 #gem "sorcery"
 #gem 'stemmer', '~> 1.0.1'

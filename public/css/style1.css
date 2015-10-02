@@ -3626,7 +3626,7 @@ span.extract_name{
 }
 
 input[type=checkbox] {
-	visibility: hidden;
+	/*visibility: hidden;*/
 }
 
 .slideThree {

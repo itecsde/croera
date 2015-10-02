@@ -112,10 +112,13 @@
 			      end 			      
 			      %>
 		    	
-		    	<% if classified_in_category != nil %>
+		    	<% if params[:user_id] == nil %>
 		    	
-		    	<div class= "extract_categories"> <b>Categories:</b>  <%= raw classified_in_category.gsub(",",", ").truncate(70, :separator => " ", :omission => "...") %></div>
-		    		
+			    	<% if classified_in_category != nil %>
+			    	
+			    	<div class= "extract_categories"> <b>Categories:</b>  <%= raw classified_in_category.gsub(",",", ").truncate(70, :separator => " ", :omission => "...") %></div>
+			    		
+			    	<% end %>	    	
 		    	<% end %>	    	
 		    	
 		    	</div>
